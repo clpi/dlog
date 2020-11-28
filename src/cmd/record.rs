@@ -1,33 +1,49 @@
-use colored::Colorize;
+use colored::{Color, Colorize};
 use pico_args::Arguments;
+use crate::cmd::SubCommand;
 
-pub struct RecordCmd {
-
+#[derive(Debug,)]
+pub struct Record {
+    key: String,
 }
 
-impl RecordCmd {
+impl Record {
 
-    pub fn new(name: String, args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog record automatic new".bright_cyan());
-        println!("{}", format!("R: {:#?}", name).bright_cyan());
-        println!("{:#?}", args);
-        Ok(())
+    pub fn self_sans_key() -> Self {
+        Self { key: "Uncategorized".into() }
     }
 
-    pub fn parse(args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog record".bright_cyan());
-        println!("{:#?}", args);
-        Ok(())
+    pub fn init(key: String) -> Self {
+        Self { key }
     }
 }
 
-impl Default for RecordCmd {
+impl SubCommand for Record {
+
+    fn new(key: String) -> Self {
+        Self { key }
+    }
+
+    fn insert(key: String, val: String) -> Result<Self, pico_args::Error> {
+        Ok(Self::default())
+    }
+
+    fn color() -> Color { Color::BrightCyan }
+
+    fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+        println!("{}", format!("R: {:#?}", key).color(Record::color()));
+        println!("{:#?}", args);
+        Ok(Self { key })
+    }
+}
+
+impl Default for Record {
     fn default() -> Self {
-        Self {}
+        Self::prompt_key().unwrap()
     }
 }
 
-impl ToString for RecordCmd {
+impl ToString for Record {
     fn to_string(&self) -> String {
         "record".to_string()
     }

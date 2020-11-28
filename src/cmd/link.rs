@@ -1,20 +1,14 @@
+
 use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
 
-#[derive(Debug,)]
-pub struct Config {
+#[derive(Debug)]
+pub struct Link {
     key: String,
 }
 
-impl Config {
-
-    pub fn init(key: String) -> Self {
-        Self { key }
-    }
-}
-
-impl SubCommand for Config {
+impl SubCommand for Link {
 
     fn new(key: String) -> Self {
         Self { key }
@@ -24,26 +18,29 @@ impl SubCommand for Config {
         Ok(Self::default())
     }
 
-    fn color() -> Color { Color::BrightBlue }
+    fn color() -> Color { Color::BrightYellow }
 
     fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         if args.clone().free()?.is_empty() {
-            return Self::init(key).prompt_value();
+            return Self::new(key).prompt_value();
         }
-        println!("{}", format!("C: {:#?}", key).color(Config::color()));
+        println!("{}", format!("L: {:#?}", key).color(Link::color()));
         println!("{:#?}", args);
         Ok(Self { key })
     }
+
 }
 
-impl Default for Config {
+impl Default for Link {
     fn default() -> Self {
         Self::prompt_key().unwrap()
     }
 }
 
-impl ToString for Config {
+impl ToString for Link {
     fn to_string(&self) -> String {
-        "item".to_string()
+        "link".to_string()
     }
 }
+
+

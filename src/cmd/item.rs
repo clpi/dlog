@@ -1,30 +1,48 @@
-use colored::Colorize;
+use colored::{Color, Colorize};
 use pico_args::Arguments;
-pub struct ItemCmd {}
+use crate::cmd::SubCommand;
 
-impl ItemCmd {
+#[derive(Debug,)]
+pub struct Item {
+    key: String
+}
 
-    pub fn new(name: String, args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog item new".bright_red());
-        println!("{}", format!("I: {:#?}", name).bright_cyan());
-        println!("{:#?}", args);
-        Ok(())
-    }
+impl Item {
 
-    pub fn parse(args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog item".bright_red());
-        println!("{:#?}", args);
-        Ok(())
+    pub fn init(key: String) -> Self {
+        Self { key }
     }
 }
 
-impl Default for ItemCmd {
+impl SubCommand for Item {
+
+    fn new(key: String) -> Self {
+        Self { key }
+    }
+
+    fn insert(key: String, val: String) -> Result<Self, pico_args::Error> {
+        Ok(Self::default())
+    }
+
+    fn color() -> Color { Color::BrightRed }
+
+    fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+        if args.clone().free()?.is_empty() {
+            return Self::init(key).prompt_value();
+        }
+        println!("{}", format!("I: {:#?}", key).color(Item::color()));
+        println!("{:#?}", args);
+        Ok(Self { key })
+    }
+}
+
+impl Default for Item {
     fn default() -> Self {
-        Self {}
+        Self::prompt_key().unwrap()
     }
 }
 
-impl ToString for ItemCmd {
+impl ToString for Item {
     fn to_string(&self) -> String {
         "item".to_string()
     }

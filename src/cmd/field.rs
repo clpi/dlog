@@ -1,29 +1,38 @@
-use colored::Colorize;
+use colored::{Color, Colorize};
 use pico_args::Arguments;
-pub struct FieldCmd {}
+use crate::cmd::SubCommand;
 
-impl FieldCmd {
-    pub fn new(name: String, args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog field new".bright_yellow());
-        println!("{}", format!("F: {:#?}", name).bright_yellow());
-        println!("{:#?}", args);
-        Ok(())
+#[derive(Debug,)]
+pub struct Field {
+    key: String,
+}
+
+impl SubCommand for Field {
+
+    fn new(key: String) -> Self {
+        Self { key }
     }
 
-    pub fn parse(args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{}", "dlog field".bright_yellow());
+    fn insert(key: String, val: String) -> Result<Self, pico_args::Error> {
+        Ok(Self::default())
+    }
+
+    fn color() -> Color { Color::BrightBlue }
+
+    fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+        println!("{}", format!("F: {:#?}", key).color(Field::color()));
         println!("{:#?}", args);
-        Ok(())
+        Ok(Self { key} )
     }
 }
 
-impl Default for FieldCmd {
+impl Default for Field {
     fn default() -> Self {
-        Self {}
+        Self::prompt_key().unwrap()
     }
 }
 
-impl ToString for FieldCmd {
+impl ToString for Field {
     fn to_string(&self) -> String {
         "item".to_string()
     }
