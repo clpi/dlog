@@ -2,38 +2,38 @@
 use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
+use chrono::{DateTime, Utc};
 
 #[derive(Debug)]
 pub struct Link {
     key: String,
+    val: Option<String>
 }
 
 impl SubCommand for Link {
 
-    fn new(key: String) -> Self {
-        Self { key }
+    fn cmd_string() -> Vec<&'static str> {
+        vec!["link", "l"]
     }
 
-    fn insert(key: String, val: String) -> Result<Self, pico_args::Error> {
-        Ok(Self::default())
+    fn new(key: String, val: Option<String>) -> Self {
+        Self { key, val}
+    }
+
+    fn insert(&self) -> Result<(), pico_args::Error> {
+        Ok(())
     }
 
     fn color() -> Color { Color::BrightYellow }
-
-    fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
-        if args.clone().free()?.is_empty() {
-            return Self::new(key).prompt_value();
-        }
-        println!("{}", format!("L: {:#?}", key).color(Link::color()));
-        println!("{:#?}", args);
-        Ok(Self { key })
-    }
 
 }
 
 impl Default for Link {
     fn default() -> Self {
-        Self::prompt_key().unwrap()
+        let key = Self::prompt_key().unwrap();
+        let val = Self::new(key.clone(), None).prompt_value().unwrap();
+        let new = Self::new(key, Some(val));
+        new
     }
 }
 
