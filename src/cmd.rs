@@ -5,19 +5,16 @@ pub mod list;
 pub mod config;
 pub mod link;
 
-use colored::{Colorize, Color};
+use colored::{Colorize, Color, Style, Styles};
 use pico_args::Arguments;
-use crate::{
-    cmd::{
+use crate::cmd::{
         record::Record,
         item::Item,
         field::Field,
         list::List,
         config::Config,
         link::Link,
-    },
-    types::DataType,
-};
+    };
 
 #[derive(Debug)]
 pub struct Log {}
@@ -36,6 +33,7 @@ impl Log {
         } else if args.contains(["-v", "--version"]) {
             Self::print_version();
             args.clone().finish()?
+
         } else {
             while let Some(cmd) = args.subcommand()? {
                 match cmd.as_str() {
@@ -48,7 +46,7 @@ impl Log {
                     "new" | "n" => { Self::parse_new(args)?; break },
                     "version" | "v" => { Self::print_version(); break }, // be flag
                     "help" | "h"   => { Self::print_help(cmd.as_str()); break },
-                    _ => {Item::with_args(cmd.clone(), args)?; break},
+                    _ => {Item::with_args(Some(cmd.clone()), args)?; break},
                 };
             };
         }
@@ -85,9 +83,9 @@ impl Log {
         match (args.subcommand()?, args.subcommand()?) {
             (Some(kind), Some(name)) => {
                 match kind.as_str() {
-                    "item" => {Item::with_args(name, args)?;},
-                    "record" => {Record::with_args(name, args)?;},
-                    "field" => {Field::with_args(name, args)?;},
+                    "item" => {Item::with_args(Some(name), args)?;},
+                    "record" => {Record::with_args(Some(name), args)?;},
+                    "field" => {Field::with_args(Some(name), args)?;},
                     _ => (),
                 };
             },
@@ -112,6 +110,14 @@ pub trait SubCommand: ToString + Default {
     fn cmd_string() -> Vec<&'static str>;
 
     fn color() -> Color;
+
+    fn printclr(input: String, bold: bool, italic: bool, blink: bool) {
+        let mut input = input.color(Self::color());
+        if bold { input = input.bold() }
+        if italic { input = input.italic() }
+        if blink { input = input.blink() }
+        println!("{}", input)
+    }
 
     fn new(key: String, val: Option<String>) -> Self;
 
@@ -143,32 +149,50 @@ pub trait SubCommand: ToString + Default {
 
     fn parse(args: &mut Arguments) -> Result<Self, pico_args::Error> {
         if let Some(key) = args.subcommand()? {
-            Ok(Self::with_args(key.clone(), args)?)
+            match key.as_str() {
+                "new" => {Self::with_args(args.subcommand()?, args)?;},
+                "list" =>{ List::kind(Self::cmd_string()[0]); },
+                "help" => {Log::print_help(Self::cmd_string()[0]);},
+                "link" => { Link::with_args(Some(key.clone()), args)?; },
+                _ =>  {},
+            };
+            Ok(Self::with_args(Some(key.clone()), args)?)
         } else {
             Ok(Self::new("".into(), None))
         }
     }
 
-    fn with_args(key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
-        match args.subcommand()? {
-            Some(val) => {
+    fn with_args(mut key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+        match (key, args.subcommand()?) {
+            (Some(mut key), Some(mut val)) => {
+                if Self::cmd_string().contains(&val.as_str()) {
+                    key  = val;
+                    return Self::with_args(Some(key.clone()), args);
+                }
+                if Self::cmd_string().contains(&key.as_str()) {
+                    return Self::with_args(Some(val.clone()), args);
+                }
                 println!("{}", format!("{}: {:?} = {:?}",
                         Self::cmd_string()[0], key, val)
                     .color(Self::color()));
-                println!("{:#?}", args);
                 let new = Self::new(key, Some(val));
                 new.insert()?;
                 Ok(new)
             }
-            None => {
-                println!("{}", format!("{}: {:?}",
-                        Self::cmd_string()[0], key)
+            (Some(mut key), None) => {
+                if Self::cmd_string().contains(&key.as_str()) {
+                    key = Self::prompt_key()?;
+                }
+                let val = Self::new(key.clone(), None).prompt_value()?;
+                println!("{}", format!("{}: {:?} = {}",
+                        Self::cmd_string()[0], key, val.clone())
                     .color(Self::color()));
-                println!("{:#?}", args);
-                 let val = Self::new(key.clone(), None).prompt_value()?;
-                 let new = Self::new(key, Some(val));
-                 new.insert()?;
-                 Ok(new)
+                let new = Self::new(key, Some(val));
+                new.insert()?;
+                Ok(new)
+            }
+            _ => {
+                Ok(Self::default())
             }
         }
     }

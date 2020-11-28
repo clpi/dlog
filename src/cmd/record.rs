@@ -2,8 +2,9 @@ use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
+use crate::cmd::Item;
 
-#[derive(Debug,)]
+#[derive(Debug,Clone)]
 pub struct Record {
     key: String,
     val: Option<String>,
@@ -37,6 +38,42 @@ impl SubCommand for Record {
     }
 
     fn color() -> Color { Color::BrightCyan }
+
+    fn with_args(mut key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+        match (key, args.subcommand()?) {
+            (Some(mut key), Some(mut val)) => {
+                if Self::cmd_string().contains(&val.as_str()) {
+                    key  = val;
+                    return Self::with_args(Some(key.clone()), args);
+                }
+                println!("{}", format!("{}: {:?}, Item: {:?}",
+                        Self::cmd_string()[0], key, val)
+                    .color(Self::color()));
+                let _item = Item::with_args(Some(val.clone()), args)?;
+                let record = Self::new(key, Some(val));
+                record.insert()?;
+                Ok(record)
+            }
+            (Some(mut key), None) => {
+                if Self::cmd_string().contains(&key.as_str()) {
+                    key = Self::prompt_key()?;
+                }
+                let val = Self::new(key.clone(), None).prompt_value()?;
+                println!("{}", format!("{}: {:?}, Field: {}",
+                        Self::cmd_string()[0], key, val.clone())
+                    .color(Self::color()));
+                let _item = Item::with_args(Some(val.clone()), args)?;
+                let record = Self::new(key, Some(val));
+                record.insert()?;
+                Ok(record)
+            }
+            _ => {
+                let record = Self::default();
+                let _field = Item::with_args(record.clone().val, args)?;
+                Ok(record)
+            }
+        }
+    }
 
 }
 

@@ -3,18 +3,13 @@ use pico_args::Arguments;
 use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
 use parse_duration::parse;
-use uom::{ Kind,
-    si::{self, length, time, Unit, Units},
-    str::ParseQuantityError,
-};
-use crate::util::Either;
 
-#[derive(Debug,Clone)]
+#[derive(Debug,)]
 pub struct Field {
     key: String,
     val: String,
     kind: Option<FieldKind>,
-    pub units: Option<UnitKind>,
+    pub units: Option<Units>,
     created: DateTime<Utc>,
 }
 
@@ -27,13 +22,9 @@ impl Field {
 
     pub fn check_units(self, key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         if let Some(units) = args.subcommand()? {
-            println!("{}",format!("Units: {:?} {:?}", key, units)
-                    .color(Self::color()));
             let units = WrittenUOM::new_keyval(
                 key.to_string(), units.to_string()
             );
-        } else {
-            println!("{}",format!("Units: {:?}", key).color(Self::color()));
         }
         Ok(Self::default())
     }
@@ -72,16 +63,15 @@ impl SubCommand for Field {
                 if Self::cmd_string().contains(&key.as_str()) {
                     return Self::with_args(Some(val.clone()), args);
                 }
-                println!("{}", format!("{}: {:?} = {:?}",
-                        Self::cmd_string()[0], key, val)
-                    .color(Self::color()));
                 if let Some(quantity) = args.subcommand()? {
                     let units = Field::new(
                         key.clone(),
-                        Some(val.clone())
-                    ).check_units(quantity, args)?;
-                    let _units = units.units.unwrap();
+                        Some(val)
+                    ).check_units(quantity, args);
                 }
+                println!("{}", format!("{}: {:?} = {:?}",
+                        Self::cmd_string()[0], key, val)
+                    .color(Self::color()));
                 let field= Field::new(key.clone(), Some(val));
                 field.insert()?;
                 Ok(field)
@@ -123,7 +113,7 @@ impl ToString for Field {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum FieldKind {
     String,
     Int,
@@ -138,7 +128,6 @@ impl Default for FieldKind {
     }
 }
 
-#[derive(Debug, Clone)]
 pub struct WrittenUOM {
     input: Option<String>,
     quantity: Option<String>,
@@ -158,29 +147,21 @@ impl WrittenUOM {
     pub fn split_digits_letters(self) -> Self {
         let (mut quant, mut unit)  =
             (String::new(), String::new());
-        for ch in self.input.clone().unwrap().chars().into_iter() {
+        for ch in self.input.unwrap().chars().into_iter() {
             if ch.is_digit(ch as u32) {
                 quant.push(ch);
             } else if ch.is_alphabetic() {
-                &unit.push(ch);
+                unit.push(ch);
             } else {
                 continue
             }
         }
-        Self { quantity: Some(quant.clone()), units: Some(unit.clone()), ..self }
-    }
-
-    pub fn convert_to_uom(self) -> Option<Either<impl si::Unit, impl time::Unit>> {
-        match self.units.unwrap().as_str() {
-            "km" | "kilometers" => Some(Either::A(length::kilometer)),
-            "day" | "d" => Some(Either::B(time::day)),
-            _ => None,
-        }
+        Self { quantity: Some(quant), units: Some(unit), ..self }
     }
 }
 
-#[derive(Debug, Clone)]
-pub enum UnitKind {
+#[derive(Debug)]
+pub enum Units {
     Distance(i32, String),
     Duration(i32, String),
     Instant(i32, String),
@@ -188,9 +169,11 @@ pub enum UnitKind {
     CustomVec(Vec<String>),
 }
 
-impl From<String> for UnitKind {
+impl From<String> for Units {
     fn from(input: String) -> Self {
-        UnitKind::CustomVec(Vec::new())
+        match input.as_str() {
+            ""
+        }
     }
 }
 

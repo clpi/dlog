@@ -11,12 +11,15 @@ pico-args = "*"
 log = "*"
 colored = "*"
 dirs-next = "*"
-uom = "*"
+uom = {version="*", features=[]}
 serde = { version = "*", features = ["derive"] }
 parse_duration = "*" # 9kb
 comfy-table = "*"
-chrono = "*"
+chrono = {version="*", features=["serde"]}
 csv = "*"
+notify = "*"
+toml = "*"
+# rustyline = "7.0.0"
 # serde_json = "*"
 # csv-core = ">=0.1.6"
 # ansi_term = "*"

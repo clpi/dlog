@@ -13,6 +13,10 @@ impl List {
     pub fn init(key: String) -> Self {
         Self { key , val: None }
     }
+
+    pub fn kind(cmd: &str) -> Self {
+        Self::new(cmd.to_string(), None)
+    }
 }
 
 impl SubCommand for List {
