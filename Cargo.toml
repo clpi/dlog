@@ -1,0 +1,71 @@
+[package]
+name = "dlog"
+version = "0.1.0"
+authors = ["Chris P <chrisp1877@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+pico-args = "*"
+log = "*"
+colored = "*"
+dirs-next = "*"
+uom = "*"
+serde = { version = "*", features = ["derive"] }
+parse_duration = "*" # 9kb
+comfy-table = "*"
+# serde_json = "*"
+# csv-core = ">=0.1.6"
+# ansi_term = "*"
+# atty = ">=0.2.14"
+# thiserror = "*"
+# toml = "*"
+# walkdir = ">=2.3.1"
+# read_input
+# term-table = "1.3.0"
+# duct = "*"
+# console = "*"
+# dialoguer = "*" #18kb
+# num = "*"
+# Inflector = "*" #16kb
+# parking_lot = "*"
+# indexmap = "*"
+# smol_str = { version = "0.1.15", features = ["serde"] }
+# walkdir = "*"
+# colourful = "*"
+# rayon = "*"
+# ureq
+# chrono = "*"
+# chrono-english = "*"
+# chrono = "*"
+# chrono-english = "*"
+# once_cell = "*"
+# anyhow = "*"
+# humantime
+# figment = "*" 50kb config
+# textwrap = "*"
+# regex = "*" 237kb
+  # aho-corasick = "*" 118
+  # regex-automata = "*" 115
+  # regex-syntax = "*"
+# fst = "0.4" 1.58 MB levenshtein feat
+# shellwords = "*"
+# bstr = "*" 356
+# term = "*"
+# term_size = "*"
+# crossbeam
+# rustyline = "*" # 88kb
+# prettytable-rs = "*" #28kb
+# anyhow = "*"
+# chrono-human = "*"
+# lite-json = "*" 10kb write-json 8kb, no dep
+# surf = "*" 50kb ureq=68kb
+
+[dev-dependencies]
+env_logger = "*"
+assert_cmd = "*"
+assert_fs = "1.0.0"
+# assert-json-diff = "*"
+# json_env_logger = "*"
+
