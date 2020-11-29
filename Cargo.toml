@@ -25,7 +25,6 @@ toml = "*"
 # ansi_term = "*"
 # atty = ">=0.2.14"
 # thiserror = "*"
-# toml = "*"
 # walkdir = ">=2.3.1"
 # read_input
 # term-table = "1.3.0"
@@ -74,4 +73,21 @@ assert_fs = "1.0.0"
 tempfile = "*"
 # assert-json-diff = "*"
 # json_env_logger = "*"
+
+[profile.dev]
+debug-assertions = true
+panic = "abort"
+debug = true
+incremental = true
+lto = false
+
+[profile.release]
+lto = true
+debug = true
+overflow-checks = true
+codegen-units = 16
+
+[profile.test]
+incremental = true
+lto = false
 

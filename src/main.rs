@@ -1,3 +1,4 @@
+pub mod error;
 pub mod files;
 pub mod config;
 pub mod cmd;
