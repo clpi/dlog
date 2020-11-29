@@ -2,7 +2,7 @@ use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
-use crate::cmd::Field;
+use crate::cmd::Fact;
 
 /// Items are the main object of interest in dlog. By default, an ambiguous
 /// subcommand always defaults to the assumption of an item name
@@ -11,7 +11,7 @@ pub struct Item {
     key: String,
     val: Option<String>,
     created: DateTime<Utc>,
-    fields: Vec<Field>,
+    Facts: Vec<Fact>,
 }
 
 impl Item {
@@ -25,7 +25,7 @@ impl SubCommand for Item {
     }
 
     fn new(key: String, val: Option<String>) -> Self {
-        Self { key, val, created: Utc::now(), fields: vec![] }
+        Self { key, val, created: Utc::now(), Facts: vec![] }
     }
 
     fn insert(&self) -> Result<(), pico_args::Error> {
@@ -41,10 +41,10 @@ impl SubCommand for Item {
                     key  = val;
                     return Self::with_args(Some(key.clone()), args);
                 }
-                println!("{}", format!("{}: {:?}, Field: {:?}",
+                println!("{}", format!("{}: {:?}, Fact: {:?}",
                         Self::cmd_string()[0], key, val)
                     .color(Self::color()));
-                let _field= Field::with_args(Some(val.clone()), args)?;
+                let _Fact= Fact::with_args(Some(val.clone()), args)?;
                 let item = Self::new(key, Some(val));
                 item.insert()?;
                 Ok(item)
@@ -54,10 +54,10 @@ impl SubCommand for Item {
                     key = Self::prompt_key()?;
                 }
                 let val = Self::new(key.clone(), None).prompt_value()?;
-                println!("{}", format!("{}: {:?}, Field: {}",
+                println!("{}", format!("{}: {:?}, Fact: {}",
                         Self::cmd_string()[0], key, val.clone())
                     .color(Self::color()));
-                let field = Field::with_args(Some(val.clone()), args)?;
+                let Fact = Fact::with_args(Some(val.clone()), args)?;
                 let item = Self::new(key.clone(), Some(val.clone()));
                 item.insert()?;
                 Self::show_in_table(vec![
@@ -65,14 +65,14 @@ impl SubCommand for Item {
                     Self::cmd_string()[0],
                     key.clone().as_str(),
                     val.clone().as_str(),
-                    field.val.as_str()
+                    Fact.val.unwrap().as_str()
                     ]
-                ], vec!["Type".into(), "Name".into(), "Field".into(), "Value".into()]);
+                ], vec!["Type".into(), "Name".into(), "Fact".into(), "Value".into()]);
                 Ok(item)
             }
             _ => {
                 let item = Self::default();
-                let _field = Field::with_args(item.clone().val, args)?;
+                let _fact = Fact::with_args(item.clone().val, args)?;
                 Ok(item)
             }
         }

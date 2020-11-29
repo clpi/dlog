@@ -71,6 +71,7 @@ toml = "*"
 env_logger = "*"
 assert_cmd = "*"
 assert_fs = "1.0.0"
+tempfile = "*"
 # assert-json-diff = "*"
 # json_env_logger = "*"
 

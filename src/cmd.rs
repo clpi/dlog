@@ -1,6 +1,6 @@
-pub mod record;
+pub mod fact;
 pub mod item;
-pub mod field;
+pub mod record;
 pub mod list;
 pub mod config;
 pub mod link;
@@ -11,7 +11,7 @@ use pico_args::Arguments;
 use crate::cmd::{
         record::Record,
         item::Item,
-        field::Field,
+        fact::Fact,
         list::List,
         config::Config,
         link::Link,
@@ -45,21 +45,21 @@ impl Log {
                 match cmd.as_str() {
                     "record" | "r" => {Record::parse(args)?;},
                     "item" | "i" => {Item::parse(args)?;},
-                    "field" | "f" => {Field::parse(args)?;},
+                    "fact" | "f" => {Fact::parse(args)?;},
                     "config" | "c"=> {Config::parse(args)?;},
                     "link" | "l" => { Link::parse(args)?; break },
                     "list" | "ls" => { List::parse(args)?; break},
                     "new" | "n" => { Self::parse_new(args)?; break },
                     "version" | "v" => { Self::print_version(); break }, // be flag
                     "help" | "h"   => { Self::print_help(cmd.as_str()); break },
-                    _ => {Field::with_args(Some(cmd.to_string()), args)?; break},
+                    _ => {Fact::with_args(Some(cmd.to_string()), args)?; break},
                 };
             };
         }
         Ok(())
     }
 
-    pub fn parse_flags(mut args: Arguments) -> Result<(), pico_args::Error> {
+    pub fn parse_flags(mut _args: Arguments) -> Result<(), pico_args::Error> {
         Ok(())
     }
 
@@ -73,7 +73,7 @@ impl Log {
             "" => { println!("dlog version 0.1.0 help") },
             "record" | "r" => { Record::help() },
             "item" | "i" => { Item::help() },
-            "field" | "f" => { Field::help() },
+            "Fact" | "f" => { Fact::help() },
             "config" | "c"=> { Config::help() },
             "link" | "l" => { Link::help() },
             "list" | "ls" => { List::help() },
@@ -90,7 +90,7 @@ impl Log {
                 match kind.as_str() {
                     "item" => {Item::with_args(Some(name), args)?;},
                     "record" => {Record::with_args(Some(name), args)?;},
-                    "field" => {Field::with_args(Some(name), args)?;},
+                    "Fact" => {Fact::with_args(Some(name), args)?;},
                     _ => (),
                 };
             },
@@ -126,7 +126,7 @@ pub trait SubCommand: ToString + Default {
 
     fn new(key: String, val: Option<String>) -> Self;
 
-    fn get(args: &Arguments) -> () {}
+    fn get(_args: &Arguments) -> () {}
 
     fn help() -> () {}
 
@@ -139,7 +139,7 @@ pub trait SubCommand: ToString + Default {
         std::io::stdin().read_line(&mut key).unwrap();
         println!("{}", format!("Got new {:?}: {:?}: ", Self::cmd_string()[0],key)
             .color(Self::color()));
-        Ok(key) //TODO process value to item, field, etc
+        Ok(key) //TODO process value to item, Fact, etc
     }
 
     fn prompt_value(self) -> Result<String, pico_args::Error> {

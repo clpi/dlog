@@ -11,16 +11,16 @@ use uom::{ Kind,
 use crate::util::Either;
 
 #[derive(Debug,Clone)]
-pub struct Field {
+pub struct Fact {
     pub key: String,
-    pub val: String,
-    pub kind: Option<FieldKind>,
-    pub units: Option<UnitKind>,
-    created: DateTime<Utc>,
+    pub val: Option<String>,
+    pub kind: Option<FactKind>,
+    pub units: Option<String>, //Eventually store in enum datatype
+    pub created: DateTime<Utc>,
 }
 
-impl Field {
-    fn with_kind(self, kind: FieldKind) -> Self {
+impl Fact {
+    fn with_kind(self, kind: FactKind) -> Self {
         Self {
             kind: Some(kind), ..self
         }
@@ -28,30 +28,31 @@ impl Field {
 
     pub fn prompt_units() {}
 
-    pub fn check_units(self, key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
-        if let Some(units) = args.subcommand()? {
-            Self::printclr(format!("Field {:?} = {:?}, units: {:?}", self.key, self.val,  units), false, false, false);
+    pub fn check_units(self, mut key: String, args: &mut Arguments)
+    -> Result<Self, pico_args::Error> {
+        if let Some(units) = args.subcommand()? { // units with a space btwen
             let _units = WrittenUOM::new_keyval(
                 key.to_string(), units.to_string()
             );
-        } else {
-            Self::printclr(format!("Field {:?} = {:?}, units: {:?}", self.key, self.val,  key), false, false, false);
+            key.extend(units.chars()); //for now, just combine
+            Ok(Self { units: Some(key), ..self })
+        } else { //units just like 1 hr
+            Ok(Self { units: Some(key.to_string()), ..self })
         }
-        Ok(self)
+        //TODO properly handle single nospace: 1hr
     }
 }
 
-impl SubCommand for Field {
+impl SubCommand for Fact {
 
     fn cmd_string() -> Vec<&'static str> {
-        vec!["field", "f", "-f", "--field"]
+        vec!["Fact", "f", "-f", "--Fact"]
     }
 
     fn new(key: String, val: Option<String>) -> Self {
         Self {
-            key,
-            val: val.unwrap_or_default(),
-            kind: Some(FieldKind::default()),
+            key, val,
+            kind: Some(FactKind::default()),
             created: Utc::now(),
             units: None,
         }
@@ -74,26 +75,34 @@ impl SubCommand for Field {
                 if Self::cmd_string().contains(&key.as_str()) {
                     return Self::with_args(Some(val.clone()), args);
                 }
-                if let Some(quantity) = args.subcommand()? {
-                    let units = Field::new(
+                let fact = if let Some(quantity) = args.subcommand()? {
+                    let units = Fact::new(
                         key.clone(),
                         Some(val.clone())
-                    ).check_units(quantity, args)?;
-                    let _units = units.units;
-                }
-                let field= Field::new(key.clone(), Some(val));
-                field.insert()?;
-                Ok(field)
+                    ).check_units(quantity.clone(), args)?;
+                    units
+                } else {
+                    Fact::new(key.clone(), Some(val))
+                };
+                Self::printclr(format!("Fact {} = {:?}, units: {:?} @ {}",
+                    fact.key,
+                    fact.val.clone().unwrap(),
+                    fact.units,
+                    fact.created.to_rfc2822()),
+                false, false, false);
+                fact.insert()?;
+                Ok(fact)
             }
             (Some(key), None) => {
                 if Self::cmd_string().contains(&key.as_str()) {
                     let nval = Self::new(key, None).prompt_value()?;
                     return Self::with_args(Some(nval), args);
                 }
+                Self::printclr(format!("Fact {}", key), false,false,false);
                  let val = Self::new(key.clone(), None).prompt_value()?;
-                 let field = Field::new(key.clone(), Some(val));
-                 field.insert()?;
-                 Ok(field)
+                 let fact = Fact::new(key.clone(), Some(val));
+                 fact.insert()?;
+                 Ok(fact)
             }
             _ => Err(pico_args::Error::NonUtf8Argument)
         }
@@ -101,7 +110,7 @@ impl SubCommand for Field {
 
 }
 
-impl Default for Field {
+impl Default for Fact {
     fn default() -> Self {
         let key = Self::prompt_key().unwrap();
         let val = Self::new(key.clone(), None).prompt_value().unwrap();
@@ -109,14 +118,14 @@ impl Default for Field {
     }
 }
 
-impl ToString for Field {
+impl ToString for Fact {
     fn to_string(&self) -> String {
         "item".to_string()
     }
 }
 
 #[derive(Debug, Clone)]
-pub enum FieldKind {
+pub enum FactKind {
     String,
     Int,
     Float,
@@ -124,7 +133,7 @@ pub enum FieldKind {
     Date,
 }
 
-impl Default for FieldKind {
+impl Default for FactKind {
     fn default() -> Self {
         Self::String
     }
