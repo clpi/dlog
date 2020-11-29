@@ -3,6 +3,9 @@ use std::{
 };
 use serde::{Serialize, Deserialize};
 
+const CONFIG_PATH: &'static str = "~./.config/dlog";
+const DATA_PATH: &'static str = "~/.dlog";
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     path: String,

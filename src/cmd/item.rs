@@ -4,6 +4,8 @@ use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
 use crate::cmd::Field;
 
+/// Items are the main object of interest in dlog. By default, an ambiguous
+/// subcommand always defaults to the assumption of an item name
 #[derive(Debug, Clone,)]
 pub struct Item {
     key: String,
@@ -32,9 +34,9 @@ impl SubCommand for Item {
 
     fn color() -> Color { Color::BrightYellow }
 
-    fn with_args(mut key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+    fn with_args(key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         match (key, args.subcommand()?) {
-            (Some(mut key), Some(mut val)) => {
+            (Some(mut key), Some(val)) => {
                 if Self::cmd_string().contains(&val.as_str()) {
                     key  = val;
                     return Self::with_args(Some(key.clone()), args);
@@ -55,9 +57,17 @@ impl SubCommand for Item {
                 println!("{}", format!("{}: {:?}, Field: {}",
                         Self::cmd_string()[0], key, val.clone())
                     .color(Self::color()));
-                let _field = Field::with_args(Some(val.clone()), args)?;
-                let item = Self::new(key, Some(val));
+                let field = Field::with_args(Some(val.clone()), args)?;
+                let item = Self::new(key.clone(), Some(val.clone()));
                 item.insert()?;
+                Self::show_in_table(vec![
+                    vec![
+                    Self::cmd_string()[0],
+                    key.clone().as_str(),
+                    val.clone().as_str(),
+                    field.val.as_str()
+                    ]
+                ], vec!["Type".into(), "Name".into(), "Field".into(), "Value".into()]);
                 Ok(item)
             }
             _ => {

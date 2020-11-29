@@ -1,0 +1,8 @@
+[files]
+config_dir = "~/.config/.dlog"
+data_dir = "~/.dlog/"
+field_data_filename = "fields.csv"
+item_data_filename = "items.csv"
+record_data_filename = "records.csv"
+
+

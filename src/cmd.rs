@@ -6,6 +6,7 @@ pub mod config;
 pub mod link;
 
 use colored::{Colorize, Color, Style, Styles};
+use std::env::{Args, args};
 use pico_args::Arguments;
 use crate::cmd::{
         record::Record,
@@ -15,6 +16,11 @@ use crate::cmd::{
         config::Config,
         link::Link,
     };
+use comfy_table::{
+    Table,
+    presets::UTF8_BORDERS_ONLY,
+    modifiers::UTF8_ROUND_CORNERS,
+};
 
 #[derive(Debug)]
 pub struct Log {}
@@ -27,7 +33,7 @@ impl Log {
     }
 
     pub fn parse(args: &mut Arguments) -> Result<(), pico_args::Error> {
-        println!("{:#?}", args.clone());
+        // println!("{:#?}", args.clone()); NOTE use to diagnose args
         if args.contains(["-h", "--help"]) {
             Self::print_help("");
         } else if args.contains(["-v", "--version"]) {
@@ -46,11 +52,10 @@ impl Log {
                     "new" | "n" => { Self::parse_new(args)?; break },
                     "version" | "v" => { Self::print_version(); break }, // be flag
                     "help" | "h"   => { Self::print_help(cmd.as_str()); break },
-                    _ => {Item::with_args(Some(cmd.clone()), args)?; break},
+                    _ => {Field::with_args(Some(cmd.to_string()), args)?; break},
                 };
             };
         }
-        println!("{:#?}", args.clone());
         Ok(())
     }
 
@@ -129,20 +134,20 @@ pub trait SubCommand: ToString + Default {
 
     fn prompt_key() -> Result<String, pico_args::Error> {
         let mut key = String::new();
-        println!("{}", format!("What is the {:#?} name?: ", Self::cmd_string().get(0))
+        println!("{}", format!("What is the {:?} name?: ", Self::cmd_string()[0])
             .color(Self::color()));
         std::io::stdin().read_line(&mut key).unwrap();
-        println!("{}", format!("Got new {:#?}: {:#?}: ", Self::cmd_string().get(0), key)
+        println!("{}", format!("Got new {:?}: {:?}: ", Self::cmd_string()[0],key)
             .color(Self::color()));
         Ok(key) //TODO process value to item, field, etc
     }
 
     fn prompt_value(self) -> Result<String, pico_args::Error> {
         let mut buf = String::new();
-        println!("{}", format!("What is the {:#?} val?: ", Self::cmd_string().get(0))
+        println!("{}", format!("What is the {:?} val?: ", Self::cmd_string()[0])
             .color(Self::color()));
         std::io::stdin().read_line(&mut buf).unwrap();
-        println!("{}", format!("Got {:#?}: {:#?}: ", Self::cmd_string().get(0), buf)
+        println!("{}", format!("Got {:?}: {:?}: ", Self::cmd_string()[0], buf)
             .color(Self::color()));
         Ok(buf)
     }
@@ -195,6 +200,18 @@ pub trait SubCommand: ToString + Default {
                 Ok(Self::default())
             }
         }
+    }
+
+    fn show_in_table<T: ToString>(rows: Vec<Vec<T>>, cols: Vec<String>) {
+        let mut table = Table::new();
+        table.load_preset(UTF8_BORDERS_ONLY);
+        table.apply_modifier(UTF8_ROUND_CORNERS);
+        table.set_header(cols);
+        for row in rows {
+            let row: Vec<String> = row.iter().map(|c| c.to_string()).collect();
+            table.add_row(row);
+        }
+
     }
 
 }

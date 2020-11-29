@@ -1,3 +1,4 @@
+// TODO implement without pico-args
 use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
@@ -11,9 +12,9 @@ use crate::util::Either;
 
 #[derive(Debug,Clone)]
 pub struct Field {
-    key: String,
-    val: String,
-    kind: Option<FieldKind>,
+    pub key: String,
+    pub val: String,
+    pub kind: Option<FieldKind>,
     pub units: Option<UnitKind>,
     created: DateTime<Utc>,
 }
@@ -25,17 +26,18 @@ impl Field {
         }
     }
 
+    pub fn prompt_units() {}
+
     pub fn check_units(self, key: String, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         if let Some(units) = args.subcommand()? {
-            println!("{}",format!("Units: {:?} {:?}", key, units)
-                    .color(Self::color()));
-            let units = WrittenUOM::new_keyval(
+            Self::printclr(format!("Field {:?} = {:?}, units: {:?}", self.key, self.val,  units), false, false, false);
+            let _units = WrittenUOM::new_keyval(
                 key.to_string(), units.to_string()
             );
         } else {
-            println!("{}",format!("Units: {:?}", key).color(Self::color()));
+            Self::printclr(format!("Field {:?} = {:?}, units: {:?}", self.key, self.val,  key), false, false, false);
         }
-        Ok(Self::default())
+        Ok(self)
     }
 }
 
@@ -72,15 +74,12 @@ impl SubCommand for Field {
                 if Self::cmd_string().contains(&key.as_str()) {
                     return Self::with_args(Some(val.clone()), args);
                 }
-                println!("{}", format!("{}: {:?} = {:?}",
-                        Self::cmd_string()[0], key, val)
-                    .color(Self::color()));
                 if let Some(quantity) = args.subcommand()? {
                     let units = Field::new(
                         key.clone(),
                         Some(val.clone())
                     ).check_units(quantity, args)?;
-                    let _units = units.units.unwrap();
+                    let _units = units.units;
                 }
                 let field= Field::new(key.clone(), Some(val));
                 field.insert()?;
@@ -92,18 +91,11 @@ impl SubCommand for Field {
                     return Self::with_args(Some(nval), args);
                 }
                  let val = Self::new(key.clone(), None).prompt_value()?;
-                println!("{}", format!("{}: {:?} = {:?}",
-                        Self::cmd_string()[0], key, val.clone())
-                    .color(Self::color()));
                  let field = Field::new(key.clone(), Some(val));
                  field.insert()?;
                  Ok(field)
             }
-            _ => {
-                let field = Self::default();
-                field.insert()?;
-                Ok(field)
-            }
+            _ => Err(pico_args::Error::NonUtf8Argument)
         }
     }
 
