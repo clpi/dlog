@@ -8,11 +8,11 @@ pub enum Either<A, B>{
 
 impl<A, B> Either<A, B> {
 
-    pub fn A(a: A) -> Self {
+    pub fn a(a: A) -> Self {
         Either::A(a)
     }
 
-    pub fn B(b: B) -> Self {
+    pub fn b(b: B) -> Self {
         Either::B(b)
     }
 }

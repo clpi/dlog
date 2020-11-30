@@ -1,12 +1,14 @@
 use csv::{ReaderBuilder, Writer};
-use std::{io, process};
+use std::{result::IntoIter, io, process};
 
-pub struct CsvWriter {
+pub struct Csv {
 }
 
-impl CsvWriter {
+impl Csv {
 
-    pub fn read(path: &str) -> io::Result<Self> {
+    pub fn read<T>(item: &str) -> csv::Result<Vec<Vec<String>>>
+    where
+        T: IntoIterator {
         let mut rdr = csv::ReaderBuilder::new()
             .has_headers(true)
             .flexible(true)
@@ -15,19 +17,20 @@ impl CsvWriter {
             .delimiter(b';')
             .comment(Some(b'#'))
             .double_quote(true)
-            .from_path(path)?;
+            .from_path(item)?;
         let _head = rdr.headers()?;
-        for res in rdr.records() {
-            match res {
-                Ok(rec) => println!("{:?}", rec),
-                Err(err) => {
-                }
-            }
+        let mut out: Vec<Vec<String>> = Vec::new();
+        if let Some(res) = rdr.records().next() {
+            out.push(vec!["".to_string()]);
         };
-        Ok(Self {  })
+        Ok(out)
     }
 
-    pub fn write(path: &str) -> io::Result<Self> {
+    pub fn write<T>(item: &str, input: T) -> csv::Result<()>
+    where
+        T: IntoIterator,
+        T::Item: AsRef<[u8]>
+    {
         let mut write = csv::WriterBuilder::new()
             .has_headers(true)
             .flexible(true)
@@ -35,8 +38,13 @@ impl CsvWriter {
             .escape(b'\\')
             .delimiter(b';')
             .double_quote(true)
-            .from_path(path);
-        Ok(Self {  })
+            .from_path(item)?;
+        write.write_record(input)?;
+        Ok(())
+    }
+
+    pub fn read_records<R>(reader: R) -> csv::Result<()> {
+        Ok(())
     }
 
 }

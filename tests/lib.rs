@@ -16,7 +16,8 @@ pub fn three_subcmds_give_field_value_units() -> OutputResult {
         .arg("sleep").arg("6").arg("hr").ok()
 }
 
-pub fn shorthand_works() -> OutputResult {
-    Command::cargo_bin("main").unwrap()
-        .arg("sleep").arg("6").arg("hr").ok()
+#[test]
+pub fn shorthand_works() -> () {
+    let cmd = Command::cargo_bin("main").unwrap()
+        .arg("sleep").arg("6").arg("hr");
 }

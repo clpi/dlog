@@ -6,7 +6,6 @@ pub mod util;
 pub mod types;
 
 fn main() -> Result<(), pico_args::Error> {
-    println!("Hello, world!");
     cmd::Log::run()?;
     Ok(())
 }

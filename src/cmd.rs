@@ -104,7 +104,7 @@ impl Log {
         Ok(())
     }
 
-    fn parse_free(args: Vec<String>) -> () {
+    fn _parse_free(args: Vec<String>) -> () {
 
     }
 
@@ -167,9 +167,9 @@ pub trait SubCommand: ToString + Default {
         }
     }
 
-    fn with_args(mut key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
+    fn with_args(key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         match (key, args.subcommand()?) {
-            (Some(mut key), Some(mut val)) => {
+            (Some(mut key), Some(val)) => {
                 if Self::cmd_string().contains(&val.as_str()) {
                     key  = val;
                     return Self::with_args(Some(key.clone()), args);
