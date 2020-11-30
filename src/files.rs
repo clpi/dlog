@@ -1,10 +1,28 @@
 use csv::{ReaderBuilder, Writer};
-use std::{result::IntoIter, io, process};
+use std::{result::IntoIter, io, process, fs, thread, sync::{Arc, Mutex}};
 
 pub struct Csv {
 }
 
 impl Csv {
+
+    pub fn read_multiple(items: Vec<String>) -> csv::Result<Vec<Vec<Vec<String>>>> {
+        const NUM_THREADS: usize = 4;
+        let num_reads = items.len();
+        let res = if num_reads < NUM_THREADS {
+            (0..num_reads).map(|n| {
+                Self::read::<Vec<String>>(&items[n]).unwrap()
+            }).collect()
+        } else {
+            (0..num_reads).map(|n| {
+                let items = Arc::new(Mutex::new(items.clone()));
+                thread::spawn(move || {
+                    Self::read::<Vec<String>>(&items.lock().unwrap()[n]).unwrap()
+                }).join().expect("Could not join threads")
+            }).collect()
+        };
+        Ok(res)
+    }
 
     pub fn read<T>(item: &str) -> csv::Result<Vec<Vec<String>>>
     where
@@ -20,7 +38,7 @@ impl Csv {
             .from_path(item)?;
         let _head = rdr.headers()?;
         let mut out: Vec<Vec<String>> = Vec::new();
-        if let Some(res) = rdr.records().next() {
+        while let Some(_res) = rdr.records().into_iter().next() {
             out.push(vec!["".to_string()]);
         };
         Ok(out)
@@ -43,7 +61,7 @@ impl Csv {
         Ok(())
     }
 
-    pub fn read_records<R>(reader: R) -> csv::Result<()> {
+    pub fn read_records<R>(_reader: R) -> csv::Result<()> {
         Ok(())
     }
 
