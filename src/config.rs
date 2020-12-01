@@ -17,18 +17,16 @@ pub struct ConfigPath {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    path: String,
     user: String,
     data_dir: String,
 }
 
 impl Config {
 
+    pub fn load<P: AsRef<Path>>(path: P) -> io::Result<Self> {
+        let _conf = fs::read_to_string(path)?;
 
-    pub fn load(path: String) -> io::Result<Self> {
-        let _conf = fs::read_to_string(&path)?;
-
-        Ok(Self { path, ..Self::default() })
+        Ok(Self {  ..Self::default() })
     }
 }
 

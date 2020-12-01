@@ -1,8 +1,8 @@
 // TODO implement without pico-args
 use colored::{Color, Colorize};
 use pico_args::Arguments;
-use crate::cmd::SubCommand;
-use chrono::{DateTime, Utc};
+use crate::cmd::{DataType, SubCommand};
+use chrono::{DateTime, Utc, Datelike};
 use parse_duration::parse;
 use uom::{ Kind,
     si::{self, length, time, Unit, Units},
@@ -63,6 +63,7 @@ impl SubCommand for Fact {
     }
 
     fn color() -> Color { Color::BrightBlue }
+    fn kind() -> String { "fact".into() }
 
     fn with_args(mut key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         if let Some(inner) = key.clone() {
@@ -84,11 +85,12 @@ impl SubCommand for Fact {
                 } else {
                     Fact::new(key.clone(), Some(val))
                 };
-                Self::printclr(format!("Fact {} = {:?}, units: {:?} @ {}",
+                Self::printclr(format!("Fact {} = {:?}, units: {:?} @ {}:{}",
                     fact.key,
                     fact.val.clone().unwrap(),
                     fact.units,
-                    fact.created.to_rfc2822()),
+                    fact.created.time(),
+                    fact.created.date()),
                 false, false, false);
                 fact.insert()?;
                 Ok(fact)
@@ -120,7 +122,7 @@ impl Default for Fact {
 
 impl ToString for Fact {
     fn to_string(&self) -> String {
-        "item".to_string()
+        self.key.to_owned()
     }
 }
 
@@ -179,6 +181,8 @@ impl WrittenUOM {
         }
     }
 }
+
+impl DataType for Fact {}
 
 #[derive(Debug, Clone)]
 pub enum UnitKind {

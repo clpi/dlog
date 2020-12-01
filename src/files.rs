@@ -1,3 +1,4 @@
+use dirs_next::data_local_dir;
 use csv::{ReaderBuilder, Writer};
 use std::{result::IntoIter, io, process, fs, thread, sync::{Arc, Mutex}};
 
@@ -27,6 +28,11 @@ impl Csv {
     pub fn read<T>(item: &str) -> csv::Result<Vec<Vec<String>>>
     where
         T: IntoIterator {
+        let item_path = data_local_dir()
+            .unwrap()
+            .join("dlog")
+            .join(format!("{}.csv", item));
+        let item = fs::File::open(&item_path)?;
         let mut rdr = csv::ReaderBuilder::new()
             .has_headers(true)
             .flexible(true)
@@ -35,7 +41,7 @@ impl Csv {
             .delimiter(b';')
             .comment(Some(b'#'))
             .double_quote(true)
-            .from_path(item)?;
+            .from_reader(item);
         let _head = rdr.headers()?;
         let mut out: Vec<Vec<String>> = Vec::new();
         while let Some(_res) = rdr.records().into_iter().next() {

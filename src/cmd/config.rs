@@ -32,6 +32,8 @@ impl SubCommand for Config {
     }
 
     fn color() -> Color { Color::BrightBlue }
+
+    fn kind() -> String { "config".into() }
 }
 
 impl Default for Config {
@@ -44,6 +46,6 @@ impl Default for Config {
 
 impl ToString for Config {
     fn to_string(&self) -> String {
-        "item".to_string()
+        self.key.to_owned()
     }
 }

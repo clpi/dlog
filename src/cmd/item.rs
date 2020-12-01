@@ -1,6 +1,6 @@
 use colored::{Color, Colorize};
 use pico_args::Arguments;
-use crate::cmd::SubCommand;
+use crate::cmd::{DataType, SubCommand};
 use chrono::{DateTime, Utc};
 use crate::cmd::Fact;
 
@@ -11,7 +11,7 @@ pub struct Item {
     key: String,
     val: Option<String>,
     created: DateTime<Utc>,
-    Facts: Vec<Fact>,
+    facts: Vec<Fact>,
 }
 
 impl Item {
@@ -25,7 +25,7 @@ impl SubCommand for Item {
     }
 
     fn new(key: String, val: Option<String>) -> Self {
-        Self { key, val, created: Utc::now(), Facts: vec![] }
+        Self { key, val, created: Utc::now(), facts: vec![] }
     }
 
     fn insert(&self) -> Result<(), pico_args::Error> {
@@ -33,6 +33,8 @@ impl SubCommand for Item {
     }
 
     fn color() -> Color { Color::BrightYellow }
+
+    fn kind() -> String { "item".into() }
 
     fn with_args(key: Option<String>, args: &mut Arguments) -> Result<Self, pico_args::Error> {
         match (key, args.subcommand()?) {
@@ -44,7 +46,7 @@ impl SubCommand for Item {
                 println!("{}", format!("{}: {:?}, Fact: {:?}",
                         Self::cmd_string()[0], key, val)
                     .color(Self::color()));
-                let _Fact= Fact::with_args(Some(val.clone()), args)?;
+                let _fact= Fact::with_args(Some(val.clone()), args)?;
                 let item = Self::new(key, Some(val));
                 item.insert()?;
                 Ok(item)
@@ -57,7 +59,7 @@ impl SubCommand for Item {
                 println!("{}", format!("{}: {:?}, Fact: {}",
                         Self::cmd_string()[0], key, val.clone())
                     .color(Self::color()));
-                let Fact = Fact::with_args(Some(val.clone()), args)?;
+                let fact = Fact::with_args(Some(val.clone()), args)?;
                 let item = Self::new(key.clone(), Some(val.clone()));
                 item.insert()?;
                 Self::show_in_table(vec![
@@ -65,7 +67,7 @@ impl SubCommand for Item {
                     Self::cmd_string()[0],
                     key.clone().as_str(),
                     val.clone().as_str(),
-                    Fact.val.unwrap().as_str()
+                    fact.val.unwrap().as_str()
                     ]
                 ], vec!["Type".into(), "Name".into(), "Fact".into(), "Value".into()]);
                 Ok(item)
@@ -80,6 +82,8 @@ impl SubCommand for Item {
 
 }
 
+impl DataType for Item {}
+
 impl Default for Item {
     fn default() -> Self {
         let key = Self::prompt_key().unwrap();
@@ -90,6 +94,6 @@ impl Default for Item {
 
 impl ToString for Item {
     fn to_string(&self) -> String {
-        "item".to_string()
+        self.key.to_owned()
     }
 }

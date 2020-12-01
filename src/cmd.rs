@@ -43,16 +43,16 @@ impl Log {
         } else {
             while let Some(cmd) = args.subcommand()? {
                 match cmd.as_str() {
-                    "record" | "r" => {Record::parse(args)?;},
-                    "item" | "i" => {Item::parse(args)?;},
-                    "fact" | "f" => {Fact::parse(args)?;},
-                    "config" | "c"=> {Config::parse(args)?;},
+                    "record" | "r" => {Record::parse(args)?; break},
+                    "item" | "i" => {Item::parse(args)?; break},
+                    "fact" | "f" => {Fact::parse(args)?; break},
+                    "config" | "c"=> {Config::parse(args)?; break},
                     "link" | "l" => { Link::parse(args)?; break },
                     "list" | "ls" => { List::parse(args)?; break},
                     "new" | "n" => { Self::parse_new(args)?; break },
                     "version" | "v" => { Self::print_version(); break }, // be flag
                     "help" | "h"   => { Self::print_help(cmd.as_str()); break },
-                    _ => {Fact::with_args(Some(cmd.to_string()), args)?; break},
+                    _ => {Fact::with_args(Some(cmd), args)?; break},
                 };
             };
         }
@@ -212,6 +212,20 @@ pub trait SubCommand: ToString + Default {
             table.add_row(row);
         }
 
+    }
+
+    fn kind() -> String;
+
+
+}
+
+pub trait DataType: SubCommand {
+
+    fn path(self) -> std::path::PathBuf {
+        dirs_next::data_local_dir()
+            .unwrap()
+            .join("dlog")
+            .join(format!("{}.csv", self.to_string()))
     }
 
 }

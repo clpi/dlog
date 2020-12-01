@@ -1,6 +1,6 @@
 use colored::{Color, Colorize};
 use pico_args::Arguments;
-use crate::cmd::SubCommand;
+use crate::cmd::{SubCommand, DataType};
 use chrono::{DateTime, Utc};
 use crate::cmd::Item;
 
@@ -75,7 +75,11 @@ impl SubCommand for Record {
         }
     }
 
+    fn kind() -> String { "record".into() }
+
 }
+
+impl DataType for Record {}
 
 impl Default for Record {
     fn default() -> Self {
@@ -89,7 +93,7 @@ impl Default for Record {
 // TODO list items and fields
 impl ToString for Record {
     fn to_string(&self) -> String {
-        "record".to_string()
+        self.key.to_owned()
     }
 }
 

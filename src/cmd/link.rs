@@ -28,6 +28,8 @@ impl SubCommand for Link {
 
     fn color() -> Color { Color::BrightYellow }
 
+    fn kind() -> String { "link".into() }
+
 }
 
 impl Default for Link {
@@ -41,7 +43,7 @@ impl Default for Link {
 
 impl ToString for Link {
     fn to_string(&self) -> String {
-        "link".to_string()
+        self.key.to_owned()
     }
 }
 

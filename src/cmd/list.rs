@@ -34,6 +34,7 @@ impl SubCommand for List {
     }
 
     fn color() -> Color { Color::BrightCyan }
+    fn kind() -> String { "list".into() }
 }
 
 impl Default for List {
@@ -47,6 +48,6 @@ impl Default for List {
 
 impl ToString for List {
     fn to_string(&self) -> String {
-        "list".to_string()
+        self.key.to_owned()
     }
 }
