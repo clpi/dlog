@@ -44,8 +44,12 @@ impl Csv {
             .from_reader(item);
         let _head = rdr.headers()?;
         let mut out: Vec<Vec<String>> = Vec::new();
-        while let Some(_res) = rdr.records().into_iter().next() {
-            out.push(vec!["".to_string()]);
+        while let Some(record) = rdr.records().into_iter().next() {
+            let mut row: Vec<String> = Vec::new();
+            record?.into_iter().for_each(|field| {
+                row.push(field.to_string());
+            });
+            out.push(row);
         };
         Ok(out)
     }

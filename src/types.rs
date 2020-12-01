@@ -1,9 +1,5 @@
-// pub mod field;
-// pub mod item;
-// pub mod link;
-// pub mod record;
+use serde::{Serialize, Deserialize, };
 
-pub trait DataType {}
 
 pub enum Unit {
     Boolean,
@@ -11,4 +7,12 @@ pub enum Unit {
     Duration,
     Distance,
 
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Fact {
+    key: String,
+    val: String,
+    date: String,
+    time: String,
 }
