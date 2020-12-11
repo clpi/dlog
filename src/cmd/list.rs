@@ -2,7 +2,7 @@ use colored::{Color, Colorize};
 use pico_args::Arguments;
 use crate::cmd::SubCommand;
 
-#[derive(Debug,)]
+#[derive(Debug,Clone)]
 pub struct List {
     key: String,
     val: Option<String>,

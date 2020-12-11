@@ -110,7 +110,7 @@ impl Log {
 
 }
 
-pub trait SubCommand: ToString + Default {
+pub trait SubCommand: ToString + Default + Clone {
 
     fn cmd_string() -> Vec<&'static str>;
 

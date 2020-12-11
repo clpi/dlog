@@ -4,10 +4,13 @@ use pico_args::Arguments;
 use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
 
-#[derive(Debug)]
+/// A data model which represents a relationship between a field/item/record and another
+/// field/item/record, and holds attribute key value pairs for that relationship
+#[derive(Debug, Clone)]
 pub struct Link {
     key: String,
-    val: Option<String>
+    val: Option<String>,
+    attributes: Option<Vec<String>>,
 }
 
 
@@ -19,7 +22,7 @@ impl SubCommand for Link {
     }
 
     fn new(key: String, val: Option<String>) -> Self {
-        Self { key, val}
+        Self { key, val, attributes: None }
     }
 
     fn insert(&self) -> Result<(), pico_args::Error> {

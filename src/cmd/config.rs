@@ -3,7 +3,7 @@ use pico_args::Arguments;
 use crate::cmd::SubCommand;
 use chrono::{DateTime, Utc};
 
-#[derive(Debug,)]
+#[derive(Debug, Clone)]
 pub struct Config {
     key: String,
     val: Option<String>,
