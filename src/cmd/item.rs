@@ -9,14 +9,14 @@ impl Item{
         Self::default()
     }
 
-    pub fn cmd() -> clap::App<'static, 'static> {
-        clap::SubCommand::with_name("item")
+    pub fn cmd() -> clap::App<'static> {
+        clap::App::new("item")
             .about("items")
             .subcommands(vec![
-                clap::SubCommand::with_name("new")
+                clap::App::new("new")
             ])
             .args(&vec![
-                clap::Arg::with_name("help")
+                clap::Arg::new("help")
             ])
 
     }
@@ -26,9 +26,9 @@ impl Item{
     }
 }
 
-impl<'a> From<&'a ArgMatches<'a>> for Item {
-    fn from(matches: &ArgMatches<'a>) -> Self {
-        if matches.args.len() == 0 { Self::print_help() }
+impl From<&ArgMatches> for Item {
+    fn from(matches: &ArgMatches) -> Self {
+        Self::print_help();
         println!("Item");
         Self::new()
     }
