@@ -16,10 +16,14 @@ impl Record{
             ])
 
     }
+    pub fn print_help() {
+        println!("Record help")
+    }
 }
 
 impl<'a> From<&'a ArgMatches<'a>> for Record {
     fn from(matches: &ArgMatches<'a>) -> Self {
+        if matches.args.len() == 0 { Self::print_help() }
         println!("Record");
         Self::default()
     }

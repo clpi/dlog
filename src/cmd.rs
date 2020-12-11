@@ -2,6 +2,7 @@ pub mod fact;
 pub mod item;
 pub mod record;
 
+use std::collections::HashMap;
 use self::{
     item::Item,
     fact::Fact,
@@ -40,7 +41,7 @@ impl Dlog {
             ("record", Some(sub)) => { Record::from(sub); },
             ("item", Some(sub)) => { Item::from(sub); },
             ("fact", Some(sub)) => { Fact::from(sub); },
-            (&_, _) => {  }
+            (&_, _) => { println!("No matches") }
         }
     }
 
@@ -60,6 +61,18 @@ impl Dlog {
             .takes_value(false)
     }
 
+    pub fn config_file() -> Arg<'static, 'static> {
+        clap::Arg::with_name("config")
+            .short("c")
+            .long("config")
+            .help("Manually set config file location and load")
+            .takes_value(true)
+    }
+
     pub fn matches() -> () {
+    }
+
+    pub fn print_help() {
+        println!("dlog help")
     }
 }

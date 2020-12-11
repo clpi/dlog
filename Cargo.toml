@@ -3,8 +3,13 @@ name = "dlog"
 version = "0.1.0"
 authors = ["Chris P <chrisp1877@gmail.com>"]
 edition = "2018"
+default_run = "dlog"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[[bin]]
+name = "dlog"
+path = "src/main.rs"
 
 [dependencies]
 colored = "*"
@@ -66,9 +71,9 @@ toml = "*"
 # surf = "*" 50kb ureq=68kb
 
 [dev-dependencies]
-env_logger = "*"
 assert_cmd = "*"
-assert_fs = "1.0.0"
+predicates = "*"
+# assert_fs = "1.0.0"
 tempfile = "*"
 # assert-json-diff = "*"
 # json_env_logger = "*"

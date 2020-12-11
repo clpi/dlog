@@ -16,10 +16,15 @@ impl Fact{
             ])
 
     }
+
+    pub fn print_help() {
+        println!("Fact help")
+    }
 }
 
 impl<'a> From<&'a ArgMatches<'a>> for Fact {
     fn from(matches: &ArgMatches<'a>) -> Self {
+        if matches.args.len() == 0 { Self::print_help() }
         println!("Fact");
         Self::default()
     }
