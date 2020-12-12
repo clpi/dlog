@@ -14,9 +14,13 @@ pub enum FormatConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
-    name: String,
-    format: FormatConfig,
-    data_loc: PathBuf,
+    name: Option<String>,
+    format: Option<FormatConfig>,
+    data_loc: Option<PathBuf>,
+    record: Option<RecordConfig>,
+    item: Option<ItemConfig>,
+    fact: Option<FactConfig>,
+    user: Option<UserConfig>,
 }
 
 impl Config {
@@ -51,10 +55,34 @@ impl Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
-            name: String::new(),
-            data_loc: Self::data_dir(),
-            format: FormatConfig::Csv,
+            name: None,
+            data_loc: Some(Self::data_dir()),
+            format: Some(FormatConfig::Csv),
+            record: None,
+            user: None,
+            item: None,
+            fact: None,
         }
     }
 }
 
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RecordConfig {
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ItemConfig {
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserConfig {
+
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FactConfig {
+
+}

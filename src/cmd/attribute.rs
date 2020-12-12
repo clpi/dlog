@@ -1,5 +1,5 @@
 use super::Cmd;
-use clap::{ArgMatches, FromArgMatches};
+use clap::{Clap, ArgMatches, FromArgMatches};
 
 #[derive(Debug, Clone, Default)]
 pub struct Attrib {

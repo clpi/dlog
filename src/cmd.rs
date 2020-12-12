@@ -15,11 +15,14 @@ use self::{
 };
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
-#[derive(Debug)]
+#[derive(Clap, Debug)]
+#[clap(version = "0.1.0", author = "Chris <clp@clp.is>")]
 pub struct App {
-    pub logfile: String,
-    pub opts: String,
+    input: String,
+    command: Command,
 }
+
+
 
 pub struct TermSettings {
     atty: bool,
@@ -115,3 +118,30 @@ pub trait Cmd: FromArgMatches + Default {
     fn cmd() -> clap::App<'static>;
     fn print_help();
 }
+
+
+#[derive(Clap, Debug)]
+pub enum Command {
+    Item,
+    Record,
+    Fact,
+    Link,
+    Attrib,
+    Free,
+}
+
+impl std::str::FromStr for Command {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let res = match s {
+            "item" => Command::Item,
+            "record" => Command::Record,
+            "fact" => Command::Fact,
+            "link" => Command::Link,
+            "attrib" => Command::Attrib,
+            _ => Command::Free,
+        };
+        Ok(res)
+    }
+}
+
