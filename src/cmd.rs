@@ -18,6 +18,8 @@ pub struct Dlog {
 
 #[derive(Clap)]
 pub struct Dl {
+    #[clap(short = 'v')]
+    version: bool,
 }
 
 #[derive(Debug, Clap)]
@@ -82,9 +84,9 @@ impl Dlog {
     }
 
     pub fn output() -> Arg<'static> {
-        clap::Arg::new("version")
-            .short('v')
-            .long("version")
+        clap::Arg::new("output")
+            .short('o')
+            .long("output")
             .about("Print version info")
             .takes_value(true)
     }
