@@ -60,7 +60,7 @@ impl App {
                 Self::config_file(),
             ])
             .get_matches();
-        println!("subc: {:?}\n matches: {:?}",
+        println!("subc: {:#?}\n matches: {:#?}",
             matches.subcommand(),
             matches
         );
