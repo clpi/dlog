@@ -1,11 +1,14 @@
-use clap::ArgMatches;
+use clap::{ArgMatches, FromArgMatches};
+use super::Cmd;
 
 #[derive(Default, Debug)]
-pub struct Record;
+pub struct Record {
+    name: String,
+}
 
-impl Record{
+impl Cmd for Record{
 
-    pub fn cmd() -> clap::App<'static> {
+    fn cmd() -> clap::App<'static> {
         clap::App::new("record")
             .about("items")
             .subcommands(vec![
@@ -16,13 +19,18 @@ impl Record{
             ])
 
     }
-    pub fn print_help() {
+
+    fn run(&self) {
+
+    }
+
+    fn print_help() {
         println!("Record help")
     }
 }
 
-impl From<&ArgMatches> for Record {
-    fn from(matches: &ArgMatches) -> Self {
+impl FromArgMatches for Record {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
         Self::print_help();
         println!("Record");
         Self::default()

@@ -1,32 +1,24 @@
 pub mod fact;
 pub mod item;
 pub mod record;
+pub mod attribute;
+pub mod link;
 
 use std::collections::HashMap;
+use super::config::Config;
 use self::{
     item::Item,
     fact::Fact,
-    record::Record
+    record::Record,
+    link::Link,
+    attribute::Attrib,
 };
-use clap::{Clap, Arg };
+use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
 #[derive(Debug)]
-pub struct Dlog {
+pub struct App {
     pub logfile: String,
     pub opts: String,
-}
-
-#[derive(Clap)]
-pub struct Dl {
-    #[clap(short = 'v')]
-    version: bool,
-}
-
-#[derive(Debug, Clap)]
-pub enum Command {
-    Record,
-    Item,
-    Fact,
 }
 
 pub struct TermSettings {
@@ -41,10 +33,11 @@ impl TermSettings {
     }
 }
 
-impl Dlog {
+impl App {
 
     pub fn run() {
         let _term = TermSettings::get();
+        let _conf = Config::load();
         let matches = clap::app_from_crate!()
             .subcommands(vec![
                 Item::cmd(),
@@ -59,9 +52,11 @@ impl Dlog {
             ])
             .get_matches();
         match matches.subcommand() {
-            Some(("record", sub)) => { Record::from(sub); },
-            Some(("item", sub)) => { Item::from(sub); },
-            Some(("fact", sub)) => { Fact::from(sub); },
+            Some(("record", sub)) => Record::from_arg_matches(sub).run(),
+            Some(("item", sub)) => Item::from_arg_matches(sub).run(),
+            Some(("fact", sub)) => Fact::from_arg_matches(sub).run(),
+            Some(("link", sub)) => Fact::from_arg_matches(sub).run(),
+            Some(("attrib", sub)) => Attrib::from_arg_matches(sub).run(),
             Some((&_, &_)) => {},
             None => { println!("No matches") }
         }
@@ -113,4 +108,10 @@ impl Dlog {
     pub fn print_help() {
         println!("dlog help")
     }
+}
+
+pub trait Cmd: FromArgMatches + Default {
+    fn run(&self);
+    fn cmd() -> clap::App<'static>;
+    fn print_help();
 }

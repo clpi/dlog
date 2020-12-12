@@ -1,11 +1,14 @@
-use clap::ArgMatches;
+use clap::{ArgMatches, FromArgMatches};
+use super::Cmd;
 
 #[derive(Default, Debug)]
 pub struct Fact;
 
-impl Fact{
+impl Cmd for Fact{
 
-    pub fn cmd() -> clap::App<'static> {
+    fn run(&self) {}
+
+    fn cmd() -> clap::App<'static> {
         clap::App::new("fact")
             .about("items")
             .subcommands(vec![
@@ -17,13 +20,13 @@ impl Fact{
 
     }
 
-    pub fn print_help() {
+    fn print_help() {
         println!("Fact help")
     }
 }
 
-impl From<&ArgMatches> for Fact {
-    fn from(matches: &ArgMatches) -> Self {
+impl FromArgMatches for Fact {
+    fn from_arg_matches(_matches: &ArgMatches) -> Self {
         Self::print_help();
         println!("Fact");
         Self::default()

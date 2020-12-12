@@ -1,23 +1,22 @@
-use super::{
-    Record, Cmd,
-};
+use super::Cmd;
 use clap::{ArgMatches, FromArgMatches};
 
-#[derive(Default, Debug)]
-pub struct Item {
+#[derive(Debug, Clone, Default)]
+pub struct Attrib {
     name: String,
+    val: String,
 }
 
-impl Cmd for Item{
+impl Cmd for Attrib {
 
     fn cmd() -> clap::App<'static> {
-        clap::App::new("item")
-            .about("items")
+        clap::App::new("attrib")
+            .about("attribs")
             .subcommands(vec![
                 clap::App::new("new")
             ])
             .args(&vec![
-                clap::Arg::new("help")
+                clap::Arg::new("name")
             ])
     }
 
@@ -26,15 +25,15 @@ impl Cmd for Item{
     }
 
     fn print_help() {
-        println!("Item help")
+        println!("Attrib help")
     }
 
 }
 
-impl FromArgMatches for Item {
+impl FromArgMatches for Attrib {
     fn from_arg_matches(_matches: &ArgMatches) -> Self {
         Self::print_help();
-        println!("Item");
+        println!("Attrib");
         Self::default()
     }
 }

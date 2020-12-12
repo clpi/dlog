@@ -13,7 +13,7 @@ pub enum FormatConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Config {
+pub struct Config {
     name: String,
     format: FormatConfig,
     data_loc: PathBuf,
@@ -21,7 +21,7 @@ struct Config {
 
 impl Config {
 
-    pub fn new() -> io::Result<Self> {
+    pub fn load() -> io::Result<Self> {
         let path = Self::conf_dir().join("dlog.toml");
         let conf = if path.exists() {
             let toml = toml::de::from_str(&fs::read_to_string(path)?)?;
@@ -35,10 +35,6 @@ impl Config {
             config
         };
         Ok(conf)
-    }
-
-    pub fn load() -> Self {
-        Self::default()
     }
 
     pub fn conf_dir() -> PathBuf {

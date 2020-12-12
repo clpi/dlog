@@ -4,6 +4,6 @@ pub mod config;
 use std::io;
 
 fn main() -> io::Result<()> {
-    cmd::Dlog::run();
+    cmd::App::run();
     Ok(())
 }
