@@ -1,13 +1,27 @@
+use crate::util::get_input;
 use clap::{ArgMatches, FromArgMatches};
 use super::Cmd;
 use colored::{Color, Colorize};
 
-#[derive(Default, Debug)]
-pub struct Fact;
+#[derive(Debug)]
+pub enum FactCmd {
+    New(Fact),
+    Help,
+    List,
+}
 
-impl Cmd for Fact{
+impl Default for FactCmd {
+    fn default() -> Self {
+        FactCmd::Help
+    }
+}
 
-    fn run(&self) {}
+impl Cmd for FactCmd {
+
+    fn run(&self) {
+        println!("{}", format!("Running fact cmd...")
+            .color(Color::BrightCyan))
+    }
 
     fn cmd() -> clap::App<'static> {
         clap::App::new("fact")
@@ -26,14 +40,54 @@ impl Cmd for Fact{
     }
 
     fn print_help() {
-        println!("Fact help")
+        let help = format!("
+            FACT: A fact is at its most basic, a key-value pa-\n
+                  ir which defines a single piece of info blah\n
+                  blah write later                            \n
+        ").color(Color::BrightCyan);
+        println!("> {}", help)
+    }
+}
+
+impl FromArgMatches for FactCmd {
+    fn from_arg_matches(_matches: &ArgMatches) -> Self {
+        Self::print_help();
+        Self::default()
+    }
+}
+
+impl clap::Subcommand for FactCmd {
+    fn from_subcommand(sub: Option<(&str, &ArgMatches)>)
+        -> Option<Self>
+    {
+        let (sub, args) = sub.unwrap();
+        if sub == "fact" {
+            Some(Self::from_arg_matches(args))
+        } else {
+            None
+        }
+    }
+
+    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
+    {
+        app
+    }
+}
+
+#[derive(Debug)]
+pub struct Fact {
+    name: String,
+}
+
+impl Default for Fact {
+    fn default() -> Self {
+        let name = get_input().expect("Could not read item name");
+        Fact { name }
     }
 }
 
 impl FromArgMatches for Fact {
     fn from_arg_matches(_matches: &ArgMatches) -> Self {
-        Self::print_help();
-        println!("Fact");
         Self::default()
     }
 }

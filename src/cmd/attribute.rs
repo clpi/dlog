@@ -1,13 +1,22 @@
 use super::Cmd;
 use clap::{Clap, ArgMatches, FromArgMatches};
+use colored::{Colorize, Color};
 
-#[derive(Debug, Clone, Default)]
-pub struct Attrib {
-    name: String,
-    val: String,
+#[derive(Debug)]
+pub enum AttribCmd {
+    New(Option<Attrib>),
+    Help,
+    List,
 }
 
-impl Cmd for Attrib {
+impl Default for AttribCmd {
+    fn default() -> Self {
+        Self::Help
+    }
+}
+
+
+impl Cmd for AttribCmd {
 
     fn cmd() -> clap::App<'static> {
         clap::App::new("attrib")
@@ -21,19 +30,48 @@ impl Cmd for Attrib {
     }
 
     fn run(&self) {
+        println!("{}", format!("Running attrib cmd...")
+            .color(Color::BrightRed))
 
     }
 
     fn print_help() {
-        println!("Attrib help")
+        let help = format!("
+            ATTRIB: The attribute command allows for the look-\n
+                    up or tagging of facts/items/records by u-\n
+                    ser defined or automatically defined...\n
+        ").color(Color::BrightRed);
+        println!("> {}", help)
     }
 
 }
 
-impl FromArgMatches for Attrib {
+impl FromArgMatches for AttribCmd {
     fn from_arg_matches(_matches: &ArgMatches) -> Self {
         Self::print_help();
-        println!("Attrib");
         Self::default()
     }
+}
+
+impl clap::Subcommand for AttribCmd {
+    fn from_subcommand(sub: Option<(&str, &ArgMatches)>)
+        -> Option<Self>
+    {
+        let (sub, args) = sub.unwrap();
+        if sub == "attrib" {
+            Some(Self::from_arg_matches(args))
+        } else {
+            None
+        }
+    }
+
+    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
+    {
+        app
+    }
+}
+
+#[derive(Debug)]
+pub struct Attrib {
+    name: String,
 }

@@ -3,16 +3,21 @@ pub mod item;
 pub mod record;
 pub mod attribute;
 pub mod link;
+pub mod user;
+pub mod stats;
 
 use std::collections::HashMap;
 use super::config::Config;
 use self::{
-    item::Item,
-    fact::Fact,
-    record::Record,
-    link::Link,
-    attribute::Attrib,
+    item::ItemCmd,
+    fact::FactCmd,
+    record::RecordCmd,
+    link::LinkCmd,
+    attribute::AttribCmd,
+    user::UserCmd,
+    stats::StatsCmd,
 };
+use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
 #[derive(Clap, Debug)]
@@ -43,9 +48,13 @@ impl App {
         let _conf = Config::load();
         let matches = clap::app_from_crate!()
             .subcommands(vec![
-                Item::cmd(),
-                Record::cmd(),
-                Fact::cmd(),
+                ItemCmd::cmd(),
+                RecordCmd::cmd(),
+                FactCmd::cmd(),
+                AttribCmd::cmd(),
+                LinkCmd::cmd(),
+                StatsCmd::cmd(),
+                UserCmd::cmd(),
             ])
             .args(&vec![
                 Self::help(),
@@ -54,12 +63,19 @@ impl App {
                 Self::config_file(),
             ])
             .get_matches();
+        println!("subc: {:?}\n matches: {:?}",
+            matches.subcommand(),
+            matches
+        );
+        // TODO handle this match through self-matching not here
         match matches.subcommand() {
-            Some(("record", sub)) => Record::from_arg_matches(sub).run(),
-            Some(("item", sub)) => Item::from_arg_matches(sub).run(),
-            Some(("fact", sub)) => Fact::from_arg_matches(sub).run(),
-            Some(("link", sub)) => Fact::from_arg_matches(sub).run(),
-            Some(("attrib", sub)) => Attrib::from_arg_matches(sub).run(),
+            Some(("record", sub)) => RecordCmd::from_arg_matches(sub).run(),
+            Some(("item", sub)) => ItemCmd::from_arg_matches(sub).run(),
+            Some(("fact", sub)) => FactCmd::from_arg_matches(sub).run(),
+            Some(("link", sub)) => LinkCmd::from_arg_matches(sub).run(),
+            Some(("attrib", sub)) => AttribCmd::from_arg_matches(sub).run(),
+            Some(("user", sub)) => UserCmd::from_arg_matches(sub).run(),
+            Some(("stats", sub)) => StatsCmd::from_arg_matches(sub).run(),
             Some((&_, &_)) => {},
             None => { println!("No matches") }
         }

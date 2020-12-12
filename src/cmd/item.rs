@@ -1,14 +1,26 @@
+use crate::util::get_input;
+use colored::{Color, Colorize};
 use super::{
-    Record, Cmd,
+    RecordCmd, Cmd,
+    record::Record,
 };
 use clap::{ArgMatches, FromArgMatches};
 
-#[derive(Default, Debug)]
-pub struct Item {
-    name: String,
+#[derive(Debug)]
+pub enum ItemCmd {
+    New(Option<Item>),
+    Delete(Option<Item>),
+    List,
+    Help,
 }
 
-impl Cmd for Item{
+impl Default for ItemCmd {
+    fn default() -> Self {
+        ItemCmd::New(None)
+    }
+}
+
+impl Cmd for ItemCmd {
 
     fn cmd() -> clap::App<'static> {
         clap::App::new("item")
@@ -22,19 +34,61 @@ impl Cmd for Item{
     }
 
     fn run(&self) {
+        println!("{}", format!("Running item cmd...")
+            .color(Color::BrightMagenta))
 
     }
 
     fn print_help() {
-        println!("Item help")
+        let help = format!("
+            ITEM: Items define groups of related facts into\n
+                  logical clusterings which map to real world\n
+                  blah blah blah to be added later\n
+        ").color(Color::BrightMagenta);
+        println!("> {}", help)
     }
 
 }
 
-impl FromArgMatches for Item {
+impl FromArgMatches for ItemCmd {
     fn from_arg_matches(_matches: &ArgMatches) -> Self {
         Self::print_help();
-        println!("Item");
+        Self::default()
+    }
+}
+
+impl clap::Subcommand for ItemCmd {
+    fn from_subcommand(sub: Option<(&str, &ArgMatches)>) -> Option<Self> {
+        if let Some((sub, args)) = sub {
+            if sub == "item" {
+                Some(Self::from_arg_matches(args))
+            } else {
+                None
+            }
+        } else { None }
+    }
+
+    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
+    {
+        app
+    }
+}
+
+#[derive(Debug)]
+pub struct Item {
+    name: String,
+    record: Record,
+}
+
+impl Default for Item {
+    fn default() -> Self {
+        let name = get_input().expect("Could not read item name");
+        Item { name, record: Record::default() }
+    }
+}
+
+impl FromArgMatches for Item {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
         Self::default()
     }
 }
