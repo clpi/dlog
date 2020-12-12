@@ -1,11 +1,17 @@
 use crate::util::get_input;
 use clap::{ArgMatches, FromArgMatches};
-use super::Cmd;
+use super::{
+    Cmd,
+    item::Item,
+};
 use colored::{Color, Colorize};
 
 #[derive(Debug)]
 pub enum FactCmd {
     New(Fact),
+    Delete(Fact),
+    LinkFact(Fact),
+    LinkItem(Item),
     Help,
     List,
 }
@@ -34,6 +40,10 @@ impl Cmd for FactCmd {
                     .about("Name of the fact to get or make")
                     .required(false)
                     .index(2),
+                clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
+                    .about("Value of the fact given by NAME")
+                    .required(false)
+                    .index(3),
                 clap::Arg::new("help")
                     .about("Prints help for the fact command")
             ])

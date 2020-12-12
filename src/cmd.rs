@@ -20,14 +20,11 @@ use self::{
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
-#[derive(Clap, Debug)]
-#[clap(version = "0.1.0", author = "Chris <clp@clp.is>")]
-pub struct App {
-    input: String,
-    command: Command,
+pub enum App {
+    Record(RecordCmd),
+    Item(ItemCmd),
+    Help,
 }
-
-
 
 pub struct TermSettings {
     atty: bool,

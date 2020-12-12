@@ -17,11 +17,13 @@ dirs-next = "2.0.0"
 serde = { version = "*", features = ["derive"] }
 chrono = {version="*", features=["serde"]}
 toml = "0.5.7"
-clap = "~3.0.0-beta.2"
 csv = "1.1.5"
 comfy-table = "1.4.2"
 atty = "0.2.14"
 notify = "4.0.15"
+reqwest = "0.10.9"
+# signal-hook = "0.2.1"
+# csv-core = "0.1.10"
 # notify = "*"
 # parse_duration = "*" # 9kb
 # uom = {version="*", features=[]}
@@ -71,6 +73,10 @@ notify = "4.0.15"
 # chrono-human = "*"
 # lite-json = "*" 10kb write-json 8kb, no dep
 # surf = "*" 50kb ureq=68kb
+
+[dependencies.clap]
+version = "3.0.0-beta.2"
+features = [ "suggestions", "color" ]
 
 [dev-dependencies]
 assert_cmd = "*"
