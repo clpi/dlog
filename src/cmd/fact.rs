@@ -213,7 +213,27 @@ pub struct Fact {
 
 impl Default for Fact {
     fn default() -> Self {
-        let name = get_input().expect("Could not read item name");
+        let name = dialoguer::Input::new()
+            .with_prompt("Fact name: ")
+            .allow_empty(false)
+            .validate_with(|input: &String| -> Result<(), &str> {
+                let invalid = vec!["new", "search", "list", "info"];
+                let inv_sym = vec!['@', '/', '&', '^', '$', '#'];
+                for ch in inv_sym {
+                    if input.contains(ch) {
+                        return Err("Invalid character");
+                    }
+                }
+                if invalid.contains(&input.as_str())
+                    || input.len() > 40
+                    || input.contains("\\") {
+                    Err("Not a valid input")
+                } else { Ok(()) }
+            })
+            .interact()
+            .expect("Could not read user input");
+        println!("{}", format!("Got new item: {}", &name)
+            .color(Color::BrightCyan));
         Fact { name }
     }
 }

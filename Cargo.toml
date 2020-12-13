@@ -21,6 +21,8 @@ csv = "1.1.5"
 comfy-table = "1.4.2"
 uuid = { version = "*", features = ["v4", "serde"] }
 atty = "0.2.14"
+dialoguer = "0.7.1"
+indicatif = "0.15.0"
 # notify = "4.0.15"
 # reqwest = "0.10.9"
 # signal-hook = "0.2.1"

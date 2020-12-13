@@ -50,3 +50,4 @@ pub fn get_or_create_data_dir() -> io::Result<PathBuf> {
     }
     Ok(def_data_dir)
 }
+
