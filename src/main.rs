@@ -1,7 +1,6 @@
 pub mod cmd;
 pub mod config;
 pub mod util;
-pub mod csv;
 
 use std::io;
 

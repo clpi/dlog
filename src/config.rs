@@ -1,4 +1,5 @@
-use dirs_next::{home_dir, config_dir};
+use crate::util;
+use dirs_next::{config_dir, data_dir, home_dir};
 use std::{
     fs, io::{self, prelude::*}, path::PathBuf
 };
@@ -41,14 +42,19 @@ impl Config {
         Ok(conf)
     }
 
+
     pub fn conf_dir() -> PathBuf {
-        let dir = config_dir().unwrap_or_default()
-            .join("dlog");
-        dir
+        util::get_or_create_conf_dir()
+            .expect("Could not get or create conf dir")
     }
 
     pub fn data_dir() -> PathBuf {
-        Self::conf_dir().join("data")
+        util::get_or_create_data_dir()
+            .expect("Could not get or create conf dir")
+    }
+
+    pub fn default_config() -> () {
+
     }
 }
 

@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::util::get_input;
 use colored::{Color, Colorize};
 use super::{
@@ -76,7 +78,7 @@ impl clap::Subcommand for ItemCmd {
 
 #[derive(Debug)]
 pub struct Item {
-    name: String,
+    pub name: String,
     record: Record,
 }
 
@@ -85,6 +87,23 @@ impl Default for Item {
         let name = get_input().expect("Could not read item name");
         Item { name, record: Record::default() }
     }
+}
+
+impl Item {
+
+    pub fn new(name: String, record: Option<String>) -> Self {
+        if let Some(record) = record {
+            Self { name, record: Record::from(record) }
+        } else {
+            Self { name, record: Record::default() }
+        }
+    }
+
+    pub fn create(&self) -> std::io::Result<PathBuf> {
+        let item = self.record.add_item(self)?;
+        Ok(item)
+    }
+
 }
 
 impl FromArgMatches for Item {
