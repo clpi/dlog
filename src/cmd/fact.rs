@@ -76,7 +76,44 @@ impl Cmd for FactCmd {
 }
 
 impl FromArgMatches for FactCmd {
-    fn from_arg_matches(_matches: &ArgMatches) -> Self {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        println!("{}", format!("subc: {:#?}\n matches: {:#?}",
+            matches.subcommand(),
+            matches
+        ).color(Color::BrightCyan));
+        match matches.subcommand() {
+            Some(("new", sub)) => {
+                let _fact = Fact::from_arg_matches(sub);
+            },
+            Some(("search", sub)) => {
+                if let Some(r_filts) = sub.values_of("filterrecord") {
+                    println!("{}", "Filter fact in records:");
+                    let r_filts = r_filts
+                        .inspect(|r| {
+                            println!("{}", format!("R: {}", r)
+                                .color(Color::BrightCyan));
+                        })
+                        .collect::<Vec<&str>>();
+                }
+                if let Some(i_filts) = sub.values_of("filteritem") {
+                    println!("{}", "Filter fact in items:");
+                    let i_filts = i_filts
+                        .inspect(|r| {
+                            println!("{}", format!("R: {}", r)
+                                .color(Color::BrightCyan));
+                        })
+                        .collect::<Vec<&str>>();
+                }
+            },
+            Some(("list", sub)) => {
+                println!("List facts comand");
+            }
+            Some(("info", sub)) => {
+                println!("Info facts comand");
+            }
+            Some((&_, &_)) => {},
+            None => {}
+        }
         Self::print_help();
         Self::default()
     }
@@ -148,13 +185,13 @@ impl FactCmd {
                     .long("attrib")
                     .multiple(true)
                     .required(false),
-                clap::Arg::new("item")
+                clap::Arg::new("filteritem")
                     .about("Filter by items")
                     .multiple(true)
                     .long("item")
                     .short('i')
                     .required(false),
-                clap::Arg::new("record")
+                clap::Arg::new("filterrecord")
                     .about("Filter by record(s)")
                     .multiple(true)
                     .long("record")

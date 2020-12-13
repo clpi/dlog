@@ -89,6 +89,7 @@ impl ItemCmd {
                     .long("record")
                     .short('r')
                     .required(false)
+                    .multiple(true)
                     .takes_value(true),
                 clap::Arg::new("attrib")
                     .about("Add any tags desired to the new item")

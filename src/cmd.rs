@@ -74,7 +74,12 @@ impl App {
             Some(("user", sub)) => UserCmd::from_arg_matches(sub).run(),
             Some(("stats", sub)) => StatsCmd::from_arg_matches(sub).run(),
             Some((&_, &_)) => {},
-            None => { println!("No matches") }
+            None => {
+                println!("subc: {:#?}\n matches: {:#?}",
+                    matches.subcommand(),
+                    matches
+                );
+            }
         }
     }
 
