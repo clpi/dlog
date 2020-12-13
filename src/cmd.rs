@@ -60,10 +60,6 @@ impl App {
                 Self::config_file(),
             ])
             .get_matches();
-        println!("subc: {:#?}\n matches: {:#?}",
-            matches.subcommand(),
-            matches
-        );
         // TODO handle this match through self-matching not here
         match matches.subcommand() {
             Some(("record", sub)) => RecordCmd::from_arg_matches(sub).run(),
@@ -89,6 +85,7 @@ impl App {
             .long("help")
             .about("Print help info")
             .takes_value(false)
+            .exclusive(true)
     }
 
     pub fn version() -> Arg<'static> {
@@ -120,6 +117,15 @@ impl App {
             .short('c')
             .long("config")
             .about("Manually set config file location and load")
+            .takes_value(true)
+    }
+
+    pub fn set_config() -> Arg<'static> {
+        clap::Arg::new("set")
+            .short('s')
+            .long("set")
+            .about("Set a config key-value pair manually")
+            .exclusive(true)
             .takes_value(true)
     }
 

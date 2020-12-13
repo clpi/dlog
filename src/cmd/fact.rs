@@ -31,9 +31,10 @@ impl Cmd for FactCmd {
 
     fn cmd() -> clap::App<'static> {
         clap::App::new("fact")
-            .about("items")
+            .about("facts")
             .subcommands(vec![
                 Self::new_cmd(),
+                Self::search_cmd(),
                 clap::App::new("list")
                     .about("List all of the facts globaally/in record/item")
                     .long_flag("ls")
@@ -55,13 +56,15 @@ impl Cmd for FactCmd {
                 clap::Arg::new("NAME")
                     .about("Name of the fact to get or make")
                     .required(false)
-                    .index(2),
+                    .index(1),
                 clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
                     .about("Value of the fact given by NAME")
                     .required(false)
-                    .index(3),
-                clap::Arg::new("help")
-                    .about("Prints help for the fact command")
+                    .index(2),
+                // clap::Arg::new("help")
+                //     .about("Prints help for the fact command")
+                //     .required(false)
+                //     .exclusive(true)
             ])
     }
 
@@ -146,6 +149,10 @@ impl FactCmd {
             .short_flag('n')
             .aliases(&["add, create"])
             .args(&[
+                clap::Arg::new("NAME")
+                    .about("Name of the fact to get or make")
+                    .required(false)
+                    .index(1),
                 clap::Arg::new("record")
                     .about("Specifies the record to add this new item to; inbox if none")
                     .aliases(&["r", "rec"])
@@ -168,8 +175,6 @@ impl FactCmd {
                     .short('a')
                     .required(false)
                     .multiple(true),
-                clap::Arg::new("NAME")
-                    .about("The name of the record to be added")
             ])
     }
 
@@ -214,7 +219,16 @@ impl Default for Fact {
 }
 
 impl FromArgMatches for Fact {
-    fn from_arg_matches(_matches: &ArgMatches) -> Self {
-        Self::default()
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        match matches.value_of("NAME") {
+            Some(name) => {
+                println!("Got new fact: {}", &name);
+                return Self { name: name.into() }
+            },
+            None => {
+                println!("Received no fact name, provide: ");
+                Self::default()
+            }
+        }
     }
 }

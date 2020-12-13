@@ -48,7 +48,8 @@ impl Cmd for ItemCmd {
                     .about("Display help pertaining to items")
                     .short('h')
                     .long("help")
-                    .takes_value(false),
+                    .takes_value(false)
+                    .exclusive(true),
                 clap::Arg::new("uncategorized")
                     .aliases(&["misc", "uncat", "etc"])
                     .short('u')
