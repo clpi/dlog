@@ -14,7 +14,7 @@ fn item_cmd_no_args_prints_help() -> Result<(), Err> {
     cmd.arg("item");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("Item help"));
+        .stdout(predicate::str::contains("item"));
     Ok(())
 }
 
@@ -25,16 +25,16 @@ fn record_cmd_no_args_prints_help() -> Result<(), Err> {
     cmd.arg("record");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("Record help"));
+        .stdout(predicate::str::contains("record"));
     Ok(())
 }
 
 #[test]
 fn fact_cmd_no_args_prints_help() -> Result<(), Err> {
     let mut cmd = Command::cargo_bin("dlog")?;
-    cmd.arg("record");
+    cmd.arg("fact");
     cmd.assert()
         .success()
-        .stdout(predicate::str::contains("Record help"));
+        .stdout(predicate::str::contains("fact"));
     Ok(())
 }
