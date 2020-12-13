@@ -6,7 +6,7 @@ use super::{
     RecordCmd, Cmd,
     record::Record,
 };
-use clap::{ArgMatches, FromArgMatches};
+use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
 
 #[derive(Debug)]
 pub enum ItemCmd {
@@ -28,10 +28,33 @@ impl Cmd for ItemCmd {
         clap::App::new("item")
             .about("items")
             .subcommands(vec![
-                clap::App::new("new")
+                Self::new_cmd(),
+                Self::search_cmd(),
+                clap::App::new("list")
+                    .about("List all of the items globaally or in a record")
+                    .long_flag("ls")
+                    .short_flag('l'),
+                clap::App::new("info")
+                    .about("Get info about a specific item")
+                    .long_flag("info")
+                    .short_flag('i'),
+                clap::App::new("link")
+                    .about("Link two items together, or with a record/fact")
+                    .long_flag("link")
+                    .short_flag('k')
             ])
             .args(&vec![
                 clap::Arg::new("help")
+                    .about("Display help pertaining to items")
+                    .short('h')
+                    .long("help")
+                    .takes_value(false),
+                clap::Arg::new("uncategorized")
+                    .aliases(&["misc", "uncat", "etc"])
+                    .short('u')
+                    .long("uncategorized")
+                    .about("Whether to show items part of the inbox record")
+                    .takes_value(false)
             ])
     }
 
@@ -50,6 +73,56 @@ impl Cmd for ItemCmd {
         println!("> {}", help)
     }
 
+}
+
+impl ItemCmd {
+    pub fn new_cmd() -> clap::App<'static> {
+        clap::App::new("new")
+            .about("Create a new item to associate with different facts")
+            .long_flag("new")
+            .short_flag('n')
+            .aliases(&["add, create"])
+            .args(&[
+                clap::Arg::new("record")
+                    .about("Specifies the record to add this new item to; inbox if none")
+                    .aliases(&["r", "rec"])
+                    .long("record")
+                    .short('r')
+                    .required(false)
+                    .takes_value(true),
+                clap::Arg::new("attrib")
+                    .about("Add any tags desired to the new item")
+                    .long("attrib")
+                    .short('a')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("NAME")
+                    .about("The name of the item to be added")
+                    .required(false)
+            ])
+    }
+
+    fn search_cmd() -> clap::App<'static> {
+        clap::App::new("search")
+            .about("Search for an item")
+            .long_flag("search")
+            .short_flag('s')
+            .args(&[
+                clap::Arg::new("attrib")
+                    .about("Filter by attribute")
+                    .short('a')
+                    .long("attrib")
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("record")
+                    .about("Filter by record(s)")
+                    .multiple(true)
+                    .long("record")
+                    .short('s')
+                    .multiple(true)
+                    .required(false)
+            ])
+    }
 }
 
 impl FromArgMatches for ItemCmd {

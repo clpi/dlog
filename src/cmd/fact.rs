@@ -33,7 +33,23 @@ impl Cmd for FactCmd {
         clap::App::new("fact")
             .about("items")
             .subcommands(vec![
-                clap::App::new("new")
+                Self::new_cmd(),
+                clap::App::new("list")
+                    .about("List all of the facts globaally/in record/item")
+                    .long_flag("ls")
+                    .short_flag('l'),
+                clap::App::new("search")
+                    .about("Search for an fact from all items & records")
+                    .long_flag("search")
+                    .short_flag('s'),
+                clap::App::new("info")
+                    .about("Get info about a specific fact")
+                    .long_flag("info")
+                    .short_flag('i'),
+                clap::App::new("link")
+                    .about("Link two facts together, or with a record/fact")
+                    .long_flag("link")
+                    .short_flag('k')
             ])
             .args(&vec![
                 clap::Arg::new("NAME")
@@ -81,6 +97,70 @@ impl clap::Subcommand for FactCmd {
     fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
     {
         app
+    }
+}
+
+impl FactCmd {
+
+    pub fn new_cmd() -> clap::App<'static> {
+        clap::App::new("new")
+            .about("Create a new fact as a key-value pair")
+            .long_flag("new")
+            .short_flag('n')
+            .aliases(&["add, create"])
+            .args(&[
+                clap::Arg::new("record")
+                    .about("Specifies the record to add this new item to; inbox if none")
+                    .aliases(&["r", "rec"])
+                    .long("record")
+                    .short('r')
+                    .required(false)
+                    .multiple(true)
+                    .takes_value(true),
+                clap::Arg::new("item")
+                    .about("Specifies the item to add this new fact to")
+                    .aliases(&["i", "itm"])
+                    .long("item")
+                    .short('i')
+                    .required(false)
+                    .multiple(true)
+                    .takes_value(true),
+                clap::Arg::new("attrib")
+                    .about("Add any tags desired to the new item")
+                    .long("attrib")
+                    .short('a')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("NAME")
+                    .about("The name of the record to be added")
+            ])
+    }
+
+    fn search_cmd() -> clap::App<'static> {
+        clap::App::new("search")
+            .about("Search for a fact")
+            .long_flag("search")
+            .short_flag('s')
+            .args(&[
+                clap::Arg::new("attrib")
+                    .about("Filter by attribute")
+                    .short('a')
+                    .long("attrib")
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("item")
+                    .about("Filter by items")
+                    .multiple(true)
+                    .long("item")
+                    .short('i')
+                    .required(false),
+                clap::Arg::new("record")
+                    .about("Filter by record(s)")
+                    .multiple(true)
+                    .long("record")
+                    .short('s')
+                    .required(false)
+            ])
     }
 }
 

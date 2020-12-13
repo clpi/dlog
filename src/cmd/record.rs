@@ -22,10 +22,27 @@ impl Cmd for RecordCmd {
         clap::App::new("record")
             .about("items")
             .subcommands(vec![
-                clap::App::new("new")
+                Self::new_cmd(),
+                Self::search_cmd(),
+                clap::App::new("list")
+                    .about("List all records")
+                    .long_flag("ls")
+                    .short_flag('l'),
+                clap::App::new("info")
+                    .about("Get info about a specific record")
+                    .long_flag("info")
+                    .short_flag('i'),
+                clap::App::new("link")
+                    .about("Link two records together, or with a item/fact")
+                    .long_flag("link")
+                    .short_flag('k')
             ])
             .args(&vec![
                 clap::Arg::new("help")
+                    .about("Display help pertaining to records")
+                    .short('h')
+                    .long("help")
+                    .takes_value(false),
             ])
 
     }
@@ -71,6 +88,49 @@ impl Subcommand for RecordCmd {
     }
 }
 
+impl RecordCmd {
+    fn new_cmd() -> clap::App<'static> {
+        clap::App::new("new")
+            .about("Create a new record")
+            .long_flag("new")
+            .short_flag('n')
+            .aliases(&["create"])
+            .args(&[
+                clap::Arg::new("record")
+                    .about("Specifies the record to add this new item to; inbox if none")
+                    .aliases(&["r", "rec"])
+                    .long("record")
+                    .short('r')
+                    .required(false)
+                    .index(1)
+                    .takes_value(true)
+                    .multiple(true),
+                clap::Arg::new("attrib")
+                    .about("Add any tags desired to the new record")
+                    .long("attrib")
+                    .short('a')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("NAME")
+                    .about("The name of the record to be added")
+            ])
+    }
+
+    fn search_cmd() -> clap::App<'static> {
+        clap::App::new("search")
+            .about("Search for a record")
+            .long_flag("search")
+            .short_flag('s')
+            .args(&[
+                clap::Arg::new("attrib")
+                    .about("Filter by attribute")
+                    .short('a')
+                    .long("attrib")
+                    .required(false),
+            ])
+    }
+}
+
 #[derive(Debug)]
 pub struct Record {
     pub name: String,
@@ -106,6 +166,7 @@ impl Record {
         fs::File::create(&record_dir)?;
         Ok(record_dir)
     }
+
 }
 
 impl From<String> for Record {
