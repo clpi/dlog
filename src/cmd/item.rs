@@ -183,6 +183,21 @@ impl Item {
 
 impl FromArgMatches for Item {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        Self::default()
+        match (matches.value_of("NAME"), matches.value_of("record")) {
+            (Some(item), Some(record)) => {
+                Self {
+                    name: item.into(),
+                    record: Record::from(record.to_string())
+                }
+            },
+            (Some(item), None)  => {
+                Self {
+                    name: item.into(),
+                    record: Record::default()
+                }
+            },
+            (_, _) => Self::default(),
+            (None, None) => Self::default(),
+        }
     }
 }
