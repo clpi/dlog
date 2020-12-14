@@ -1,4 +1,5 @@
 use super::Cmd;
+use serde::{Serialize, Deserialize};
 use clap::{Clap, ArgMatches, FromArgMatches};
 use colored::{Colorize, Color};
 
@@ -71,7 +72,14 @@ impl clap::Subcommand for AttribCmd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Attrib {
     name: String,
 }
+
+impl Attrib {
+    pub fn new(name: &str) -> Self {
+        Self { name: name.to_string() }
+    }
+}
+

@@ -1,7 +1,15 @@
-use crate::util::prompt_input;
+use crate::{
+    util::prompt_input,
+    cmd::{
+        Cmd,
+        item::Item,
+        record::Record,
+        attribute::Attrib,
+    }
+};
+use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime};
 use clap::{ArgMatches, FromArgMatches};
-use super::{Cmd, item::Item, record::Record};
 use colored::{Color, Colorize};
 
 #[derive(Debug)]
@@ -59,10 +67,24 @@ impl Cmd for FactCmd {
                     .about("Value of the fact given by NAME")
                     .required(false)
                     .index(2),
-                // clap::Arg::new("help")
-                //     .about("Prints help for the fact command")
-                //     .required(false)
-                //     .exclusive(true)
+                clap::Arg::new("attribs")
+                    .about("Add any attribs desired to the new item")
+                    .long("attrib")
+                    .short('a')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("record")
+                    .about("Specify the record to add this fact to")
+                    .long("record")
+                    .short('r')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("item")
+                    .about("Specify the item to add this fact to")
+                    .long("item")
+                    .short('i')
+                    .required(false)
+                    .multiple(true),
             ])
     }
 
@@ -167,7 +189,7 @@ impl FactCmd {
                     .required(false)
                     .multiple(true)
                     .takes_value(true),
-                clap::Arg::new("attrib")
+                clap::Arg::new("newattribs")
                     .about("Add any tags desired to the new item")
                     .long("attrib")
                     .short('a')
@@ -204,14 +226,24 @@ impl FactCmd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Fact {
+    #[serde(rename="Fact")]
     pub name: String,
+    #[serde(rename="Value")]
     pub val: String,
+    #[serde(rename="Datetime")]
     pub time: DateTime<Utc>,
+    pub attribs: Vec<Attrib>,
 }
 
 impl Fact {
+
+    pub fn new(name: String, val: String, attribs: Option<Vec<Attrib>>) -> Self {
+        let attribs = attribs.unwrap_or_default();
+        Self { name, val, time: Utc::now(), attribs }
+    }
+
     pub fn write(
         record: Option<Record>,
         item: Option<Item>
@@ -244,7 +276,7 @@ impl Default for Fact {
             .expect("Could not prompt fact value");
         println!("{}", format!("Got new item: {} = {}",
                 &name, &val).color(Color::BrightCyan));
-        Fact { name, val, time: Utc::now() }
+        Fact { name, val, time: Utc::now(), attribs: Vec::new() }
     }
 }
 
@@ -254,13 +286,17 @@ impl FromArgMatches for Fact {
             Some(name) => {
                 println!("Got new fact: {}", &name);
                 if let Some(value) = matches.value_of("VALUE") {
-                    return Self {
-                        name: name.into(), val: value.into(), time: Utc::now()
-                    }
+                    let attribs: Vec<Attrib> =
+                        if let Some(attribs) = matches.values_of("attribs") {
+                        attribs.map(|a| Attrib::new(a))
+                            .collect()
+                        } else { Vec::new() };
+                    return Self::new(name.into(), value.into(), Some(attribs));
                 } else {
-                    return Self {
-                        name: name.into(), val: String::new(), time: Utc::now()
-                    }
+                    return Self::new(
+                        name.into(),
+                        prompt_input(format!("What is {}'s value?: ", &name).as_str()).expect("Could not read fact value"),
+                        None)
                 }
             },
             None => {

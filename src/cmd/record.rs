@@ -11,6 +11,8 @@ use crate::{
 use clap::{ArgMatches, FromArgMatches, Subcommand};
 use colored::{Color, Colorize, Style, Styles};
 
+use super::attribute::Attrib;
+
 #[derive(Debug)]
 pub enum RecordCmd {
     New(Option<Record>),
@@ -214,15 +216,17 @@ impl Record {
             match rec {
                 Ok(rec) => {
                     println!("{:#?}", rec);
+                    let attribs: Vec<Attrib> = rec.iter().skip(3)
+                        .map(|a| Attrib::new(a))
+                        .collect();
                     let fact = Fact {
                         name: rec[0].to_string(),
                         val: rec[1].to_string(),
                         time: DateTime::parse_from_rfc2822(&rec[2])
                             .expect("Could not parse datetime").into(),
+                        attribs,
                     };
-                    while let Some(attr) = rec.iter().skip(3).next() {
-
-                    }
+                    println!("{:#?}", fact);
                 },
                 Err(e) => return Err(From::from(e)),
             };
