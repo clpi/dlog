@@ -1,5 +1,5 @@
 use colored::{Colorize, Color};
-use std::{fs, io::{Read, self}, path::PathBuf};
+use std::{fs, io::{Read, prelude::*, self}, path::PathBuf};
 
 pub fn get_input(prompt: &str) -> io::Result<String> {
     print!("{}", prompt);

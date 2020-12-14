@@ -1,5 +1,11 @@
 use std::{path::PathBuf, fs};
-use crate::util;
+use crate::{
+    util,
+    cmd::{
+        item::Item,
+        fact::Fact,
+    }
+};
 use clap::{ArgMatches, FromArgMatches, Subcommand};
 use colored::{Color, Colorize, Style, Styles};
 use super::{Cmd, item::Item};
@@ -152,19 +158,47 @@ impl Record {
         }
     }
 
-    fn create(&self) -> std::io::Result<PathBuf> {
-        let data_dir = util::get_or_create_data_dir()?
+    fn get_or_create(&self) -> std::io::Result<PathBuf> {
+        let rec_dir = util::get_or_create_data_dir()?
             .join(&self.name);
-        fs::create_dir(&data_dir)?;
-        Ok(data_dir)
+        if rec_dir.exists() && rec_dir.is_dir() {
+            let rec = rec_dir.join(&format!("{}.csv", &self.name));
+            if rec.exists() && rec.is_file() {
+                return Ok(rec)
+            } else {
+                fs::File::create(&rec)?;
+                return Ok(rec)
+            }
+        } else {
+            fs::create_dir(&rec_dir)?;
+            let rec = rec_dir.join(&format!("{}.csv", &self.name));
+            fs::File::create(&rec)?;
+            Ok(rec)
+        }
     }
 
     pub fn add_item(&self, item: &Item) -> std::io::Result<PathBuf> {
-        let record_dir = util::get_or_create_data_dir()?
-            .join(&self.name)
+        let rec = self.get_or_create()?;
+        let item = rec.parent().expect("Could not find parent")
             .join(format!("{}{}", &item.name, ".csv"));
-        fs::File::create(&record_dir)?;
-        Ok(record_dir)
+        let wtr = csv::WriterBuilder::new()
+            .from_path(&item)?;
+        Ok(item)
+    }
+
+    pub fn read(&self, item: Option<String>) -> std::io::Result<Vec<Fact>> {
+        let rec = self.get_or_create()?;
+        let csv = if let Some(item) = item {
+            PathBuf::from(rec).join(&format!("{}.csv", &item))
+        } else {
+            rec
+        };
+        let rdr = csv::Reader::from_path(&rec)?;
+        while let Some(rec) = rdr.records().next() {
+            let record = rec?;
+            println!("{:#?}", record);
+        }
+        Ok(vec![Fact::default()])
     }
 
 }

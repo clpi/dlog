@@ -53,8 +53,16 @@ impl Config {
             .expect("Could not get or create conf dir")
     }
 
-    pub fn default_config() -> () {
-
+    pub fn default_config() -> Config {
+    let toml_str = r#"
+        [format]
+        [user]
+        [record]
+        [item]
+        [fact]
+    "#;
+    let conf: Config = toml::from_str(toml_str).unwrap();
+    conf
     }
 }
 

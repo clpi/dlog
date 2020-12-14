@@ -160,25 +160,8 @@ pub struct Item {
 impl Default for Item {
     fn default() -> Self {
         // TODO make this into a function called by all default functions
-        let name = dialoguer::Input::new()
-            .with_prompt("Item name: ")
-            .allow_empty(false)
-            .validate_with(|input: &String| -> Result<(), &str> {
-                let invalid = vec!["new", "search", "list", "info"];
-                let inv_sym = vec!['@', '/', '&', '^', '$', '#'];
-                for ch in inv_sym {
-                    if input.contains(ch) {
-                        return Err("Invalid character");
-                    }
-                }
-                if invalid.contains(&input.as_str())
-                    || input.len() > 40
-                    || input.contains("\\") {
-                    Err("Not a valid input")
-                } else { Ok(()) }
-            })
-            .interact()
-            .expect("Could not read user input");
+        let name = crate::util::prompt_input("Item name: ")
+            .expect("Could not prompt item name");
         println!("{}", format!("Got new item: {}", &name)
             .color(Color::BrightCyan));
         Item { name, record: Record::default() }
