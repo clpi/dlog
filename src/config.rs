@@ -16,6 +16,8 @@ pub enum FormatConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     name: Option<String>,
+    color: Option<bool>,
+    data_dir: Option<String>,
     format: Option<FormatConfig>,
     data_loc: Option<PathBuf>,
     record: Option<RecordConfig>,
@@ -76,6 +78,7 @@ impl Default for Config {
             user: None,
             item: None,
             fact: None,
+            ..Default::default()
         }
     }
 }

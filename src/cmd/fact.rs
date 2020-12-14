@@ -53,16 +53,8 @@ impl Cmd for FactCmd {
                     .short_flag('k')
             ])
             .args(&vec![
-                clap::Arg::new("NAME")
-                    .about("Name of the fact to get or make")
-                    .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
-                    .index(1),
-                clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
-                    .about("Value of the fact given by NAME")
-                    .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
-                    .index(2),
+                Self::key_arg(1),
+                Self::val_arg(2),
                 clap::Arg::new("attribs")
                     .about("Add any attribs desired to the new fact")
                     .long("attrib")
@@ -236,6 +228,12 @@ impl FactCmd {
                 clap::Arg::new("case-insensitive")
                     .about("Search for fact case insensitive")
                     .required(false),
+                clap::Arg::new("max-results")
+                    .long("max-results")
+                    .takes_value(true)
+                    .value_name("rescount")
+                    .hidden_short_help(true)
+                    .long_about("Limit the number of search results to 'count' and quit immediately."),
             ])
     }
 
@@ -256,6 +254,22 @@ impl FactCmd {
                     .about("Fact with attribute")
                     .short('a'),
             ])
+    }
+
+    pub fn key_arg(idx: u64) -> clap::Arg<'static> {
+        clap::Arg::new("NAME")
+            .about("Name of the fact to get or make")
+            .required(false)
+            .validator(|a| crate::util::validate_input(a.into()))
+            .index(idx)
+    }
+
+    pub fn val_arg(idx: u64) -> clap::Arg<'static> {
+        clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
+            .about("Value of the fact given by NAME")
+            .required(false)
+            .validator(|a| crate::util::validate_input(a.into()))
+            .index(idx)
     }
 }
 
@@ -348,4 +362,12 @@ impl FromArgMatches for Fact {
             }
         }
     }
+}
+
+
+/// TODO: Representation of the full interconnected graph of facts and items (records)
+/// taking into account links between different entities, attributes, and other
+/// implicit information not manually provided by the user
+pub struct FactSpace {
+
 }

@@ -59,8 +59,12 @@ impl App {
                 LinkCmd::cmd(),
                 StatsCmd::cmd(),
                 UserCmd::cmd(),
+                clap::App::new("export")
+                    .about("Export all of your data to a .zip file")
             ])
             .args(&vec![
+                FactCmd::key_arg(1),
+                FactCmd::val_arg(2),
                 Self::help(),
                 Self::version(),
                 Self::output(),
