@@ -52,6 +52,31 @@ impl Cmd for RecordCmd {
                     .short('h')
                     .long("help")
                     .takes_value(false),
+                clap::Arg::new("NAME")
+                    .about("Name of the item to log")
+                    .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
+                    .index(1),
+                clap::Arg::new("link-attribute")
+                    .long("Link an attribute to this record")
+                    .long_about("Link an attribute to this fact (not just this fact entry)")
+                    .long("link-attrib")
+                    .aliases(&["save-attrib",  "attrib-link"])
+                    .short_alias('a')
+                    .short('A')
+                    .overrides_with("attribs") //TODO test this
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("link-item")
+                    .about("Whether to persist the item-fact link specified")
+                    .long_about("Link an item to this fact (not just this fact entry)")
+                    .long("link-item")
+                    .aliases(&["save-item",  "item-link"])
+                    .short('I')
+                    .short_alias('i')
+                    .overrides_with("item") //TODO test this
+                    .multiple(true)
+                    .required(false),
             ])
 
     }

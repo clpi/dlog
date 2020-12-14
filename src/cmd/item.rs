@@ -85,7 +85,25 @@ impl Cmd for ItemCmd {
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
-            ])
+                clap::Arg::new("link-attribute")
+                    .long("Whether to persist the attribute-item link")
+                    .long_about("Link an attribute to this item (not just this fact entry)")
+                    .long("link-attrib")
+                    .aliases(&["save-attrib",  "attrib-link"])
+                    .short('A')
+                    .overrides_with("attribs") //TODO test this
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("link-record")
+                    .about("Whether to persist the record-item link specified")
+                    .long_about("Link a record to this item (not just this item entry)")
+                    .long("link-record")
+                    .aliases(&["save-record", "save-rec", "record-link"])
+                    .short('R')
+                    .overrides_with("record") //TODO test this
+                    .multiple(true)
+                    .required(false),
+            ]) //TODO add item-item possibility
     }
 
     fn run(&self) {
@@ -130,6 +148,7 @@ impl ItemCmd {
                 clap::Arg::new("NAME")
                     .about("The name of the item to be added")
                     .required(false)
+                    .index(1),
             ])
     }
 

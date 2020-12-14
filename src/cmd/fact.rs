@@ -88,7 +88,34 @@ impl Cmd for FactCmd {
                         clap::ArgSettings::UseValueDelimiter
                     ])
                     .multiple(true),
-            ])
+                clap::Arg::new("link-attribute")
+                    .long("Whether to persist the attribute-fact link")
+                    .long_about("Link an attribute to this fact (not just this fact entry)")
+                    .long("link-attrib")
+                    .aliases(&["save-attrib",  "attrib-link"])
+                    .short('A')
+                    .overrides_with("attribs") //TODO test this
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("link-item")
+                    .about("Whether to persist the item-fact link specified")
+                    .long_about("Link an item to this fact (not just this fact entry)")
+                    .long("link-item")
+                    .aliases(&["save-item",  "item-link"])
+                    .short('I')
+                    .overrides_with("item") //TODO test this
+                    .multiple(true)
+                    .required(false),
+                clap::Arg::new("link-record")
+                    .about("Whether to persist the record-fact link specified")
+                    .long_about("Link a record to this fact (not just this fact entry)")
+                    .long("link-record")
+                    .aliases(&["save-record", "save-rec", "record-link"])
+                    .short('R')
+                    .overrides_with("record") //TODO test this
+                    .multiple(true)
+                    .required(false),
+            ]) // TODO add fact-fact link possibility
     }
 
     fn print_help() {
@@ -191,6 +218,7 @@ impl FactCmd {
                     .short('i')
                     .required(false)
                     .multiple(true)
+                    .requires("VALUE")
                     .takes_value(true),
                 clap::Arg::new("newattribs")
                     .about("Add any tags desired to the new item")
@@ -199,6 +227,7 @@ impl FactCmd {
                     .required(false)
                     .multiple(true),
             ])
+
     }
 
     fn search_cmd() -> clap::App<'static> {
@@ -273,6 +302,9 @@ impl FactCmd {
     }
 }
 
+/// A single key-value pair to be logged into a csv corresponding to the fact's
+/// name (key). Fact entries are automatically tagged with their time of entry
+/// and each entry may optionally be associated with a number of different attributes.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fact {
     #[serde(rename="Fact")]
@@ -281,6 +313,7 @@ pub struct Fact {
     pub val: String,
     #[serde(rename="Datetime")]
     pub time: DateTime<Utc>,
+    #[serde(rename="Attribute")]
     pub attribs: Vec<Attrib>,
 }
 
