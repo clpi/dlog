@@ -109,6 +109,7 @@ impl RecordCmd {
                     .about("Specifies the record to add this new item to; inbox if none")
                     .aliases(&["r", "rec"])
                     .long("record")
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .short('r')
                     .required(false)
                     .takes_value(true)
@@ -117,10 +118,12 @@ impl RecordCmd {
                     .about("Add any tags desired to the new record")
                     .long("attrib")
                     .short('a')
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .required(false)
                     .multiple(true),
                 clap::Arg::new("NAME")
                     .about("The name of the record to be added")
+                    .validator(|a| crate::util::validate_input(a.into()))
             ])
     }
 

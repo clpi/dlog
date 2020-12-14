@@ -53,14 +53,17 @@ impl Cmd for ItemCmd {
                 clap::Arg::new("NAME")
                     .about("Name of the item to log")
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .index(1),
                 clap::Arg::new("FACT") //TODO if no index 3, prompt from stdin
                     .about("Optional fact to associate with new item")
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .index(2),
                 clap::Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
                     .about("Optional value of the fact to associate with new fact")
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .index(3),
                 clap::Arg::new("uncategorized")
                     .aliases(&["misc", "uncat", "etc"])
@@ -73,12 +76,14 @@ impl Cmd for ItemCmd {
                     .long("attrib")
                     .short('a')
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
                 clap::Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
                     .short('r')
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
             ])
     }

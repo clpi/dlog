@@ -10,23 +10,27 @@ pub fn get_input(prompt: &str) -> io::Result<String> {
     Ok(inp)
 }
 
+pub fn validate_input(input: String) -> Result<(), &'static str> {
+    let invalid = vec!["new", "search", "list", "info"];
+    let inv_sym = vec!['@', '/', '&', '^', '$', '#'];
+    for ch in inv_sym {
+        if input.contains(ch) {
+            return Err("Invalid character");
+        }
+    }
+    if invalid.contains(&input.as_str())
+        || input.len() > 40
+        || input.contains("\\") {
+        Err("Not a valid input")
+    } else { Ok(()) }
+}
+
 pub fn prompt_input(prompt: &str) -> io::Result<String> {
     let name = dialoguer::Input::new()
         .with_prompt(prompt)
         .allow_empty(false)
         .validate_with(|input: &String| -> Result<(), &str> {
-            let invalid = vec!["new", "search", "list", "info"];
-            let inv_sym = vec!['@', '/', '&', '^', '$', '#'];
-            for ch in inv_sym {
-                if input.contains(ch) {
-                    return Err("Invalid character");
-                }
-            }
-            if invalid.contains(&input.as_str())
-                || input.len() > 40
-                || input.contains("\\") {
-                Err("Not a valid input")
-            } else { Ok(()) }
+            validate_input(input.into())
         })
         .interact()
         .expect("Could not read user input");

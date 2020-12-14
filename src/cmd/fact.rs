@@ -62,28 +62,43 @@ impl Cmd for FactCmd {
                 clap::Arg::new("NAME")
                     .about("Name of the fact to get or make")
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .index(1),
                 clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
                     .about("Value of the fact given by NAME")
                     .required(false)
+                    .validator(|a| crate::util::validate_input(a.into()))
                     .index(2),
                 clap::Arg::new("attribs")
                     .about("Add any attribs desired to the new fact")
                     .long("attrib")
                     .short('a')
                     .required(false)
+                    .use_delimiter(true)
+                    .validator(|a| crate::util::validate_input(a.into()))
+                    .settings(&[
+                        clap::ArgSettings::UseValueDelimiter,
+                        clap::ArgSettings::AllowHyphenValues,
+                    ])
                     .multiple(true),
+
                 clap::Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
                     .short('r')
                     .required(false)
+                    .settings(&[
+                        clap::ArgSettings::UseValueDelimiter
+                    ])
                     .multiple(true),
                 clap::Arg::new("item")
                     .about("Specify the item to add this fact to")
                     .long("item")
                     .short('i')
                     .required(false)
+                    .settings(&[
+                        clap::ArgSettings::UseValueDelimiter
+                    ])
                     .multiple(true),
             ])
     }
