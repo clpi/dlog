@@ -340,6 +340,8 @@ pub struct Fact {
     pub name: String,
     #[serde(rename="Value")]
     pub val: String,
+    #[serde(rename="Units")]
+    pub unit: Vec<String>,
     #[serde(rename="Datetime")]
     pub time: DateTime<Utc>,
     #[serde(rename="Attribute")]
@@ -348,9 +350,15 @@ pub struct Fact {
 
 impl Fact {
 
-    pub fn new(name: String, val: String, attribs: Option<Vec<Attrib>>) -> Self {
+    pub fn new(
+        name: String,
+        val: String,
+        unit: Option<Vec<String>>,
+        attribs: Option<Vec<Attrib>>) -> Self
+    {
         let attribs = attribs.unwrap_or_default();
-        Self { name, val, time: Utc::now(), attribs }
+        let unit = unit.unwrap_or_default();
+        Self { name, val, time: Utc::now(), unit, attribs }
     }
 
     pub fn write(
@@ -401,7 +409,10 @@ impl Default for Fact {
             .expect("Could not prompt fact value");
         println!("{}", format!("Got new item: {} = {}",
                 &name, &val).color(Color::BrightCyan));
-        Fact { name, val, time: Utc::now(), attribs: Vec::new() }
+        Fact {
+            name, val, time: Utc::now(),
+            attribs: Vec::new(), unit: Vec::new()
+        }
     }
 }
 
@@ -416,12 +427,12 @@ impl FromArgMatches for Fact {
                         attribs.map(|a| Attrib::new(a))
                             .collect()
                         } else { Vec::new() };
-                    return Self::new(name.into(), value.into(), Some(attribs));
+                    return Self::new(name.into(), value.into(),  Some(Vec::new()), Some(attribs))
                 } else {
                     return Self::new(
                         name.into(),
                         prompt_input(format!("What is {}'s value?: ", &name).as_str()).expect("Could not read fact value"),
-                        None)
+                        None, None)
                 }
             },
             None => {

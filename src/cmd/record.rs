@@ -253,6 +253,7 @@ impl Record {
                         val: rec[1].to_string(),
                         time: DateTime::parse_from_rfc2822(&rec[2])
                             .expect("Could not parse datetime").into(),
+                        unit: Vec::new(),
                         attribs,
                     };
                     println!("{:#?}", fact);
