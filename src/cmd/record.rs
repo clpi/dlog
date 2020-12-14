@@ -1,14 +1,14 @@
 use std::{path::PathBuf, fs};
+use chrono::{Utc, DateTime};
 use crate::{
     util,
-    cmd::{
+    cmd::{ Cmd,
         item::Item,
         fact::Fact,
     }
 };
 use clap::{ArgMatches, FromArgMatches, Subcommand};
 use colored::{Color, Colorize, Style, Styles};
-use super::{Cmd, item::Item};
 
 #[derive(Debug)]
 pub enum RecordCmd {
@@ -150,7 +150,7 @@ impl Default for Record {
 
 impl Record {
 
-    fn new(name: Option<String>) -> Self {
+    pub fn new(name: Option<String>) -> Self {
         if let Some(name) = name {
             Self { name }
         } else {
@@ -158,7 +158,7 @@ impl Record {
         }
     }
 
-    fn get_or_create(&self) -> std::io::Result<PathBuf> {
+    pub fn get_or_create(&self) -> std::io::Result<PathBuf> {
         let rec_dir = util::get_or_create_data_dir()?
             .join(&self.name);
         if rec_dir.exists() && rec_dir.is_dir() {
@@ -181,7 +181,9 @@ impl Record {
         let rec = self.get_or_create()?;
         let item = rec.parent().expect("Could not find parent")
             .join(format!("{}{}", &item.name, ".csv"));
-        let wtr = csv::WriterBuilder::new()
+        let mut wtr = csv::WriterBuilder::new()
+            .has_headers(true)
+            .flexible(true)
             .from_path(&item)?;
         Ok(item)
     }
@@ -193,10 +195,31 @@ impl Record {
         } else {
             rec
         };
-        let rdr = csv::Reader::from_path(&rec)?;
+        let mut rdr = csv::ReaderBuilder::new()
+            .has_headers(true)
+            .flexible(true)
+            .trim(csv::Trim::All)
+            .double_quote(false)
+            .escape(Some(b'\\'))
+
+            .from_path(&csv)?;
+        let _headers = rdr.headers()?.clone();
         while let Some(rec) = rdr.records().next() {
-            let record = rec?;
-            println!("{:#?}", record);
+            match rec {
+                Ok(rec) => {
+                    println!("{:#?}", rec);
+                    let fact = Fact {
+                        name: rec[0].to_string(),
+                        val: rec[1].to_string(),
+                        time: DateTime::parse_from_rfc2822(&rec[2])
+                            .expect("Could not parse datetime").into(),
+                    };
+                    while let Some(attr) = rec.iter().skip(3).next() {
+
+                    }
+                },
+                Err(e) => return Err(From::from(e)),
+            };
         }
         Ok(vec![Fact::default()])
     }

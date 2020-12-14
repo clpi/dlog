@@ -1,23 +1,8 @@
-use std::{io, path::PathBuf};
+use std::{fs, io, path::PathBuf};
 
 pub fn create<P: Into<PathBuf>>(path: P) -> io::Result<()> {
     let mut wtr = csv::Writer::from_path(&path.into().as_path())?;
-    wtr.write_record(&[
-        "City",
-        "State",
-        "Population",
-        "Latitude",
-        "Longitude",
-    ])?;
-    wtr.write_record(&[
-        "Davidsons Landing",
-        "AK",
-        "",
-        "65.2419444",
-        "-165.2716667",
-    ])?;
-    wtr.write_record(&["Kenai", "AK", "7610", "60.5544444", "-151.2583333"])?;
-    wtr.write_record(&["Oakman", "AL", "", "33.7133333", "-87.3886111"])?;
+    wtr.write_record(&["a"])?;
     wtr.flush()?;
 
     Ok(())
@@ -30,3 +15,27 @@ pub fn read<P: Into<PathBuf>>(path: P) -> io::Result<()> {
             .from_path(path.into())?;
     Ok(())
 }
+
+pub fn csv_reader<P: Into<PathBuf>>(path: P)
+    -> io::Result<csv::Reader<fs::File>>
+{
+    let rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .flexible(true)
+        .trim(csv::Trim::All)
+        .double_quote(false)
+        .escape(Some(b'\\'))
+        .from_path(&path.into())?;
+    Ok(rdr)
+}
+
+pub fn csv_writer<P: Into<PathBuf>>(path: P)
+    -> io::Result<csv::Writer<fs::File>>
+{
+    let wtr = csv::WriterBuilder::new()
+        .has_headers(true)
+        .flexible(true)
+        .from_path(&path.into())?;
+    Ok(wtr)
+}
+

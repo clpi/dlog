@@ -1,9 +1,7 @@
 use crate::util::prompt_input;
+use chrono::{Utc, DateTime};
 use clap::{ArgMatches, FromArgMatches};
-use super::{
-    Cmd,
-    item::Item,
-};
+use super::{Cmd, item::Item, record::Record};
 use colored::{Color, Colorize};
 
 #[derive(Debug)]
@@ -208,12 +206,34 @@ impl FactCmd {
 
 #[derive(Debug)]
 pub struct Fact {
-    name: String,
-    val: String,
+    pub name: String,
+    pub val: String,
+    pub time: DateTime<Utc>,
 }
 
 impl Fact {
+    pub fn write(
+        record: Option<Record>,
+        item: Option<Item>
+    ) -> std::io::Result<()>
+    {
+        match (record, item) {
+            (Some(record), Some(item)) => {
 
+            },
+            (Some(record), None) => {
+                let mut wtr = crate::csv::csv_writer(record.get_or_create()?);
+
+            },
+            (None, Some(item)) => {
+
+            }
+            (None, None) => {
+
+            }
+        };
+        Ok(())
+    }
 }
 
 impl Default for Fact {
@@ -224,7 +244,7 @@ impl Default for Fact {
             .expect("Could not prompt fact value");
         println!("{}", format!("Got new item: {} = {}",
                 &name, &val).color(Color::BrightCyan));
-        Fact { name, val }
+        Fact { name, val, time: Utc::now() }
     }
 }
 
@@ -234,9 +254,13 @@ impl FromArgMatches for Fact {
             Some(name) => {
                 println!("Got new fact: {}", &name);
                 if let Some(value) = matches.value_of("VALUE") {
-                    return Self { name: name.into(), val: value.into() }
+                    return Self {
+                        name: name.into(), val: value.into(), time: Utc::now()
+                    }
                 } else {
-                    return Self { name: name.into(), val: String::new() }
+                    return Self {
+                        name: name.into(), val: String::new(), time: Utc::now()
+                    }
                 }
             },
             None => {
