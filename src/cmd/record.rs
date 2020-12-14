@@ -196,6 +196,7 @@ impl Record {
             .has_headers(true)
             .flexible(true)
             .from_path(&item)?;
+        wtr.flush()?;
         Ok(item)
     }
 

@@ -29,13 +29,17 @@ pub fn csv_reader<P: Into<PathBuf>>(path: P)
     Ok(rdr)
 }
 
-pub fn csv_writer<P: Into<PathBuf>>(path: P)
-    -> io::Result<csv::Writer<fs::File>>
+pub fn csv_writer<P, I>(path: P, item: I) -> io::Result<csv::Writer<fs::File>>
+    where
+        P: Into<PathBuf>,
+        I: serde::Serialize,
 {
-    let wtr = csv::WriterBuilder::new()
+    let mut wtr = csv::WriterBuilder::new()
         .has_headers(true)
         .flexible(true)
         .from_path(&path.into())?;
+    wtr.serialize(item)?;
+    wtr.flush()?;
     Ok(wtr)
 }
 

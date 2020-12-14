@@ -7,6 +7,7 @@ use crate::{
         attribute::Attrib,
     }
 };
+use std::path::PathBuf;
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime};
 use clap::{ArgMatches, FromArgMatches};
@@ -260,23 +261,33 @@ impl Fact {
     }
 
     pub fn write(
+        &self,
         record: Option<Record>,
         item: Option<Item>
     ) -> std::io::Result<()>
     {
         match (record, item) {
             (Some(record), Some(item)) => {
+                let rec = record.get_or_create()?;
+                let rec = rec.parent().expect("Could not get record parent");
+                let item = PathBuf::from(rec).join(item.name);
+                let mut _wtr = crate::csv::csv_writer(item, self)?;
 
             },
             (Some(record), None) => {
-                let mut wtr = crate::csv::csv_writer(record.get_or_create()?);
-
+                let mut _wtr = crate::csv::csv_writer(record.get_or_create()?, self);
             },
             (None, Some(item)) => {
-
+                // TODO put in uncategorized, don't prompt for record
+                let rec = Record::from(prompt_input("What is the record name?: ")?);
+                let rec = rec.get_or_create()?;
+                let rec = rec.parent().expect("Could not get record parent");
+                let item = PathBuf::from(rec).join(item.name);
+                let mut _wtr = crate::csv::csv_writer(item, self)?;
             }
             (None, None) => {
-
+                let rec = Record::default().get_or_create()?;
+                let mut _wtr = crate::csv::csv_writer(rec, self)?;
             }
         };
         Ok(())
