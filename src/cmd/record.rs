@@ -1,4 +1,5 @@
 use std::{path::PathBuf, fs};
+use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime};
 use crate::{
     util,
@@ -108,7 +109,6 @@ impl RecordCmd {
                     .long("record")
                     .short('r')
                     .required(false)
-                    .index(1)
                     .takes_value(true)
                     .multiple(true),
                 clap::Arg::new("attrib")
@@ -137,14 +137,20 @@ impl RecordCmd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
+    #[serde(rename="Record")]
     pub name: String,
+    #[serde(rename="Item")]
+    pub items: Vec<Item>,
 }
 
 impl Default for Record {
     fn default() -> Self {
-        Self { name: "Uncategorized".into() }
+        Self {
+            name: "Uncategorized".into() ,
+            items: Vec::new(),
+        }
     }
 }
 
@@ -152,7 +158,7 @@ impl Record {
 
     pub fn new(name: Option<String>) -> Self {
         if let Some(name) = name {
-            Self { name }
+            Self { name, items: Vec::new() }
         } else {
             Self::default()
         }
@@ -228,7 +234,7 @@ impl Record {
 
 impl From<String> for Record {
     fn from(name: String) -> Self {
-        Self { name }
+        Self { name, items: Vec::new() }
     }
 }
 

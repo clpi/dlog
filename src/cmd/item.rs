@@ -1,6 +1,6 @@
 use std::path::PathBuf;
-
-use crate::util::get_input;
+use serde::{Serialize, Deserialize};
+use crate::util::prompt_input;
 use colored::{Color, Colorize};
 use super::{
     RecordCmd, Cmd,
@@ -151,16 +151,17 @@ impl clap::Subcommand for ItemCmd {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Item {
+    #[serde(rename = "Item")]
     pub name: String,
-    record: Record,
+    pub record: Record,
 }
 
 impl Default for Item {
     fn default() -> Self {
         // TODO make this into a function called by all default functions
-        let name = crate::util::prompt_input("Item name: ")
+        let name = prompt_input("Item name: ")
             .expect("Could not prompt item name");
         println!("{}", format!("Got new item: {}", &name)
             .color(Color::BrightCyan));
