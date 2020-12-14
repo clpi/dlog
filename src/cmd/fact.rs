@@ -1,4 +1,4 @@
-use crate::util::get_input;
+use crate::util::prompt_input;
 use clap::{ArgMatches, FromArgMatches};
 use super::{
     Cmd,
@@ -209,32 +209,22 @@ impl FactCmd {
 #[derive(Debug)]
 pub struct Fact {
     name: String,
+    val: String,
+}
+
+impl Fact {
+
 }
 
 impl Default for Fact {
     fn default() -> Self {
-        let name = dialoguer::Input::new()
-            .with_prompt("Fact name: ")
-            .allow_empty(false)
-            .validate_with(|input: &String| -> Result<(), &str> {
-                let invalid = vec!["new", "search", "list", "info"];
-                let inv_sym = vec!['@', '/', '&', '^', '$', '#'];
-                for ch in inv_sym {
-                    if input.contains(ch) {
-                        return Err("Invalid character");
-                    }
-                }
-                if invalid.contains(&input.as_str())
-                    || input.len() > 40
-                    || input.contains("\\") {
-                    Err("Not a valid input")
-                } else { Ok(()) }
-            })
-            .interact()
-            .expect("Could not read user input");
-        println!("{}", format!("Got new item: {}", &name)
-            .color(Color::BrightCyan));
-        Fact { name }
+        let name = prompt_input("Fact name: ")
+            .expect("Could not prompt fact name");
+        let val = prompt_input("Fact value: ")
+            .expect("Could not prompt fact value");
+        println!("{}", format!("Got new item: {} = {}",
+                &name, &val).color(Color::BrightCyan));
+        Fact { name, val }
     }
 }
 
@@ -243,7 +233,11 @@ impl FromArgMatches for Fact {
         match matches.value_of("NAME") {
             Some(name) => {
                 println!("Got new fact: {}", &name);
-                return Self { name: name.into() }
+                if let Some(value) = matches.value_of("VALUE") {
+                    return Self { name: name.into(), val: value.into() }
+                } else {
+                    return Self { name: name.into(), val: String::new() }
+                }
             },
             None => {
                 println!("Received no fact name, provide: ");
