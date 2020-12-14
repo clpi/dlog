@@ -38,18 +38,11 @@ impl Cmd for FactCmd {
 
     fn cmd() -> clap::App<'static> {
         clap::App::new("fact")
-            .about("facts")
+            .about("The fact subcommand")
+            .long_about("A fact is a ...")
             .subcommands(vec![
                 Self::new_cmd(),
                 Self::search_cmd(),
-                clap::App::new("list")
-                    .about("List all of the facts globaally/in record/item")
-                    .long_flag("ls")
-                    .short_flag('l'),
-                clap::App::new("search")
-                    .about("Search for an fact from all items & records")
-                    .long_flag("search")
-                    .short_flag('s'),
                 clap::App::new("get")
                     .about("Get info about a specific fact")
                     .long_flag("get")
@@ -86,6 +79,7 @@ impl Cmd for FactCmd {
                 clap::Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
+                    .overrides_with("record")
                     .short('r')
                     .required(false)
                     .settings(&[
@@ -95,6 +89,7 @@ impl Cmd for FactCmd {
                 clap::Arg::new("item")
                     .about("Specify the item to add this fact to")
                     .long("item")
+                    .overrides_with("item")
                     .short('i')
                     .required(false)
                     .settings(&[
@@ -237,7 +232,29 @@ impl FactCmd {
                     .multiple(true)
                     .long("record")
                     .short('s')
-                    .required(false)
+                    .required(false),
+                clap::Arg::new("case-insensitive")
+                    .about("Search for fact case insensitive")
+                    .required(false),
+            ])
+    }
+
+    fn list_cmd() -> clap::App<'static> {
+        clap::App::new("list")
+            .about("List all of the facts globaally/in record/item")
+            .long_about("Specify arguments to list different facts")
+            .long_flag("ls")
+            .short_flag('l')
+            .args(&[
+                clap::Arg::new("record")
+                    .about("Fact in record")
+                    .short('r'),
+                clap::Arg::new("item")
+                    .about("Fact in item")
+                    .short('i'),
+                clap::Arg::new("attribute")
+                    .about("Fact with attribute")
+                    .short('a'),
             ])
     }
 }

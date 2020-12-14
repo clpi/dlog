@@ -1,4 +1,5 @@
 pub mod fact;
+pub mod action;
 pub mod item;
 pub mod record;
 pub mod attribute;
@@ -28,22 +29,28 @@ pub enum App {
 
 pub struct TermSettings {
     atty: bool,
+    color: clap::AppSettings,
 }
 
 impl TermSettings {
-    pub fn get() -> Self {
-        Self {
-            atty: atty::is(atty::Stream::Stdout),
-        }
+    pub fn new() -> Self {
+        let color = match std::env::var_os("NO_COLOR") {
+            Some(_) => clap::AppSettings::ColoredHelp,
+            None => clap::AppSettings::ColorNever,
+        };
+        let atty = atty::is(atty::Stream::Stdout);
+        Self { atty, color }
     }
 }
 
 impl App {
 
     pub fn run() {
-        let _term = TermSettings::get();
+        let term = TermSettings::new();
         let _conf = Config::load();
         let matches = clap::app_from_crate!()
+            .setting(term.color)
+            .setting(clap::AppSettings::DeriveDisplayOrder)
             .subcommands(vec![
                 ItemCmd::cmd(),
                 RecordCmd::cmd(),
