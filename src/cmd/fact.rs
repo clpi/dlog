@@ -43,6 +43,7 @@ impl Cmd for FactCmd {
             .subcommands(vec![
                 Self::new_cmd(),
                 Self::search_cmd(),
+                Self::list_cmd(),
                 clap::App::new("get")
                     .about("Get info about a specific fact")
                     .long_flag("get")
@@ -55,6 +56,8 @@ impl Cmd for FactCmd {
             .args(&vec![
                 Self::key_arg(1),
                 Self::val_arg(2),
+                Self::val_unit(3),
+                Self::set_units(),
                 clap::Arg::new("attribs")
                     .about("Add any attribs desired to the new fact")
                     .long("attrib")
@@ -295,10 +298,36 @@ impl FactCmd {
 
     pub fn val_arg(idx: u64) -> clap::Arg<'static> {
         clap::Arg::new("VALUE") //TODO if no index 3, prompt from stdin
+            .requires("NAME")
             .about("Value of the fact given by NAME")
             .required(false)
             .validator(|a| crate::util::validate_input(a.into()))
             .index(idx)
+    }
+
+    pub fn val_unit(idx: u64) -> clap::Arg<'static> {
+        clap::Arg::new("UNIT") //TODO if no index 3, prompt from stdin
+            .about("First unit value")
+            .long_about("Units for the value provided for the input fact. If not provided, defaults to the last units provided or the units specified as the permanent units for this fact.")
+            .multiple(true)
+            .use_delimiter(true)
+            .value_delimiter(" ")
+            .require_delimiter(true)
+            .requires_all(&["VALUE", "NAME"])
+            .required(false)
+            .validator(|a| crate::util::validate_input(a.into()))
+            .index(idx)
+    }
+
+    pub fn set_units() -> clap::Arg<'static> {
+        clap::Arg::new("set-units") //TODO if no index 3, prompt from stdin
+            .hidden_short_help(true)
+            .long_about("Save the defined units as the permanent units for this fact")
+            .aliases(&["set-unit", "save-unit"])
+            .short('U')
+            .long("set-units")
+            .requires_all(&["VALUE", "NAME", "UNIT"])
+            .required(false)
     }
 }
 
@@ -355,6 +384,12 @@ impl Fact {
             }
         };
         Ok(())
+    }
+
+    pub fn parse_date(val: String) -> chrono_english::DateResult<String> {
+        // use chrono_english::{parse_date_string, Dialect};
+        // use chrono::prelude::*;
+        Ok(String::new())
     }
 }
 
