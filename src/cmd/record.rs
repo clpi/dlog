@@ -37,10 +37,10 @@ impl Cmd for RecordCmd {
                     .about("List all records")
                     .long_flag("ls")
                     .short_flag('l'),
-                clap::App::new("info")
+                clap::App::new("get")
                     .about("Get info about a specific record")
-                    .long_flag("info")
-                    .short_flag('i'),
+                    .long_flag("get")
+                    .short_flag('g'),
                 clap::App::new("link")
                     .about("Link two records together, or with a item/fact")
                     .long_flag("link")

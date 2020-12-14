@@ -34,10 +34,10 @@ impl Cmd for ItemCmd {
                     .about("List all of the items globaally or in a record")
                     .long_flag("ls")
                     .short_flag('l'),
-                clap::App::new("info")
+                clap::App::new("get")
                     .about("Get info about a specific item")
-                    .long_flag("info")
-                    .short_flag('i'),
+                    .long_flag("get")
+                    .short_flag('g'),
                 clap::App::new("link")
                     .about("Link two items together, or with a record/fact")
                     .long_flag("link")
@@ -50,12 +50,36 @@ impl Cmd for ItemCmd {
                     .long("help")
                     .takes_value(false)
                     .exclusive(true),
+                clap::Arg::new("NAME")
+                    .about("Name of the item to log")
+                    .required(false)
+                    .index(1),
+                clap::Arg::new("FACT") //TODO if no index 3, prompt from stdin
+                    .about("Optional fact to associate with new item")
+                    .required(false)
+                    .index(2),
+                clap::Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
+                    .about("Optional value of the fact to associate with new fact")
+                    .required(false)
+                    .index(3),
                 clap::Arg::new("uncategorized")
                     .aliases(&["misc", "uncat", "etc"])
                     .short('u')
                     .long("uncategorized")
                     .about("Whether to show items part of the inbox record")
-                    .takes_value(false)
+                    .takes_value(false),
+                clap::Arg::new("attribs")
+                    .about("Add any attribs desired to the new item")
+                    .long("attrib")
+                    .short('a')
+                    .required(false)
+                    .multiple(true),
+                clap::Arg::new("record")
+                    .about("Specify the record to add this fact to")
+                    .long("record")
+                    .short('r')
+                    .required(false)
+                    .multiple(true),
             ])
     }
 

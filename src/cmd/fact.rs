@@ -49,10 +49,10 @@ impl Cmd for FactCmd {
                     .about("Search for an fact from all items & records")
                     .long_flag("search")
                     .short_flag('s'),
-                clap::App::new("info")
+                clap::App::new("get")
                     .about("Get info about a specific fact")
-                    .long_flag("info")
-                    .short_flag('i'),
+                    .long_flag("get")
+                    .short_flag('g'),
                 clap::App::new("link")
                     .about("Link two facts together, or with a record/fact")
                     .long_flag("link")
@@ -68,7 +68,7 @@ impl Cmd for FactCmd {
                     .required(false)
                     .index(2),
                 clap::Arg::new("attribs")
-                    .about("Add any attribs desired to the new item")
+                    .about("Add any attribs desired to the new fact")
                     .long("attrib")
                     .short('a')
                     .required(false)
