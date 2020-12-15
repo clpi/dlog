@@ -97,7 +97,7 @@ impl Attrib {
     }
 
     pub fn prompt(prompt: &str) -> Vec<Attrib> {
-        let attrib = prompt_input("Attributes? (Enter if not applicable): ")
+        let attrib = prompt_input(prompt)
             .expect("Could not prompt fact value");
         Self::from_prompt(attrib)
     }

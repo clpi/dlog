@@ -406,15 +406,13 @@ impl Default for Fact {
             .expect("Could not prompt fact name");
         let val = prompt_input("Fact value: ")
             .expect("Could not prompt fact value");
-        let attrib = prompt_input("Attributes? (Enter if not applicable): ")
-            .expect("Could not prompt fact value");
         let unit = Units::prompt("Units? (Enter if not applicable): ");
-        let attrib = Attrib::prompt("Attributes? (Enter if not applicable): ");
+        let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
-                &name, &val, &unit, &attrib).color(Color::BrightCyan));
+                &name, &val, &unit, &attribs).color(Color::BrightCyan));
         Fact {
             name, val, time: Utc::now(),
-            attribs: Vec::new(), unit,
+            attribs, unit,
         }
     }
 }
@@ -468,7 +466,7 @@ impl Default for Units {
 impl Units {
 
     pub fn prompt(prompt: &str) -> Self {
-        let unit = prompt_input("Units? (Enter if not applicable): ")
+        let unit = prompt_input(prompt)
             .expect("Could not prompt fact value");
        Self::from_prompt(unit)
     }
@@ -498,10 +496,10 @@ impl fmt::Display for Units {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Units::Datetime(date) => {
-                f.write_str(date.to_rfc2822().as_str());
+                f.write_str(date.to_rfc2822().as_str())?;
             },
             Units::Other(units) => {
-                f.write_str(units.as_str());
+                f.write_str(units.as_str())?;
             },
             Units::None => {
                 String::new();
