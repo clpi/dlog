@@ -5,7 +5,7 @@ use crate::{
     util,
     cmd::{ Cmd,
         item::Item,
-        fact::Fact,
+        fact::{Fact, Units},
     }
 };
 use clap::{ArgMatches, FromArgMatches, Subcommand};
@@ -98,7 +98,16 @@ impl Cmd for RecordCmd {
 
 impl FromArgMatches for RecordCmd {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        Self::default()
+        match matches.value_of("NAME") {
+            Some(name) => {
+                println!("Got new record: {}", &name);
+                Self::default()
+            },
+            None => {
+                println!("Received no fact name, provide: to inbox");
+                Self::default()
+            }
+        }
     }
 }
 
@@ -178,7 +187,7 @@ pub struct Record {
 impl Default for Record {
     fn default() -> Self {
         Self {
-            name: "Uncategorized".into() ,
+            name: "Inbox".into() ,
             items: Vec::new(),
         }
     }
@@ -253,7 +262,7 @@ impl Record {
                         val: rec[1].to_string(),
                         time: DateTime::parse_from_rfc2822(&rec[2])
                             .expect("Could not parse datetime").into(),
-                        unit: Vec::new(),
+                        unit: Units::Other(rec[3].to_string()), //TODO handle date parsing
                         attribs,
                     };
                     println!("{:#?}", fact);

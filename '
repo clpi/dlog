@@ -63,7 +63,12 @@ impl Cmd for FactCmd {
                     .long("attrib")
                     .short('a')
                     .required(false)
+                    .use_delimiter(true)
                     .validator(|a| crate::util::validate_input(a.into()))
+                    .settings(&[
+                        clap::ArgSettings::UseValueDelimiter,
+                        clap::ArgSettings::AllowHyphenValues,
+                    ])
                     .multiple(true),
 
                 clap::Arg::new("record")
@@ -479,8 +484,8 @@ impl Units {
             if split.clone().count() == 1 {
                 Units::Other(prompt)
             } else { //TODO check if datetime
-                let unit: String = split.into_iter().collect();
-                Units::Other(unit)
+                let unit: &String = &split.into_iter().collect();
+                Units::Other(unit.to_owned())
             }
         } else { Units::None }
     }
