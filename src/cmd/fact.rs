@@ -274,6 +274,12 @@ impl FactCmd {
                     .long("record")
                     .short('s')
                     .required(false),
+                clap::Arg::new("max-entries")
+                    .about("Maximum number of entries to display")
+                    .long("max")
+                    .short('m')
+                    .takes_value(false)
+                    .required(false)
                 clap::Arg::new("case-insensitive")
                     .about("Search for fact case insensitive")
                     .required(false),

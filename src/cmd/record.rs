@@ -173,6 +173,12 @@ impl RecordCmd {
                     .long("descending")
                     .alias("desc")
                     .takes_value(false),
+                clap::Arg::new("max-entries")
+                    .about("Maximum number of entries to display")
+                    .long("max")
+                    .short('m')
+                    .takes_value(false)
+                    .required(false)
             ])
     }
 }
