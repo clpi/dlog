@@ -37,6 +37,32 @@ impl Units {
             }
         } else { Units::None }
     }
+
+    pub fn from_time_str<'a>(time: Vec<&'a str>) -> Self {
+        while let Some(word) = time.iter().next() {
+            if word.chars().all(|c| c.is_numeric()) {
+                println!("word is qty");
+            } else {
+                if word.contains("day") {
+
+                } else if word.contains("hr") || word.contains("hour") {
+
+                } else if word == &"s" || word.contains("sec") {
+
+                } else if word == &"min" || word.contains("minute") {
+
+                } else if word.contains("wk") || word.contains("week") {
+
+                } else if word == &"mo" || word.contains("month") {
+
+                } else if word.contains("year") || word.contains("yr") {
+
+                }
+            }
+
+        }
+        Self::default()
+    }
 }
 
 impl From<Option<String>> for Units {
@@ -63,3 +89,26 @@ impl fmt::Display for Units {
         Ok(())
     }
 }
+
+#[derive(Debug, Clone)]
+pub enum DateStr {
+    Year(u8),
+    Month(u8),
+    Week(u32),
+    Day(u32),
+    Hour(u32),
+    Minute(u32),
+    Second(u32),
+    Ms(u32),
+}
+
+/*
+impl std::str::FromStr for DateStr {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match *s {
+            "d"
+        }
+    }
+}
+*/
+
