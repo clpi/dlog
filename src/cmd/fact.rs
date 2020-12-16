@@ -1,5 +1,4 @@
 use crate::{
-    csv as Csv, util::prompt_input,
     models::{
         fact::Fact,
         units::Units,
@@ -8,9 +7,6 @@ use crate::{
     },
     cmd::Cmd
 };
-use std::{fmt, path::PathBuf};
-use serde::{Serialize, Deserialize};
-use chrono::{Utc, DateTime};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
@@ -274,21 +270,17 @@ impl FactCmd {
                     .long("record")
                     .short('s')
                     .required(false),
-                clap::Arg::new("max-entries")
+                clap::Arg::new("max-results")
                     .about("Maximum number of entries to display")
                     .long("max")
                     .short('m')
                     .takes_value(false)
-                    .required(false)
+                    .default_value("50")
+                    .value_name("rescount")
+                    .required(false),
                 clap::Arg::new("case-insensitive")
                     .about("Search for fact case insensitive")
                     .required(false),
-                clap::Arg::new("max-results")
-                    .long("max-results")
-                    .takes_value(true)
-                    .value_name("rescount")
-                    .hidden_short_help(true)
-                    .long_about("Limit the number of search results to 'count' and quit immediately."),
             ])
     }
 

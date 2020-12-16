@@ -1,11 +1,8 @@
 use crate::{
-    util::prompt_input,
     models::attrib::Attrib,
     cmd::Cmd,
 };
-use std::fmt;
-use serde::{Serialize, Deserialize};
-use clap::{Clap, ArgMatches, FromArgMatches};
+use clap::{ArgMatches, FromArgMatches};
 use colored::{Colorize, Color};
 
 #[derive(Debug)]

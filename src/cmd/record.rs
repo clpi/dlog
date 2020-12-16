@@ -177,6 +177,7 @@ impl RecordCmd {
                     .about("Maximum number of entries to display")
                     .long("max")
                     .short('m')
+                    .default_value("50")
                     .takes_value(false)
                     .required(false)
             ])

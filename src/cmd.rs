@@ -6,8 +6,8 @@ pub mod attribute;
 pub mod link;
 pub mod user;
 pub mod stats;
+pub mod args;
 
-use std::collections::HashMap;
 use super::config::Config;
 use self::{
     item::ItemCmd,
@@ -17,6 +17,7 @@ use self::{
     attribute::AttribCmd,
     user::UserCmd,
     stats::StatsCmd,
+    action::ActionCmd,
 };
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
@@ -59,8 +60,13 @@ impl App {
                 LinkCmd::cmd(),
                 StatsCmd::cmd(),
                 UserCmd::cmd(),
+                ActionCmd::cmd(),
+                clap::App::new("init")
+                    .about("Initialize a fact database in the current folder"),
                 clap::App::new("export")
-                    .about("Export all of your data to a .zip file")
+                    .about("Export all of your data to a .zip file or HTML"),
+                clap::App::new("inbox")
+                    .about("Show operations related to unorganized facts and items"),
             ])
             .args(&vec![
                 FactCmd::key_arg(1),

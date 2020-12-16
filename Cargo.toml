@@ -28,11 +28,12 @@ serde_json = {version = "1.0.60", features = ["preserve_order"]}
 dashmap = { version = "*", features = ["serde"] }
 chrono-humanize = "0.1.1"
 chrono-english = "0.1.4"
-humantime = "2.0"
-globset = "0.4"
-anyhow = "1.0"
-num-format = "*"
-encoding_rs_io = "*"
+ignore = "*"
+# humantime = "2.0"
+# globset = "0.4"
+# anyhow = "1.0"
+# num-format = "*"
+# encoding_rs_io = "*"
 # sled = "0.34.6"
 # lalrpop = { veresion = "*", features = ["lexer"] }
 # fs_extra = "1.2.0"

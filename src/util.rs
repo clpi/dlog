@@ -1,3 +1,5 @@
+pub mod file;
+
 use colored::{Colorize, Color};
 use std::{fs, io::{Read, prelude::*, self}, path::PathBuf};
 
