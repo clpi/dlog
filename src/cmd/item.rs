@@ -1,10 +1,7 @@
-use std::path::PathBuf;
-use serde::{Serialize, Deserialize};
-use crate::util::prompt_input;
 use colored::{Color, Colorize};
-use super::{
-    RecordCmd, Cmd,
-    record::Record,
+use crate::{
+    models::Item,
+    cmd::Cmd,
 };
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
 
@@ -50,42 +47,42 @@ impl Cmd for ItemCmd {
                     .long("help")
                     .takes_value(false)
                     .exclusive(true),
-                clap::Arg::new("NAME")
+                Arg::new("NAME")
                     .about("Name of the item to log")
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .index(1),
-                clap::Arg::new("FACT") //TODO if no index 3, prompt from stdin
+                Arg::new("FACT") //TODO if no index 3, prompt from stdin
                     .about("Optional fact to associate with new item")
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .index(2),
-                clap::Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
+                Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
                     .about("Optional value of the fact to associate with new fact")
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .index(3),
-                clap::Arg::new("uncategorized")
+                Arg::new("uncategorized")
                     .aliases(&["misc", "uncat", "etc"])
                     .short('u')
                     .long("uncategorized")
                     .about("Whether to show items part of the inbox record")
                     .takes_value(false),
-                clap::Arg::new("attribs")
+                Arg::new("attribs")
                     .about("Add any attribs desired to the new item")
                     .long("attrib")
                     .short('a')
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
-                clap::Arg::new("record")
+                Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
                     .short('r')
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
-                clap::Arg::new("link-attribute")
+                Arg::new("link-attribute")
                     .long("Whether to persist the attribute-item link")
                     .long_about("Link an attribute to this item (not just this fact entry)")
                     .long("link-attrib")
@@ -94,7 +91,7 @@ impl Cmd for ItemCmd {
                     .overrides_with("attribs") //TODO test this
                     .multiple(true)
                     .required(false),
-                clap::Arg::new("link-record")
+                Arg::new("link-record")
                     .about("Whether to persist the record-item link specified")
                     .long_about("Link a record to this item (not just this item entry)")
                     .long("link-record")
@@ -196,60 +193,5 @@ impl clap::Subcommand for ItemCmd {
     fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
     {
         app
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Item {
-    #[serde(rename = "Item")]
-    pub name: String,
-    pub record: Record,
-}
-
-impl Default for Item {
-    fn default() -> Self {
-        // TODO make this into a function called by all default functions
-        let name = prompt_input("Item name: ")
-            .expect("Could not prompt item name");
-        println!("{}", format!("Got new item: {}", &name)
-            .color(Color::BrightCyan));
-        Item { name, record: Record::default() }
-    }
-}
-
-impl Item {
-
-    pub fn new(name: String, record: Option<String>) -> Self {
-        if let Some(record) = record {
-            Self { name, record: Record::from(record) }
-        } else {
-            Self { name, record: Record::default() }
-        }
-    }
-
-    pub fn create(&self) -> std::io::Result<PathBuf> {
-        let item = self.record.add_item(self)?;
-        Ok(item)
-    }
-
-}
-
-impl FromArgMatches for Item {
-    fn from_arg_matches(matches: &ArgMatches) -> Self {
-        match (matches.value_of("NAME"), matches.value_of("record")) {
-            (Some(item), Some(record)) => {
-                Self {
-                    name: item.into(),
-                    record: Record::from(record.to_string())
-                }
-            },
-            (Some(item), None)  => {
-                Self {
-                    name: item.into(),
-                    record: Record::default()
-                }
-            },
-            (_, _) => Self::default(),
-        }
     }
 }

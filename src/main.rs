@@ -1,4 +1,5 @@
 pub mod cmd;
+pub mod models;
 pub mod csv;
 pub mod config;
 pub mod util;
