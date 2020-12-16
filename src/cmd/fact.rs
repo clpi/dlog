@@ -242,6 +242,26 @@ impl FactCmd {
                     .long("attrib")
                     .multiple(true)
                     .required(false),
+                clap::Arg::new("sort")
+                    .about("Sort output results by specified parameter")
+                    .possible_values(&[
+                        "alphabetical", "entry-quantity", "date", "item",
+                        "record", "attrib",
+                    ])
+                    .case_insensitive(true)
+                    .value_name("SORT")
+                    .required(false)
+                    .takes_value(true),
+                clap::Arg::new("ascending")
+                    .about("Sort values ascending")
+                    .long("ascending")
+                    .alias("asc")
+                    .takes_value(false),
+                clap::Arg::new("descending")
+                    .about("Sort values ascending")
+                    .long("descending")
+                    .alias("desc")
+                    .takes_value(false),
                 clap::Arg::new("filteritem")
                     .about("Filter by items")
                     .multiple(true)

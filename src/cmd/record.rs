@@ -163,6 +163,16 @@ impl RecordCmd {
                     .short('a')
                     .long("attrib")
                     .required(false),
+                clap::Arg::new("ascending")
+                    .about("Sort values ascending")
+                    .long("ascending")
+                    .alias("asc")
+                    .takes_value(false),
+                clap::Arg::new("descending")
+                    .about("Sort values ascending")
+                    .long("descending")
+                    .alias("desc")
+                    .takes_value(false),
             ])
     }
 }
