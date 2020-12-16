@@ -1,5 +1,5 @@
 use crate::{
-    util::prompt_input,
+    csv as Csv, util::prompt_input,
     cmd::{
         Cmd,
         item::Item,
@@ -367,11 +367,15 @@ impl Fact {
                 let rec = record.get_or_create()?;
                 let rec = rec.parent().expect("Could not get record parent");
                 let item = PathBuf::from(rec).join(item.name);
-                let mut _wtr = crate::csv::csv_writer(item, self)?;
+                let mut wtr = Csv::csv_writer(item, self)?;
+                wtr.serialize(self).expect("Could not serialize fact");
+                wtr.flush()?;
 
             },
             (Some(record), None) => {
-                let mut _wtr = crate::csv::csv_writer(record.get_or_create()?, self);
+                let mut wtr = Csv::csv_writer(record.get_or_create()?, self)?;
+                wtr.serialize(self).expect("Could not serialize fact");
+                wtr.flush()?
             },
             (None, Some(item)) => {
                 // TODO put in uncategorized, don't prompt for record
@@ -379,11 +383,15 @@ impl Fact {
                 let rec = rec.get_or_create()?;
                 let rec = rec.parent().expect("Could not get record parent");
                 let item = PathBuf::from(rec).join(item.name);
-                let mut _wtr = crate::csv::csv_writer(item, self)?;
+                let mut wtr = Csv::csv_writer(item, self)?;
+                wtr.serialize(self).expect("Could not serialize fact");
+                wtr.flush()?;
             }
             (None, None) => {
                 let rec = Record::default().get_or_create()?;
-                let mut _wtr = crate::csv::csv_writer(rec, self)?;
+                let mut wtr = Csv::csv_writer(rec, self)?;
+                wtr.serialize(self).expect("Could not serialize fact");
+                wtr.flush()?;
             }
         };
         Ok(())
