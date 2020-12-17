@@ -7,6 +7,7 @@ use crate::{
         attrib::Attrib,
     },
 };
+use uuid::Uuid;
 use std::{fmt, path::PathBuf};
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime};
@@ -18,6 +19,7 @@ use colored::{Color, Colorize};
 /// and each entry may optionally be associated with a number of different attributes.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fact {
+    pub id: uuid::Uuid,
     #[serde(rename="Fact")]
     pub name: String,
     #[serde(rename="Value")]
@@ -39,7 +41,10 @@ impl Fact {
         attribs: Vec<Attrib>) -> Self
     {
         let unit = Units::from(unit);
-        Self { name, val, time: Utc::now(), unit, attribs }
+        Self {
+            id: Uuid::new_v4(),
+            name, val, time: Utc::now(), unit, attribs
+        }
     }
 
     pub fn write(
@@ -104,10 +109,7 @@ impl Default for Fact {
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
                 &name, &val, &unit, &attribs).color(Color::BrightCyan));
-        Fact {
-            name, val, time: Utc::now(),
-            attribs, unit,
-        }
+        Fact::new(name, val, unit, attribs)
     }
 }
 

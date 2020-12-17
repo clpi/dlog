@@ -1,17 +1,21 @@
-use std::path::PathBuf;
+use std::{rc::Rc, path::PathBuf};
 use serde::{Serialize, Deserialize};
 use crate::util::prompt_input;
 use colored::{Color, Colorize};
-use super::{
-    record::Record,
+use crate::{
+    error::DResult,
+    models::{Fact, Record},
 };
+use uuid::Uuid;
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Item {
+    pub id: uuid::Uuid,
     #[serde(rename = "Item")]
     pub name: String,
-    pub record: Record,
+    #[serde(skip)]
+    pub record: Rc<Record>,
 }
 
 impl Default for Item {
@@ -21,17 +25,22 @@ impl Default for Item {
             .expect("Could not prompt item name");
         println!("{}", format!("Got new item: {}", &name)
             .color(Color::BrightCyan));
-        Item { name, record: Record::default() }
+        Item {
+            id: Uuid::new_v4(),
+            name, record: Rc::new(Record::default())
+        }
     }
 }
 
 impl Item {
 
     pub fn new(name: String, record: Option<String>) -> Self {
+        let id: Uuid = Uuid::new_v4();
         if let Some(record) = record {
-            Self { name, record: Record::from(record) }
+            Self { id, name, record: Rc::new(Record::from(record))
+            }
         } else {
-            Self { name, record: Record::default() }
+            Self { id, name, record: Rc::new(Record::default()) }
         }
     }
 
@@ -40,22 +49,45 @@ impl Item {
         Ok(item)
     }
 
+    // pub fn path(&self) -> PathBuf {
+
+    // }
+
+    pub fn get_all_facts(&self) -> DResult<Vec<Fact>> {
+        let mut facts: Vec<Fact> = vec![];
+        let mut rdr = csv::Reader::from_path("~/test.csv")?;
+        while let Some(rec) = rdr.records().next() {
+            let fact: Fact = rec?.clone().deserialize(None)?;
+            facts.push(fact);
+        }
+        Ok(facts)
+    }
+
+    pub fn get_fact(&self, fact: &str) -> DResult<Vec<Fact>> {
+        let mut facts: Vec<Fact> = vec![];
+        let mut rdr = csv::Reader::from_path("~/test.csv")?;
+        while let Some(rec) = rdr.records().next() {
+            let rec = rec?.clone();
+            let name = &rec[0];
+            if name.eq_ignore_ascii_case(fact) {
+                let fact = rec.deserialize(None)?;
+                facts.push(fact);
+            }
+        }
+        Ok(facts)
+
+    }
+
 }
 
 impl FromArgMatches for Item {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         match (matches.value_of("NAME"), matches.value_of("record")) {
             (Some(item), Some(record)) => {
-                Self {
-                    name: item.into(),
-                    record: Record::from(record.to_string())
-                }
+                Self::new(item.into(), Some(record.to_string()))
             },
             (Some(item), None)  => {
-                Self {
-                    name: item.into(),
-                    record: Record::default()
-                }
+                Self::new(item.into(), None)
             },
             (_, _) => Self::default(),
         }

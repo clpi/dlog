@@ -1,5 +1,6 @@
 use std::{path::PathBuf, fs};
 use serde::{Serialize, Deserialize};
+use uuid::Uuid;
 use chrono::{Utc, DateTime};
 use crate::{
     util,
@@ -13,6 +14,7 @@ use super::attrib::Attrib;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
+    pub id: uuid::Uuid,
     #[serde(rename="Record")]
     pub name: String,
     #[serde(rename="Item")]
@@ -22,6 +24,7 @@ pub struct Record {
 impl Default for Record {
     fn default() -> Self {
         Self {
+            id: Uuid::new_v4(),
             name: "Inbox".into() ,
             items: Vec::new(),
         }
@@ -32,7 +35,7 @@ impl Record {
 
     pub fn new(name: Option<String>) -> Self {
         if let Some(name) = name {
-            Self { name, items: Vec::new() }
+            Self { id: Uuid::new_v4(), name, items: Vec::new() }
         } else {
             Self::default()
         }
@@ -93,11 +96,13 @@ impl Record {
                         .map(|a| Attrib::new(a))
                         .collect();
                     let fact = Fact {
-                        name: rec[0].to_string(),
-                        val: rec[1].to_string(),
-                        time: DateTime::parse_from_rfc2822(&rec[2])
+                        id: Uuid::parse_str(&rec[0])
+                            .expect("Could not parse UUID"),
+                        name: rec[1].to_string(),
+                        val: rec[2].to_string(),
+                        time: DateTime::parse_from_rfc2822(&rec[3])
                             .expect("Could not parse datetime").into(),
-                        unit: Units::Other(rec[3].to_string()), //TODO handle date parsing
+                        unit: Units::Other(rec[4].to_string()), //TODO handle date parsing
                         attribs,
                     };
                     println!("{:#?}", fact);
@@ -112,7 +117,7 @@ impl Record {
 
 impl From<String> for Record {
     fn from(name: String) -> Self {
-        Self { name, items: Vec::new() }
+        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new() }
     }
 }
 

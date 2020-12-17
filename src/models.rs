@@ -15,3 +15,8 @@ pub use attrib::Attrib;
 pub use graph::Graph;
 pub use stats::Stats;
 pub use action::Action;
+
+#[derive(Debug)]
+pub struct Object {
+
+}
