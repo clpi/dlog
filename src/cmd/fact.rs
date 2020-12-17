@@ -62,7 +62,12 @@ impl Cmd for FactCmd {
                     .required(false)
                     .validator(|a| crate::util::validate_input(a.into()))
                     .multiple(true),
-
+                clap::Arg::new("notes")
+                    .long("notes")
+                    .short('n')
+                    .about("Any optional notes you wish to add to this fact entry")
+                    .takes_value(true)
+                    .required(false),
                 clap::Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
@@ -192,7 +197,7 @@ impl FactCmd {
         clap::App::new("new")
             .about("Create a new fact as a key-value pair")
             .long_flag("new")
-            .short_flag('n')
+            .short_flag('N')
             .aliases(&["add, create"])
             .args(&[
                 clap::Arg::new("NAME")
@@ -369,9 +374,13 @@ impl FromArgMatches for Fact {
                     attribs.map(|a| Attrib::new(a))
                         .collect()
                     } else { Vec::new() };
-                return Self::new(name.into(), value.into(), units, attribs)
+                let notes: Option<String> =
+                    if let Some(notes) = matches.value_of("notes") {
+                        Some(notes.to_string())
+                    } else { None };
+                Self::new(name.into(), value.into(), units, attribs, notes)
             } else {
-                return Self { name: name.into(), ..Self::default()  }
+                Self { name: name.into(), ..Self::default()  }
             }
         } else {
             println!("Received no fact name, provide: ");

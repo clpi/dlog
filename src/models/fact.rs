@@ -30,6 +30,8 @@ pub struct Fact {
     pub time: DateTime<Utc>,
     #[serde(rename="Attribute")]
     pub attribs: Vec<Attrib>,
+    #[serde(rename="Notes")]
+    pub notes: Option<String>,
 }
 
 impl Fact {
@@ -38,12 +40,13 @@ impl Fact {
         name: String,
         val: String,
         unit: Units,
-        attribs: Vec<Attrib>) -> Self
+        attribs: Vec<Attrib>,
+        notes: Option<String>) -> Self
     {
         let unit = Units::from(unit);
         Self {
             id: Uuid::new_v4(),
-            name, val, time: Utc::now(), unit, attribs
+            name, val, time: Utc::now(), unit, attribs, notes,
         }
     }
 
@@ -109,7 +112,7 @@ impl Default for Fact {
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
                 &name, &val, &unit, &attribs).color(Color::BrightCyan));
-        Fact::new(name, val, unit, attribs)
+        Fact::new(name, val, unit, attribs, None)
     }
 }
 
@@ -119,5 +122,27 @@ impl fmt::Display for Fact {
         let attribs: String = Attrib::join(attribs);
         f.write_fmt(format_args!("Fact: {}: {} {} {}",
             &self.name, &self.val, &self.unit, &attribs))
+    }
+}
+
+impl std::convert::TryFrom<csv::StringRecord> for Fact {
+    type Error = csv::Error;
+    fn try_from(rec: csv::StringRecord) -> Result<Self, Self::Error> {
+        let fact = Fact {
+            id: Uuid::parse_str(&rec[0])
+                .expect("Could not parse UUID"),
+            name: rec[1].to_string(),
+            val: rec[2].to_string(),
+            time: DateTime::parse_from_rfc2822(&rec[3])
+                .expect("Could not parse datetime").into(),
+            unit: Units::Other(rec[4].to_string()), //TODO handle date parsing
+            notes: if !rec[5].len().eq(&0) {
+                    Some(rec[5].to_string())
+                } else {None},
+            attribs: rec.iter().skip(5)
+                .map(|a| Attrib::new(a))
+                .collect(),
+        };
+        Ok(fact)
     }
 }

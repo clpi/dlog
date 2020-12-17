@@ -1,4 +1,7 @@
-use std::{path::PathBuf, fs};
+use std::{
+    path::PathBuf, fs,
+    convert::TryFrom,
+};
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 use chrono::{Utc, DateTime};
@@ -91,20 +94,7 @@ impl Record {
         while let Some(rec) = rdr.records().next() {
             match rec {
                 Ok(rec) => {
-                    println!("{:#?}", rec);
-                    let attribs: Vec<Attrib> = rec.iter().skip(3)
-                        .map(|a| Attrib::new(a))
-                        .collect();
-                    let fact = Fact {
-                        id: Uuid::parse_str(&rec[0])
-                            .expect("Could not parse UUID"),
-                        name: rec[1].to_string(),
-                        val: rec[2].to_string(),
-                        time: DateTime::parse_from_rfc2822(&rec[3])
-                            .expect("Could not parse datetime").into(),
-                        unit: Units::Other(rec[4].to_string()), //TODO handle date parsing
-                        attribs,
-                    };
+                    let fact = Fact::try_from(rec)?;
                     println!("{:#?}", fact);
                 },
                 Err(e) => return Err(From::from(e)),
