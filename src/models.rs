@@ -21,3 +21,22 @@ pub use action::Action;
 pub struct Object {
 
 }
+
+use chrono::{prelude::*};
+
+pub trait Entry {
+
+    fn datetime(&self) -> chrono::DateTime<chrono::Utc>;
+
+    fn date(&self) -> chrono::Date<chrono::Utc> {
+        self.datetime().date()
+    }
+
+    fn time(&self) -> chrono::NaiveTime {
+        self.datetime().time()
+    }
+
+    fn weekday(&self) -> chrono::Weekday {
+        self.datetime().weekday()
+    }
+}

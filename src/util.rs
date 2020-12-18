@@ -1,5 +1,6 @@
 pub mod file;
 
+use chrono::{prelude::*, DateTime, Utc, Weekday, Month, Date};
 use colored::{Colorize, Color};
 use std::{fs, io::{Read, prelude::*, self}, path::PathBuf};
 
@@ -86,3 +87,7 @@ pub fn get_or_create_data_dir() -> io::Result<PathBuf> {
     Ok(def_data_dir)
 }
 
+
+pub fn split_datetime(datetime: chrono::DateTime<chrono::Utc>) -> () {
+
+}

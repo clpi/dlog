@@ -7,7 +7,7 @@ use uuid::Uuid;
 use chrono::{Utc, DateTime};
 use crate::{
     util,
-    models::{Units, Fact, Item},
+    models::{Entry, Units, Fact, Item},
     cmd::{ Cmd,
     }
 };
@@ -22,14 +22,16 @@ pub struct Record {
     pub name: String,
     #[serde(rename="Item")]
     pub items: Vec<Item>,
+    pub created: DateTime<Utc>,
 }
 
 impl Default for Record {
     fn default() -> Self {
-        Self {
+        Self { //FIXME should lookup UUID and created time for Inbox record, not generate
             id: Uuid::new_v4(),
             name: "Inbox".into() ,
             items: Vec::new(),
+            created: Utc::now(),
         }
     }
 }
@@ -38,7 +40,7 @@ impl Record {
 
     pub fn new(name: Option<String>) -> Self {
         if let Some(name) = name {
-            Self { id: Uuid::new_v4(), name, items: Vec::new() }
+            Self { id: Uuid::new_v4(), name, items: Vec::new(), created: Utc::now(), }
         } else {
             Self::default()
         }
@@ -107,12 +109,18 @@ impl Record {
 
 impl From<String> for Record {
     fn from(name: String) -> Self {
-        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new() }
+        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new(), created: Utc::now() }
     }
 }
 
 impl FromArgMatches for Record {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         Self::default()
+    }
+}
+
+impl Entry for Record {
+    fn datetime(&self) -> chrono::DateTime<Utc> {
+        self.created
     }
 }

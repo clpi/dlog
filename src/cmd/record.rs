@@ -1,5 +1,7 @@
 use crate::{
-    models::record::Record, cmd::Cmd,
+    models::{
+        Entry, record::Record
+    }, cmd::Cmd,
 };
 use clap::{ArgMatches, FromArgMatches, Subcommand};
 use colored::{Color, Colorize, Style, Styles};

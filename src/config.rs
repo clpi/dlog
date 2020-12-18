@@ -16,6 +16,8 @@ pub enum FormatConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     name: Option<String>,
+    #[serde(skip)]
+    timezone: Option<chrono::FixedOffset>,
     dialect: Option<String>,
     color: Option<bool>,
     data_dir: Option<String>,
@@ -47,7 +49,7 @@ impl Config {
 
     pub fn dialect(self) -> Option<chrono_english::Dialect> {
         if let Some(dialect) = self.dialect {
-            match dialect.as_str() {
+            match dialect.to_lowercase().as_str() {
                 "en_us" => Some(chrono_english::Dialect::Us),
                 "en_uk" => Some(chrono_english::Dialect::Uk),
                 _ => None,
@@ -88,6 +90,7 @@ impl Default for Config {
             user: None,
             item: None,
             fact: None,
+            timezone: None,
             ..Default::default()
         }
     }

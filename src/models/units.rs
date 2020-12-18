@@ -1,7 +1,7 @@
 use crate::util::prompt_input;
 use std::{fmt, path::PathBuf, convert::TryFrom, time};
 use serde::{Serialize, Deserialize};
-use chrono::{Utc, DateTime};
+use chrono::{Utc, DateTime, Duration, format, prelude::*};
 use chrono_english::{Dialect, DateError, parse_date_string};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
@@ -10,8 +10,8 @@ use colored::{Color, Colorize};
 pub enum Units {
     #[serde(rename="Date")]
     Datetime(DateTime<Utc>),
-    #[serde(rename="Duration")]
-    Duration(time::Duration),
+    #[serde(skip, rename="Duration")]
+    Duration(Duration),
     #[serde(rename="Other")]
     Other(String),
     #[serde(rename="None")]
@@ -107,7 +107,7 @@ impl std::str::FromStr for Units {
                     || w.contains("hr") || w.contains("hour")
             })
             {
-                return Ok(Units::Duration(time::Duration::from_secs(1000)));
+                return Ok(Units::Duration(Duration::seconds(100)));
             } else {
                 return Ok(Units::Other(s.to_string()));
             }
@@ -134,7 +134,7 @@ impl fmt::Display for Units {
                 f.write_str(units.as_str())?;
             },
             Units::Duration(duration) => {
-                f.write_str(&duration.as_secs().to_string())?;
+                f.write_str(&duration.num_seconds().to_string())?;
             }
             Units::None => {
                 String::new();

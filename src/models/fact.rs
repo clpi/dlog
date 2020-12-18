@@ -1,6 +1,7 @@
 use crate::{
     csv as Csv, util::prompt_input,
     models::{
+        Entry,
         units::Units,
         record::Record,
         item::Item,
@@ -110,6 +111,7 @@ impl Fact {
         // use chrono::prelude::*;
         Ok(String::new())
     }
+
 }
 
 impl Default for Fact {
@@ -154,5 +156,11 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
                 .collect(),
         };
         Ok(fact)
+    }
+}
+
+impl Entry for Fact {
+    fn datetime(&self) -> chrono::DateTime<Utc> {
+        self.time
     }
 }

@@ -1,10 +1,11 @@
 use std::{rc::Rc, path::PathBuf};
+use chrono::{prelude::*, Utc, DateTime};
 use serde::{Serialize, Deserialize};
 use crate::util::prompt_input;
 use colored::{Color, Colorize};
 use crate::{
     error::DResult,
-    models::{Fact, Record},
+    models::{Entry, Fact, Record},
 };
 use uuid::Uuid;
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
@@ -16,6 +17,7 @@ pub struct Item {
     pub name: String,
     #[serde(skip)]
     pub record: Rc<Record>,
+    pub created: DateTime<Utc>,
 }
 
 impl Default for Item {
@@ -27,7 +29,8 @@ impl Default for Item {
             .color(Color::BrightCyan));
         Item {
             id: Uuid::new_v4(),
-            name, record: Rc::new(Record::default())
+            name, record: Rc::new(Record::default()),
+            created: Utc::now(),
         }
     }
 }
@@ -37,10 +40,9 @@ impl Item {
     pub fn new(name: String, record: Option<String>) -> Self {
         let id: Uuid = Uuid::new_v4();
         if let Some(record) = record {
-            Self { id, name, record: Rc::new(Record::from(record))
-            }
+            Self { id, name, record: Rc::new(Record::from(record)), created: Utc::now()}
         } else {
-            Self { id, name, record: Rc::new(Record::default()) }
+            Self { id, name, record: Rc::new(Record::default()), created: Utc::now() }
         }
     }
 
@@ -91,5 +93,11 @@ impl FromArgMatches for Item {
             },
             (_, _) => Self::default(),
         }
+    }
+}
+
+impl Entry for Item {
+    fn datetime(&self) -> DateTime<Utc> {
+        self.created
     }
 }
