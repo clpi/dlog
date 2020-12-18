@@ -9,7 +9,7 @@ use colored::{Color, Colorize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Units {
     #[serde(rename="Date")]
-    Datetime(DateTime<Utc>),
+    Datetime(DateTime<Local>),
     #[serde(skip, rename="Duration")]
     Duration(Duration),
     #[serde(rename="Other")]
@@ -61,6 +61,11 @@ impl Units {
             if word.chars().all(|c| c.is_numeric()) {
                 println!("word is qty");
             } else {
+                if let Ok(weekday) = word.parse::<chrono::Weekday>() {
+                    use chrono::DurationRound;
+                    let _dt = weekday;
+                    let today = Local::now().weekday();
+                }
                 if word.contains("day") {
 
                 } else if word.contains("hr") || word.contains("hour") {
@@ -86,7 +91,7 @@ impl Units {
 impl From<Option<String>> for Units {
     fn from(input: Option<String>) -> Self {
         if let Some(input) = input { //TODO check if datetime
-            if let Ok(date) = chrono_english::parse_date_string::<Utc>(&input, Utc::now(), Dialect::Us){
+            if let Ok(date) = chrono_english::parse_date_string::<Local>(&input, Local::now(), Dialect::Us){
                 return Units::Datetime(date);
             }
             Units::Other(input)
@@ -97,7 +102,7 @@ impl From<Option<String>> for Units {
 impl std::str::FromStr for Units {
     type Err = crate::error::DError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Ok(date) = chrono_english::parse_date_string::<Utc>(s, Utc::now(), Dialect::Us){
+        if let Ok(date) = chrono_english::parse_date_string::<Local>(s, Local::now(), Dialect::Us){
             return Ok(Units::Datetime(date));
         }
         if let Some(dur) = s.strip_prefix("for") { //TODO split this into match fn

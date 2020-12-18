@@ -29,7 +29,9 @@ dashmap = { version = "*", features = ["serde"] }
 chrono-humanize = "0.1.1"
 chrono-english = "0.1.4"
 ignore = "*"
-reqwest = { version = "*", features = ["blocking"]}
+chrono-tz = "0.5.3"
+regex = "1.4.2"
+# reqwest = { version = "*", features = ["blocking"]}
 # humantime = "2.0"
 # globset = "0.4"
 # anyhow = "1.0"

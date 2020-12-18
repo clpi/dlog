@@ -43,3 +43,4 @@
 - [ ] Make top level args (index 1 and 2) be free values corresponding to fact name and value, respectively
 - [ ] Add unit of measure
 - [ ] Figure out if you're going to implement the cmd flow through enums or if you should give up on that project and just make it all through functions or fieldless structs
+- [ ] $12/18/20$ $00:07$ TODO separate core logic (models, parsing natural language, data structure representation, etc.) from CLI logic
