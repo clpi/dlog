@@ -17,7 +17,7 @@ pub struct Item {
     pub name: String,
     #[serde(skip)]
     pub record: Rc<Record>,
-    pub created: DateTime<Utc>,
+    pub created: DateTime<Local>,
 }
 
 impl Default for Item {
@@ -30,7 +30,7 @@ impl Default for Item {
         Item {
             id: Uuid::new_v4(),
             name, record: Rc::new(Record::default()),
-            created: Utc::now(),
+            created: Local::now(),
         }
     }
 }
@@ -40,9 +40,9 @@ impl Item {
     pub fn new(name: String, record: Option<String>) -> Self {
         let id: Uuid = Uuid::new_v4();
         if let Some(record) = record {
-            Self { id, name, record: Rc::new(Record::from(record)), created: Utc::now()}
+            Self { id, name, record: Rc::new(Record::from(record)), created: Local::now()}
         } else {
-            Self { id, name, record: Rc::new(Record::default()), created: Utc::now() }
+            Self { id, name, record: Rc::new(Record::default()), created: Local::now() }
         }
     }
 
@@ -97,7 +97,7 @@ impl FromArgMatches for Item {
 }
 
 impl Entry for Item {
-    fn datetime(&self) -> DateTime<Utc> {
+    fn datetime(&self) -> DateTime<Local> {
         self.created
     }
 }

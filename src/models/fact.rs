@@ -11,7 +11,7 @@ use crate::{
 use uuid::Uuid;
 use std::{fmt, path::PathBuf};
 use serde::{Serialize, Deserialize};
-use chrono::{Utc, DateTime};
+use chrono::{Utc, DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
@@ -37,8 +37,8 @@ pub struct Fact {
     pub val: FactVal,
     #[serde(rename="Units", default="Units::default")]
     pub unit: Units,
-    #[serde(rename="Datetime", default="Utc::now")]
-    pub time: DateTime<Utc>,
+    #[serde(rename="Datetime", default="Local::now")]
+    pub time: DateTime<chrono::Local>,
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes")]
@@ -57,7 +57,7 @@ impl Fact {
         let unit = Units::from(unit);
         Self {
             id: Uuid::new_v4(),
-            name, val, time: Utc::now(), unit, attribs, notes,
+            name, val, time: Local::now(), unit, attribs, notes,
         }
     }
 
@@ -160,7 +160,7 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
 }
 
 impl Entry for Fact {
-    fn datetime(&self) -> chrono::DateTime<Utc> {
+    fn datetime(&self) -> chrono::DateTime<chrono::Local> {
         self.time
     }
 }

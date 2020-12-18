@@ -16,8 +16,6 @@ pub enum FormatConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     name: Option<String>,
-    #[serde(skip)]
-    timezone: Option<chrono::FixedOffset>,
     dialect: Option<String>,
     color: Option<bool>,
     data_dir: Option<String>,
@@ -90,7 +88,6 @@ impl Default for Config {
             user: None,
             item: None,
             fact: None,
-            timezone: None,
             ..Default::default()
         }
     }

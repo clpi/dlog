@@ -4,7 +4,7 @@ use std::{
 };
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use chrono::{Utc, DateTime};
+use chrono::{Utc, DateTime, Local};
 use crate::{
     util,
     models::{Entry, Units, Fact, Item},
@@ -22,7 +22,7 @@ pub struct Record {
     pub name: String,
     #[serde(rename="Item")]
     pub items: Vec<Item>,
-    pub created: DateTime<Utc>,
+    pub created: DateTime<Local>,
 }
 
 impl Default for Record {
@@ -31,7 +31,7 @@ impl Default for Record {
             id: Uuid::new_v4(),
             name: "Inbox".into() ,
             items: Vec::new(),
-            created: Utc::now(),
+            created: Local::now(),
         }
     }
 }
@@ -40,7 +40,7 @@ impl Record {
 
     pub fn new(name: Option<String>) -> Self {
         if let Some(name) = name {
-            Self { id: Uuid::new_v4(), name, items: Vec::new(), created: Utc::now(), }
+            Self { id: Uuid::new_v4(), name, items: Vec::new(), created: Local::now(), }
         } else {
             Self::default()
         }
@@ -109,7 +109,7 @@ impl Record {
 
 impl From<String> for Record {
     fn from(name: String) -> Self {
-        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new(), created: Utc::now() }
+        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new(), created: Local::now() }
     }
 }
 
@@ -120,7 +120,7 @@ impl FromArgMatches for Record {
 }
 
 impl Entry for Record {
-    fn datetime(&self) -> chrono::DateTime<Utc> {
+    fn datetime(&self) -> chrono::DateTime<Local> {
         self.created
     }
 }

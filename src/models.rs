@@ -26,9 +26,9 @@ use chrono::{prelude::*};
 
 pub trait Entry {
 
-    fn datetime(&self) -> chrono::DateTime<chrono::Utc>;
+    fn datetime(&self) -> chrono::DateTime<chrono::Local>;
 
-    fn date(&self) -> chrono::Date<chrono::Utc> {
+    fn date(&self) -> chrono::Date<chrono::Local> {
         self.datetime().date()
     }
 
