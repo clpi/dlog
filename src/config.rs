@@ -16,6 +16,7 @@ pub enum FormatConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Config {
     name: Option<String>,
+    dialect: Option<String>,
     color: Option<bool>,
     data_dir: Option<String>,
     format: Option<FormatConfig>,
@@ -44,6 +45,15 @@ impl Config {
         Ok(conf)
     }
 
+    pub fn dialect(self) -> Option<chrono_english::Dialect> {
+        if let Some(dialect) = self.dialect {
+            match dialect.as_str() {
+                "en_us" => Some(chrono_english::Dialect::Us),
+                "en_uk" => Some(chrono_english::Dialect::Uk),
+                _ => None,
+            }
+        } else { None }
+    }
 
     pub fn conf_dir() -> PathBuf {
         util::get_or_create_conf_dir()

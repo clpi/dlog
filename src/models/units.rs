@@ -100,6 +100,18 @@ impl std::str::FromStr for Units {
         if let Ok(date) = chrono_english::parse_date_string::<Utc>(s, Utc::now(), Dialect::Us){
             return Ok(Units::Datetime(date));
         }
+        if let Some(dur) = s.strip_prefix("for") { //TODO split this into match fn
+            if dur.split_whitespace().any(|w| {
+                w.contains("min") || w.contains("minute")
+                    || w.contains("sec") || w.contains("second")
+                    || w.contains("hr") || w.contains("hour")
+            })
+            {
+                return Ok(Units::Duration(time::Duration::from_secs(1000)));
+            } else {
+                return Ok(Units::Other(s.to_string()));
+            }
+        }
         return Ok(Units::Other(s.to_string()))
     }
 }
@@ -109,6 +121,7 @@ impl From<Vec<String>> for Units {
         Self::default() //TODO implement
     }
 }
+
 
 
 impl fmt::Display for Units {
