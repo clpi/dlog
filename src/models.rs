@@ -6,6 +6,7 @@ pub mod item;
 pub mod record;
 pub mod units;
 pub mod stats;
+pub mod value;
 
 pub use units::Units;
 pub use fact::Fact;

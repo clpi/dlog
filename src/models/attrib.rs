@@ -9,6 +9,7 @@ use colored::{Colorize, Color};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Attrib {
+    #[serde(rename = "Name")]
     pub name: String,
 }
 

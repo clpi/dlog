@@ -14,21 +14,31 @@ use chrono::{Utc, DateTime};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
+pub type FactKey = String;
+pub type FactVal = String;
+
+pub struct ConcreteFact {
+    pub name: FactKey,
+    pub val: FactVal,
+    pub attribs: Vec<Attrib>,
+}
+
 /// A single key-value pair to be logged into a csv corresponding to the fact's
 /// name (key). Fact entries are automatically tagged with their time of entry
 /// and each entry may optionally be associated with a number of different attributes.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Fact {
+    #[serde(rename="Id", default="Uuid::new_v4")]
     pub id: uuid::Uuid,
     #[serde(rename="Fact")]
-    pub name: String,
+    pub name: FactKey,
     #[serde(rename="Value")]
-    pub val: String,
-    #[serde(rename="Units")]
+    pub val: FactVal,
+    #[serde(rename="Units", default="Units::default")]
     pub unit: Units,
-    #[serde(rename="Datetime")]
+    #[serde(rename="Datetime", default="Utc::now")]
     pub time: DateTime<Utc>,
-    #[serde(rename="Attribute")]
+    #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes")]
     pub notes: Option<String>,

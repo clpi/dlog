@@ -1,16 +1,34 @@
 use crate::util::prompt_input;
-use std::{fmt, path::PathBuf};
+use std::{fmt, path::PathBuf, convert::TryFrom, time};
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime};
+use chrono_english::{Dialect, DateError, parse_date_string};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Units {
+    #[serde(rename="Date")]
     Datetime(DateTime<Utc>),
+    #[serde(rename="Duration")]
+    Duration(time::Duration),
+    #[serde(rename="Other")]
     Other(String),
+    #[serde(rename="None")]
     None,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum UserUnit {
+    DiscreteNum(i32),
+    ContinuousNum(f32),
+    Text(String),
+    Enumeration {
+        name: String,
+        vals: std::collections::HashMap<String, String>,
+    },
+}
+
 
 impl Default for Units {
     fn default() -> Self {
@@ -68,10 +86,30 @@ impl Units {
 impl From<Option<String>> for Units {
     fn from(input: Option<String>) -> Self {
         if let Some(input) = input { //TODO check if datetime
+            if let Ok(date) = chrono_english::parse_date_string::<Utc>(&input, Utc::now(), Dialect::Us){
+                return Units::Datetime(date);
+            }
             Units::Other(input)
         } else { Units::None }
     }
 }
+
+impl std::str::FromStr for Units {
+    type Err = crate::error::DError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if let Ok(date) = chrono_english::parse_date_string::<Utc>(s, Utc::now(), Dialect::Us){
+            return Ok(Units::Datetime(date));
+        }
+        return Ok(Units::Other(s.to_string()))
+    }
+}
+
+impl From<Vec<String>> for Units {
+    fn from(units: Vec<String>) -> Self {
+        Self::default() //TODO implement
+    }
+}
+
 
 impl fmt::Display for Units {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -82,6 +120,9 @@ impl fmt::Display for Units {
             Units::Other(units) => {
                 f.write_str(units.as_str())?;
             },
+            Units::Duration(duration) => {
+                f.write_str(&duration.as_secs().to_string())?;
+            }
             Units::None => {
                 String::new();
             }
@@ -102,13 +143,4 @@ pub enum DateStr {
     Ms(u32),
 }
 
-/*
-impl std::str::FromStr for DateStr {
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match *s {
-            "d"
-        }
-    }
-}
-*/
 
