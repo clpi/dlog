@@ -31,6 +31,13 @@ chrono-english = "0.1.4"
 ignore = "*"
 chrono-tz = "0.5.3"
 regex = "1.4.2"
+glob = "*"
+
+[dependencies.config]
+version = "*"
+default-features = false
+features = ["toml"]
+
 # reqwest = { version = "*", features = ["blocking"]}
 # humantime = "2.0"
 # globset = "0.4"

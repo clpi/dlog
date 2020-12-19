@@ -4,16 +4,12 @@ use std::{
 };
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
-use chrono::{Utc, DateTime, Local};
+use chrono::{DateTime, Local};
 use crate::{
     util,
     models::{Entry, Units, Fact, Item},
-    cmd::{ Cmd,
-    }
 };
-use clap::{ArgMatches, FromArgMatches, Subcommand};
-use colored::{Color, Colorize, Style, Styles};
-use super::attrib::Attrib;
+use clap::{ArgMatches, FromArgMatches};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
