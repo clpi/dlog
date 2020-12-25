@@ -1,5 +1,4 @@
 use crate::util;
-use config::{Config, ConfigError};
 use std::{
     fs, io::{self, prelude::*}, path::PathBuf,
         convert::TryInto, collections::HashMap,
@@ -23,6 +22,7 @@ pub struct DConfig {
     custom_db: Option<String>,
     data_dir: Option<String>,
     date_format: Option<String>,
+    default_editor: Option<String>,
     encryption: bool,
     synchronization: bool,
     password: Option<String>,
@@ -38,7 +38,7 @@ impl DConfig {
 
     pub fn new() -> Self {
         let path = Self::conf_dir().join("config");
-        let cf = Config::default();
+        let mut cf = config::Config::default();
         cf.merge(config::File::with_name(path.to_str().unwrap()))
             .unwrap()
             .merge(config::Environment::with_prefix("APP")).unwrap();

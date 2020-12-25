@@ -20,9 +20,11 @@ colored = "2.0.0"
 dirs-next = "2.0.0"
 serde = { version = "*", features = ["derive"] }
 chrono = {version="*", features=["serde"]}
+crossterm = "*"
 toml = "0.5.7"
 csv = "1.1.5"
 comfy-table = "1.4.2"
+indicatif = "*"
 uuid = { version = "*", features = ["v4", "serde"] }
 atty = "0.2.14"
 dialoguer = "0.7.1"
@@ -30,6 +32,8 @@ ring = "0.16.19"
 clipboard = "0.5.0"
 serde_json = {version = "1.0.60", features = ["preserve_order"]}
 dashmap = { version = "*", features = ["serde"] }
+grep-cli = "*"
+edit = "*"
 chrono-humanize = "0.1.1"
 chrono-english = "0.1.4"
 ignore = "*"
@@ -38,6 +42,7 @@ regex = "1.4.2"
 glob = "*"
 sled = "*"
 lazy_static = "*"
+clap_generate = "*"
 
 [dependencies.config]
 version = "*"

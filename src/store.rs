@@ -1,7 +1,7 @@
 use sled::{Config as SConfig, Db, IVec};
 use std::path::PathBuf;
 use crate::{
-    config::Config,
+    config::DConfig,
     error::DError,
     models::{Record, Fact, Item},
 };
@@ -32,7 +32,7 @@ impl Store {
 
 impl Default for Store {
     fn default() -> Self {
-        let loc = Config::conf_dir().join("db");
+        let loc = DConfig::conf_dir().join("db");
         let db = SConfig::default()
             .path(&loc)
             .cache_capacity(10_000_000)
