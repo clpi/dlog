@@ -120,3 +120,13 @@ impl Entry for Record {
         self.created
     }
 }
+
+pub struct RecordIdKey {
+    id: uuid::Uuid,
+    uid: uuid::Uuid,
+}
+
+pub struct RecordNameKey {
+    name: String,
+    username: String,
+}

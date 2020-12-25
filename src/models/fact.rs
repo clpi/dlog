@@ -159,6 +159,7 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
     }
 }
 
+
 impl Entry for Fact {
     fn datetime(&self) -> chrono::DateTime<chrono::Local> {
         self.time

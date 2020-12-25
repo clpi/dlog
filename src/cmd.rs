@@ -8,7 +8,7 @@ pub mod user;
 pub mod stats;
 pub mod args;
 
-use super::config::Config;
+use super::config::DConfig;
 use self::{
     item::ItemCmd,
     fact::FactCmd,
@@ -48,7 +48,7 @@ impl App {
 
     pub fn run() {
         let term = TermSettings::new();
-        let _conf = Config::load();
+        let _conf = DConfig::load();
         let matches = clap::app_from_crate!()
             .setting(term.color)
             .setting(clap::AppSettings::DeriveDisplayOrder)

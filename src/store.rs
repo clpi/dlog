@@ -1,32 +1,48 @@
-use dirs_next::data_dir;
-use std::{
-    fs, path::PathBuf,
-    sync::{Arc, Mutex},
-};
+use sled::{Config as SConfig, Db, IVec};
+use std::path::PathBuf;
 use crate::{
+    config::Config,
     error::DError,
-    models::Record,
-    util::prompt_input,
+    models::{Record, Fact, Item},
 };
 
 #[derive(Debug)]
 pub struct Store {
+    db: sled::Db,
     loc: PathBuf,
-    records: Arc<Mutex<Vec<Record>>>,
+}
+
+impl Store {
+
+    pub fn init(&self) -> sled::Result<()> {
+        let reco = self.db.open_tree("record")?;
+        let item = self.db.open_tree("item")?;
+
+
+        Ok(())
+    }
+
+    pub fn insert_fact(&self, fact: Fact) -> sled::Result<()> {
+        let fact = self.db.open_tree("fact")?;
+        // fact.insert(fact.id, serde:)
+
+        Ok(())
+    }
 }
 
 impl Default for Store {
     fn default() -> Self {
-        let dir = if let Some(ddir) = data_dir() {
-            ddir
-        } else if let Ok(ddir) = prompt_input("Data dir?") {
-            PathBuf::from(ddir)
-        } else {
-            PathBuf::default()
-        };
+        let loc = Config::conf_dir().join("db");
+        let db = SConfig::default()
+            .path(&loc)
+            .cache_capacity(10_000_000)
+            .use_compression(true)
+            .mode(sled::Mode::HighThroughput)
+            .temporary(false)
+            .create_new(true)
+            .open().expect("Could not open DB");
         Self {
-            loc: dir,
-            records: Arc::new(Mutex::new(vec![ Record::default() ]))
+            db: sled::open(&loc).unwrap(), loc,
         }
     }
 }
@@ -34,9 +50,10 @@ impl Default for Store {
 impl Store {
 
     pub fn add_record(&mut self, record: Record) {
-        if let Ok(mut rec) = self.records.lock() {
-            rec.push(record);
-        }
+        // self.db.insert("record", IVec::from(record));
+        // if let Ok(mut rec) = self.records.lock() {
+            // rec.push(record);
+        // }
     }
 
     pub fn remove_record(&mut self, record: &str) -> Result<(), DError> {

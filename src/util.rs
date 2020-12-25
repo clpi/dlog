@@ -1,6 +1,6 @@
 pub mod file;
 
-use chrono::{prelude::*, DateTime, Utc, Weekday, Month, Date};
+// use chrono::{prelude::*, DateTime, Utc, Weekday, Month, Date};
 use colored::{Colorize, Color};
 use std::{fs, io::{Read, prelude::*, self}, path::PathBuf};
 
@@ -49,7 +49,7 @@ pub fn create_dir(parent: PathBuf, name: &str) -> io::Result<PathBuf> {
 }
 
 pub fn create_default_conf() -> io::Result<()> {
-    fs::copy("../assets/Config.default.toml", crate::config::Config::conf_dir())?;
+    fs::copy("../assets/Config.default.toml", crate::config::DConfig::conf_dir())?;
     Ok(())
 }
 

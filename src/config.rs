@@ -1,7 +1,8 @@
 use crate::util;
-use dirs_next::{config_dir, data_dir, home_dir};
+use config::{Config, ConfigError};
 use std::{
-    fs, io::{self, prelude::*}, path::PathBuf
+    fs, io::{self, prelude::*}, path::PathBuf,
+        convert::TryInto, collections::HashMap,
 };
 
 use serde::{Serialize, Deserialize};
@@ -14,11 +15,17 @@ pub enum FormatConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Config {
+pub struct DConfig {
     name: Option<String>,
     dialect: Option<String>,
+    start_of_week: Option<chrono::Weekday>,
     color: Option<bool>,
+    custom_db: Option<String>,
     data_dir: Option<String>,
+    date_format: Option<String>,
+    encryption: bool,
+    synchronization: bool,
+    password: Option<String>,
     format: Option<FormatConfig>,
     data_loc: Option<PathBuf>,
     record: Option<RecordConfig>,
@@ -27,7 +34,17 @@ pub struct Config {
     user: Option<UserConfig>,
 }
 
-impl Config {
+impl DConfig {
+
+    pub fn new() -> Self {
+        let path = Self::conf_dir().join("config");
+        let cf = Config::default();
+        cf.merge(config::File::with_name(path.to_str().unwrap()))
+            .unwrap()
+            .merge(config::Environment::with_prefix("APP")).unwrap();
+        println!("{:?}", cf.try_into::<HashMap<String, String>>().unwrap());
+        Self::default()
+    }
 
     pub fn load() -> io::Result<Self> {
         let path = Self::conf_dir().join("dlog.toml");
@@ -65,7 +82,7 @@ impl Config {
             .expect("Could not get or create conf dir")
     }
 
-    pub fn default_config() -> Config {
+    pub fn default_config() -> DConfig {
     let toml_str = r#"
         [format]
         [user]
@@ -73,12 +90,12 @@ impl Config {
         [item]
         [fact]
     "#;
-    let conf: Config = toml::from_str(toml_str).unwrap();
+    let conf: DConfig = toml::from_str(toml_str).unwrap();
     conf
     }
 }
 
-impl Default for Config {
+impl Default for DConfig {
     fn default() -> Self {
         Self {
             name: None,

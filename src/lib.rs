@@ -8,7 +8,12 @@ pub mod error;
 
 pub use error::DResult;
 
-use std::io;
+use std::{io, sync::RwLock};
+
+lazy_static::lazy_static! {
+    static ref CONF: RwLock<Vec<u8>> = RwLock::new(Vec::new());
+}
+
 
 fn main() -> io::Result<()> {
     cmd::App::run();

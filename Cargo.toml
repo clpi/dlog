@@ -9,7 +9,11 @@ default_run = "dlog"
 
 [[bin]]
 name = "dlog"
-path = "src/main.rs"
+path = "src/bin/dlog.rs"
+
+[lib]
+name = "dlog"
+path = "src/lib.rs"
 
 [dependencies]
 colored = "2.0.0"
@@ -32,6 +36,8 @@ ignore = "*"
 chrono-tz = "0.5.3"
 regex = "1.4.2"
 glob = "*"
+sled = "*"
+lazy_static = "*"
 
 [dependencies.config]
 version = "*"
