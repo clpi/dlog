@@ -66,7 +66,7 @@ impl App {
                 clap::App::new("export")
                     .about("Export all of your data to a .zip file or HTML, or save your data to a file to be imported later"),
                 clap::App::new("import")
-                    .about("Import dlog data or other data sources into a local Dlog database")
+                    .about("Import dlog data or other data sources into a local Dlog database"),
                 clap::App::new("inbox")
                     .about("Show operations related to unorganized facts and items"),
             ])

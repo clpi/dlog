@@ -1,5 +1,5 @@
 use crate::{
-    csv as Csv, util::prompt_input,
+    csv as Csv, prompt,
     models::{
         Entry,
         units::Units,
@@ -84,7 +84,7 @@ impl Fact {
             },
             (None, Some(item)) => {
                 // TODO put in uncategorized, don't prompt for record
-                let rec = Record::from(prompt_input("What is the record name?: ")?);
+                let rec = Record::from(prompt::prompt("What is the record name?: ")?);
                 let rec = rec.get_or_create()?;
                 let rec = rec.parent().expect("Could not get record parent");
                 let item = PathBuf::from(rec).join(item.name);
@@ -116,9 +116,9 @@ impl Fact {
 
 impl Default for Fact {
     fn default() -> Self {
-        let name = prompt_input("Fact name: ")
+        let name = prompt::prompt("Fact name: ")
             .expect("Could not prompt fact name");
-        let val = prompt_input("Fact value: ")
+        let val = prompt::prompt("Fact value: ")
             .expect("Could not prompt fact value");
         let unit = Units::prompt("Units? (Enter if not applicable): ");
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");

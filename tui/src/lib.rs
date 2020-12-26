@@ -4,7 +4,6 @@ pub mod error;
 pub mod store;
 pub mod view;
 
-use std::io;
 use error::EError;
 
 pub fn run() -> Result<(), EError> {

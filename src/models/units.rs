@@ -1,4 +1,4 @@
-use crate::util::prompt_input;
+use crate::prompt::prompt;
 use std::{fmt, path::PathBuf, convert::TryFrom, time};
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime, Duration, format, prelude::*};
@@ -38,8 +38,8 @@ impl Default for Units {
 
 impl Units {
 
-    pub fn prompt(prompt: &str) -> Self {
-        let unit = prompt_input(prompt)
+    pub fn prompt(prompt_str: &str) -> Self {
+        let unit = prompt(prompt_str)
             .expect("Could not prompt fact value");
        Self::from_prompt(unit)
     }
@@ -62,7 +62,6 @@ impl Units {
                 println!("word is qty");
             } else {
                 if let Ok(weekday) = word.parse::<chrono::Weekday>() {
-                    use chrono::DurationRound;
                     let _dt = weekday;
                     let today = Local::now().weekday();
                 }

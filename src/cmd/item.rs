@@ -50,17 +50,17 @@ impl Cmd for ItemCmd {
                 Arg::new("NAME")
                     .about("Name of the item to log")
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .index(1),
                 Arg::new("FACT") //TODO if no index 3, prompt from stdin
                     .about("Optional fact to associate with new item")
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .index(2),
                 Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
                     .about("Optional value of the fact to associate with new fact")
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .index(3),
                 Arg::new("uncategorized")
                     .aliases(&["misc", "uncat", "etc"])
@@ -73,14 +73,14 @@ impl Cmd for ItemCmd {
                     .long("attrib")
                     .short('a')
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .multiple(true),
                 Arg::new("record")
                     .about("Specify the record to add this fact to")
                     .long("record")
                     .short('r')
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .multiple(true),
                 Arg::new("link-attribute")
                     .long("Whether to persist the attribute-item link")

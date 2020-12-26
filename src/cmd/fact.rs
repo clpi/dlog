@@ -60,7 +60,7 @@ impl Cmd for FactCmd {
                     .long("attrib")
                     .short('a')
                     .required(false)
-                    .validator(|a| crate::util::validate_input(a.into()))
+                    .validator(|a| crate::prompt::validate_input(a.into()))
                     .multiple(true),
                 clap::Arg::new("notes")
                     .long("notes")
@@ -312,7 +312,7 @@ impl FactCmd {
         clap::Arg::new("NAME")
             .about("Name of the fact to get or make")
             .required(false)
-            .validator(|a| crate::util::validate_input(a.into()))
+            .validator(|a| crate::prompt::validate_input(a.into()))
             .index(idx)
     }
 
@@ -321,7 +321,7 @@ impl FactCmd {
             .requires("NAME")
             .about("Value of the fact given by NAME")
             .required(false)
-            .validator(|a| crate::util::validate_input(a.into()))
+            .validator(|a| crate::prompt::validate_input(a.into()))
             .index(idx)
     }
 
@@ -335,7 +335,7 @@ impl FactCmd {
             .require_delimiter(true)
             .requires_all(&["VALUE", "NAME"])
             .required(false)
-            .validator(|a| crate::util::validate_input(a.into()))
+            .validator(|a| crate::prompt::validate_input(a.into()))
             .index(idx)
     }
 

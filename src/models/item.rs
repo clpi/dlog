@@ -1,9 +1,9 @@
 use std::{rc::Rc, path::PathBuf};
 use chrono::{prelude::*, Utc, DateTime};
 use serde::{Serialize, Deserialize};
-use crate::util::prompt_input;
 use colored::{Color, Colorize};
 use crate::{
+    prompt::prompt,
     error::DResult,
     models::{Entry, Fact, Record},
 };
@@ -23,7 +23,7 @@ pub struct Item {
 impl Default for Item {
     fn default() -> Self {
         // TODO make this into a function called by all default functions
-        let name = prompt_input("Item name: ")
+        let name = prompt("Item name: ")
             .expect("Could not prompt item name");
         println!("{}", format!("Got new item: {}", &name)
             .color(Color::BrightCyan));

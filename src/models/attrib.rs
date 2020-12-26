@@ -1,5 +1,5 @@
 use crate::{
-    util::prompt_input,
+    prompt::prompt,
     cmd::Cmd,
 };
 use std::fmt;
@@ -28,8 +28,8 @@ impl Attrib {
         } else { vec![] }
     }
 
-    pub fn prompt(prompt: &str) -> Vec<Attrib> {
-        let attrib = prompt_input(prompt)
+    pub fn prompt(prompt_str: &str) -> Vec<Attrib> {
+        let attrib = prompt(prompt_str)
             .expect("Could not prompt fact value");
         Self::from_prompt(attrib)
     }
