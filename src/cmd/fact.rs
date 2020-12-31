@@ -41,6 +41,7 @@ impl Cmd for FactCmd {
                 Self::new_cmd(),
                 Self::search_cmd(),
                 Self::list_cmd(),
+                Self::help_cmd(),
                 clap::App::new("get")
                     .about("Get info about a specific fact")
                     .long_flag("get")
@@ -54,6 +55,7 @@ impl Cmd for FactCmd {
                 Self::key_arg(1),
                 Self::val_arg(2),
                 Self::val_unit(3),
+                Self::val_notes(4),
                 Self::set_units(),
                 clap::Arg::new("attribs")
                     .about("Add any attribs desired to the new fact")
@@ -126,6 +128,14 @@ impl Cmd for FactCmd {
         ").color(Color::BrightCyan);
 
         println!("> {}", help)
+    }
+
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
     }
 }
 
@@ -349,6 +359,17 @@ impl FactCmd {
             .requires_all(&["VALUE", "NAME", "UNIT"])
             .required(false)
     }
+
+    pub fn val_notes(idx: u64) -> clap::Arg<'static> {
+        clap::Arg::new("notes")
+            .hidden_short_help(true)
+            .long_about("Any extra notes about the fact entry written freeform.")
+            .short('n')
+            .long("notes")
+            .required(false)
+            .index(idx)
+    }
+
 }
 
 

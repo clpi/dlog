@@ -26,6 +26,7 @@ impl Cmd for RecordCmd {
             .subcommands(vec![
                 Self::new_cmd(),
                 Self::search_cmd(),
+                Self::help_cmd(),
                 clap::App::new("list")
                     .about("List all records")
                     .long_flag("ls")
@@ -86,6 +87,14 @@ impl Cmd for RecordCmd {
                     erent actions and attributes based on... \n
         ").color(Color::BrightGreen);
         println!("> {}", help)
+    }
+
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
     }
 }
 

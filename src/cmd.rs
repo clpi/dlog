@@ -61,6 +61,7 @@ impl App {
                 StatsCmd::cmd(),
                 UserCmd::cmd(),
                 ActionCmd::cmd(),
+                Self::help_cmd(),
                 clap::App::new("init")
                     .about("Initialize a fact database in the current folder"),
                 clap::App::new("export")
@@ -73,6 +74,8 @@ impl App {
             .args(&vec![
                 FactCmd::key_arg(1),
                 FactCmd::val_arg(2),
+                FactCmd::val_unit(3),
+                FactCmd::val_notes(4),
                 Self::help(),
                 Self::version(),
                 Self::output(),
@@ -159,12 +162,21 @@ impl App {
     pub fn print_help() {
         println!("dlog help")
     }
+
+    pub fn help_cmd() -> clap::App<'static> {
+        clap::App::new("base_help")
+            .about("Prints the help for dlog")
+            .long_about("Prints help of dlog with no args, otherwise, input 'fact', 'record', 'item', etc. for a summary of how to use these different subcommands")
+            .short_flag('h')
+            .long_flag("help")
+    }
 }
 
 pub trait Cmd: FromArgMatches + Default {
     fn run(&self);
     fn cmd() -> clap::App<'static>;
     fn print_help();
+    fn help_cmd() -> clap::App<'static>;
 }
 
 

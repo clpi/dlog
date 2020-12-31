@@ -24,7 +24,7 @@ impl Cmd for UserCmd {
         clap::App::new("user")
             .about("users")
             .subcommands(vec![
-                clap::App::new("help")
+                Self::help_cmd(),
             ])
             .args(&vec![
                 clap::Arg::new("help")
@@ -36,6 +36,14 @@ impl Cmd for UserCmd {
         let help = format!("User
         ").color(Color::BrightCyan);
         println!("> {}", help)
+    }
+
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
     }
 }
 

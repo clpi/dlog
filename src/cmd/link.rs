@@ -88,6 +88,14 @@ impl Cmd for LinkCmd {
         println!("> {}", help)
     }
 
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
+    }
+
 }
 
 impl FromArgMatches for LinkCmd {
