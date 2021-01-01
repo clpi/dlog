@@ -18,10 +18,11 @@ use colored::{Color, Colorize};
 pub type FactKey = String;
 pub type FactVal = String;
 
-pub struct ConcreteFact {
+// TODO add units
+pub struct AbstractFact {
     pub name: FactKey,
-    pub val: FactVal,
     pub attribs: Vec<Attrib>,
+    pub notes: Vec<String>,
 }
 
 /// A single key-value pair to be logged into a csv corresponding to the fact's
@@ -163,5 +164,60 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
 impl Entry for Fact {
     fn datetime(&self) -> chrono::DateTime<chrono::Local> {
         self.time
+    }
+}
+
+impl FromArgMatches for Fact {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        let name = if let Some(name) = matches.value_of("NAME") {
+            name.to_string()
+        } else {
+            crate::prompt::prompt("Fact name?: ").unwrap().to_string()
+        };
+        println!("Got new fact: {}", &name);
+        if let Some(value) = matches.value_of("VALUE") {
+            println!("Got new fact: {} = {}", &name, &value);
+            let units: Units = if let Some(units)
+                = matches.values_of("UNIT")
+            {
+                if matches.occurrences_of("UNIT") == 1 {
+                    Units::Other(units.take(0).collect())
+                } else {
+                    let units = units.into_iter().collect();
+                    Units::Other(units)
+                }
+            } else { Units::None };
+            println!("Got new fact: {} = {} ({})", &name, &value, &units);
+            let attr = matches.values_of("attrib")
+                .unwrap_or_default()
+                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
+                .collect::<Vec<Attrib>>();
+            let notes = matches.values_of("notes")
+                .unwrap_or_default()
+                .map(|att| { println!("{:?}", att); att.to_string() })
+                .collect::<Vec<String>>();
+            Self::new(name.into(), value.into(), units, attr, notes)
+        } else {
+            Self { name: name.into(), ..Self::default()  }
+        }
+    }
+}
+
+impl FromArgMatches for AbstractFact {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        let name = if let Some(name) = matches.value_of("NAME") {
+            name.to_string()
+        } else {
+            crate::prompt::prompt("Fact name?: ").unwrap().to_string()
+        };
+        let linked_attribs = matches.values_of("link-attrib")
+            .unwrap_or_default()
+            .map(|att| {println!(" linked attr {:?}", att); Attrib::from(att.to_string())})
+            .collect::<Vec<Attrib>>();
+        let notes = matches.values_of("linked-notes")
+            .unwrap_or_default()
+            .map(|note| { println!(" linked note {:?}", note); note.to_string() })
+            .collect::<Vec<String>>();
+        Self { name, attribs: linked_attribs, notes }
     }
 }

@@ -1,6 +1,6 @@
 use crate::{
     models::{
-        fact::Fact,
+        fact::{Fact, AbstractFact},
         units::Units,
         item::Item,
         attrib::Attrib,
@@ -132,6 +132,7 @@ impl FromArgMatches for FactCmd {
             None => {}
         }
         let fact = Fact::from_arg_matches(&matches);
+        let fact_type = AbstractFact::from_arg_matches(&matches);
         println!("Got fact: {:?}", fact);
         Self::default()
     }
@@ -503,48 +504,6 @@ impl FactCmd {
     }
 
 }
-
-
-impl FromArgMatches for Fact {
-    fn from_arg_matches(matches: &ArgMatches) -> Self {
-        let name = if let Some(name) = matches.value_of("NAME") {
-            name.to_string()
-        } else {
-            prompt("Fact name?: ").unwrap().to_string()
-        };
-        println!("Got new fact: {}", &name);
-        if let Some(value) = matches.value_of("VALUE") {
-            println!("Got new fact: {} = {}", &name, &value);
-            let units: Units = if let Some(units)
-                = matches.values_of("UNIT")
-            {
-                if matches.occurrences_of("UNIT") == 1 {
-                    Units::Other(units.take(0).collect())
-                } else {
-                    let units = units.into_iter().collect();
-                    Units::Other(units)
-                }
-            } else { Units::None };
-            println!("Got new fact: {} = {} ({})", &name, &value, &units);
-            let linked_attribs = matches.values_of("link-attrib")
-                .unwrap_or_default()
-                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
-                .collect::<Vec<Attrib>>();
-            let attr = matches.values_of("attrib")
-                .unwrap_or_default()
-                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
-                .collect::<Vec<Attrib>>();
-            let notes = matches.values_of("notes")
-                .unwrap_or_default()
-                .map(|att| { println!("{:?}", att); att.to_string() })
-                .collect::<Vec<String>>();
-            Self::new(name.into(), value.into(), units, attr, notes)
-        } else {
-            Self { name: name.into(), ..Self::default()  }
-        }
-    }
-}
-
 
 
 
