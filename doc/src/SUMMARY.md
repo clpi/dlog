@@ -1,5 +1,6 @@
 # Summary
 
+- [Introduction](./introduction.md)
 - [Installation](./install.md)
 - [Overview of data model](model.md)
 - [Running the command](./run.md)
@@ -19,5 +20,9 @@
     - [Add actions to objects](./usage_advanced/add_action.md)
     - [Advanced searching](./usage_advanced/search.md)
     - [Examples](./usage_advanced/examples.md)
+- [Scripting](./scripting.md)
+    - [Introduction to scripting](./scripting/introduction.md)
+    - [Basics of scripting](./scripting/basics.md)
+    - [Examples](./scripting/examples.md)
 - [Export your data](./export.md)
 - [Importing your data](./import.md)

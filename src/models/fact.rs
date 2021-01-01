@@ -62,6 +62,12 @@ pub enum FactValue {
     Range(f32, f32),
 }
 
+impl Default for FactValue {
+    fn default() -> Self {
+        FactValue::Boolean(true)
+    }
+}
+
 impl From<String> for FactValue {
     fn from(val: String) -> Self {
         if let Ok(num) = val.parse::<f32>() {
