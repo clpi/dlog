@@ -42,7 +42,7 @@ pub struct Fact {
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes")]
-    pub notes: Option<String>,
+    pub notes: Vec<String>,
 }
 
 impl Fact {
@@ -52,7 +52,7 @@ impl Fact {
         val: String,
         unit: Units,
         attribs: Vec<Attrib>,
-        notes: Option<String>) -> Self
+        notes: Vec<String>) -> Self
     {
         let unit = Units::from(unit);
         Self {
@@ -124,7 +124,7 @@ impl Default for Fact {
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
                 &name, &val, &unit, &attribs).color(Color::BrightCyan));
-        Fact::new(name, val, unit, attribs, None)
+        Fact::new(name, val, unit, attribs, Vec::new())
     }
 }
 
@@ -149,10 +149,10 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
                 .expect("Could not parse datetime").into(),
             unit: Units::Other(rec[4].to_string()), //TODO handle date parsing
             notes: if !rec[5].len().eq(&0) {
-                    Some(rec[5].to_string())
-                } else {None},
+                    vec![rec[5].to_string()]
+                } else {Vec::new()},
             attribs: rec.iter().skip(5)
-                .map(|a| Attrib::new(a))
+                .map(|a| Attrib::new(a, None))
                 .collect(),
         };
         Ok(fact)

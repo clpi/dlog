@@ -11,11 +11,12 @@ use colored::{Colorize, Color};
 pub struct Attrib {
     #[serde(rename = "Name")]
     pub name: String,
+    pub value: Option<String>,
 }
 
 impl Attrib {
-    pub fn new(name: &str) -> Self {
-        Self { name: name.to_string() }
+    pub fn new(name: &str, val: Option<String>) -> Self {
+        Self { name: name.to_string(), value: None}
     }
 
     pub fn from_prompt(prompt: String) -> Vec<Attrib> {
@@ -45,7 +46,23 @@ impl Attrib {
 }
 
 impl From<String> for Attrib {
-    fn from(string: String) -> Self {
-        Self { name: string }
+    fn from(attrib: String) -> Self {
+        if attrib.contains("=") {
+            let pair = attrib.split("=").collect::<Vec<&str>>();
+            Self { name: pair[0].into(), value: Some(pair[1].into()) }
+        } else {
+            Self { name: attrib, value: None }
+        }
+    }
+}
+
+impl fmt::Display for Attrib {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(val) = self.value.clone() {
+            f.write_fmt(format_args!("Attrib: {} with value {} ", self.name, val))
+        } else {
+            f.write_fmt(format_args!("Attrib: {}", self.name))
+        }
+
     }
 }

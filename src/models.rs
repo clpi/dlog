@@ -7,7 +7,10 @@ pub mod record;
 pub mod units;
 pub mod stats;
 pub mod value;
+pub mod relation;
+pub mod note;
 
+pub use note::Note;
 pub use units::Units;
 pub use fact::Fact;
 pub use record::Record;

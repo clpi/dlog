@@ -5,7 +5,8 @@ use crate::{
         item::Item,
         attrib::Attrib,
     },
-    cmd::Cmd
+    cmd::Cmd,
+    prompt::prompt,
 };
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
@@ -130,6 +131,8 @@ impl FromArgMatches for FactCmd {
             Some((&_, &_)) => {},
             None => {}
         }
+        let fact = Fact::from_arg_matches(&matches);
+        println!("Got fact: {:?}", fact);
         Self::default()
     }
 }
@@ -389,7 +392,7 @@ impl FactCmd {
     }
 
     pub fn persist_attributes() -> clap::Arg<'static> {
-        clap::Arg::new("link-attribute")
+        clap::Arg::new("link-attrib")
             .about("Whether to persist the attribute-fact link")
             .long_about("Link an attribute to this fact (not just this fact entry)")
             .long("link-attrib")
@@ -504,37 +507,40 @@ impl FactCmd {
 
 impl FromArgMatches for Fact {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        if let Some(name) = matches.value_of("NAME") {
-            println!("Got new fact: {}", &name);
-            if let Some(value) = matches.value_of("VALUE") {
-                println!("Got new fact: {} = {}", &name, &value);
-                let units: Units = if let Some(units)
-                    = matches.values_of("UNIT")
-                {
-                    if matches.occurrences_of("UNIT") == 1 {
-                        Units::Other(units.take(0).collect())
-                    } else {
-                        let units = units.into_iter().collect();
-                        Units::Other(units)
-                    }
-                } else { Units::None };
-                println!("Got new fact: {} = {} ({})", &name, &value, &units);
-                let attribs: Vec<Attrib> =
-                    if let Some(attribs) = matches.values_of("attribs") {
-                    attribs.map(|a| Attrib::new(a))
-                        .collect()
-                    } else { Vec::new() };
-                let notes: Option<String> =
-                    if let Some(notes) = matches.value_of("notes") {
-                        Some(notes.to_string())
-                    } else { None };
-                Self::new(name.into(), value.into(), units, attribs, notes)
-            } else {
-                Self { name: name.into(), ..Self::default()  }
-            }
+        let name = if let Some(name) = matches.value_of("NAME") {
+            name.to_string()
         } else {
-            println!("Received no fact name, provide: ");
-            Self::default()
+            prompt("Fact name?: ").unwrap().to_string()
+        };
+        println!("Got new fact: {}", &name);
+        if let Some(value) = matches.value_of("VALUE") {
+            println!("Got new fact: {} = {}", &name, &value);
+            let units: Units = if let Some(units)
+                = matches.values_of("UNIT")
+            {
+                if matches.occurrences_of("UNIT") == 1 {
+                    Units::Other(units.take(0).collect())
+                } else {
+                    let units = units.into_iter().collect();
+                    Units::Other(units)
+                }
+            } else { Units::None };
+            println!("Got new fact: {} = {} ({})", &name, &value, &units);
+            let linked_attribs = matches.values_of("link-attrib")
+                .unwrap_or_default()
+                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
+                .collect::<Vec<Attrib>>();
+            let attr = matches.values_of("attrib")
+                .unwrap_or_default()
+                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
+                .collect::<Vec<Attrib>>();
+            let notes = matches.values_of("notes")
+                .unwrap_or_default()
+                .map(|att| { println!("{:?}", att); att.to_string() })
+                .collect::<Vec<String>>();
+            Self::new(name.into(), value.into(), units, attr, notes)
+        } else {
+            Self { name: name.into(), ..Self::default()  }
         }
     }
 }
