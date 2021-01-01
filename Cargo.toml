@@ -18,6 +18,8 @@ path = "src/lib.rs"
 [dependencies]
 colored = "2.0.0"
 dirs-next = "2.0.0"
+byteorder = "*"
+zerocopy = "*"
 serde = { version = "*", features = ["derive"] }
 chrono = {version="*", features=["serde", "std"]}
 crossterm = "*"
