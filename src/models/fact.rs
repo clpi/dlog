@@ -190,11 +190,11 @@ impl FromArgMatches for Fact {
             println!("Got new fact: {} = {} ({})", &name, &value, &units);
             let attr = matches.values_of("attrib")
                 .unwrap_or_default()
-                .map(|att| {println!("{:?}", att); Attrib::from(att.to_string())})
+                .map(|att| {let att = Attrib::from(att.to_string()); println!("att: {:?}", att); att})
                 .collect::<Vec<Attrib>>();
             let notes = matches.values_of("notes")
                 .unwrap_or_default()
-                .map(|att| { println!("{:?}", att); att.to_string() })
+                .map(|att| { println!(" note: {:?}", att); att.to_string() })
                 .collect::<Vec<String>>();
             Self::new(name.into(), value.into(), units, attr, notes)
         } else {
@@ -212,7 +212,7 @@ impl FromArgMatches for AbstractFact {
         };
         let linked_attribs = matches.values_of("link-attrib")
             .unwrap_or_default()
-            .map(|att| {println!(" linked attr {:?}", att); Attrib::from(att.to_string())})
+            .map(|att| {let att = Attrib::from(att.to_string()); println!("linked att: {:?}", att); att})
             .collect::<Vec<Attrib>>();
         let notes = matches.values_of("linked-notes")
             .unwrap_or_default()
