@@ -134,6 +134,7 @@ impl FromArgMatches for FactCmd {
         let fact = Fact::from_arg_matches(&matches);
         let fact_type = AbstractFact::from_arg_matches(&matches);
         println!("Got fact: {:?}", fact);
+        println!("Got abstract fact: {:#?}", fact_type);
         Self::default()
     }
 }

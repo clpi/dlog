@@ -138,6 +138,15 @@ impl fmt::Display for Fact {
     }
 }
 
+impl fmt::Display for AbstractFact {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let attribs = &self.clone().attribs;
+        let notes = &self.clone().notes;
+        f.write_fmt(format_args!("Fact: {}: {} {} {}",
+            self.name, attribs, notes))
+    }
+}
+
 impl std::convert::TryFrom<csv::StringRecord> for Fact {
     type Error = csv::Error;
     fn try_from(rec: csv::StringRecord) -> Result<Self, Self::Error> {
@@ -188,7 +197,7 @@ impl FromArgMatches for Fact {
                 }
             } else { Units::None };
             println!("Got new fact: {} = {} ({})", &name, &value, &units);
-            let attr = matches.values_of("attrib")
+            let attr = matches.values_of("attribs")
                 .unwrap_or_default()
                 .map(|att| {let att = Attrib::from(att.to_string()); println!("att: {:?}", att); att})
                 .collect::<Vec<Attrib>>();
@@ -214,7 +223,7 @@ impl FromArgMatches for AbstractFact {
             .unwrap_or_default()
             .map(|att| {let att = Attrib::from(att.to_string()); println!("linked att: {:?}", att); att})
             .collect::<Vec<Attrib>>();
-        let notes = matches.values_of("linked-notes")
+        let notes = matches.values_of("link-notes")
             .unwrap_or_default()
             .map(|note| { println!(" linked note {:?}", note); note.to_string() })
             .collect::<Vec<String>>();
