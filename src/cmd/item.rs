@@ -203,8 +203,23 @@ impl ItemCmd {
 }
 
 impl FromArgMatches for ItemCmd {
-    fn from_arg_matches(_matches: &ArgMatches) -> Self {
-        Self::print_help();
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        println!("{}", format!("ITEM: subc: {:#?} \n matches: {:#?}",
+            matches.subcommand(),
+            matches
+        ).color(Color::BrightMagenta));
+        match matches.subcommand() {
+            Some(("new", sub)) => {
+            },
+            Some(("search", sub)) => {
+            },
+            Some(("list", sub)) => {
+            }
+            Some(("info", sub)) => {
+            }
+            Some((&_, &_)) => {},
+            None => {}
+        }
         Self::default()
     }
 }

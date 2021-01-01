@@ -93,7 +93,7 @@ impl Cmd for FactCmd {
 
 impl FromArgMatches for FactCmd {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        println!("{}", format!("subc: {:#?} \n matches: {:#?}",
+        println!("{}", format!("subc: {:?} \n matches: {:?}",
             matches.subcommand(),
             matches
         ).color(Color::BrightCyan));
@@ -130,7 +130,6 @@ impl FromArgMatches for FactCmd {
             Some((&_, &_)) => {},
             None => {}
         }
-        Self::print_help();
         Self::default()
     }
 }

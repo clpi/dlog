@@ -100,8 +100,23 @@ impl Cmd for LinkCmd {
 }
 
 impl FromArgMatches for LinkCmd {
-    fn from_arg_matches(_matches: &ArgMatches) -> Self {
-        Self::print_help();
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        println!("{}", format!("LINK: subc: {:#?} \n matches: {:#?}",
+            matches.subcommand(),
+            matches
+        ).color(Color::BrightBlue));
+        match matches.subcommand() {
+            Some(("new", sub)) => {
+            },
+            Some(("search", sub)) => {
+            },
+            Some(("list", sub)) => {
+            }
+            Some(("info", sub)) => {
+            }
+            Some((&_, &_)) => {},
+            None => {}
+        }
         Self::default()
     }
 }
