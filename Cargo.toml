@@ -19,7 +19,7 @@ path = "src/lib.rs"
 colored = "2.0.0"
 dirs-next = "2.0.0"
 serde = { version = "*", features = ["derive"] }
-chrono = {version="*", features=["serde"]}
+chrono = {version="*", features=["serde", "std"]}
 crossterm = "*"
 toml = "0.5.7"
 csv = "1.1.5"

@@ -57,6 +57,9 @@ pub enum FactValue {
     Integer(i32),
     RealNumber(f32),
     Option(HashMap<String, bool>), //TODO find a way to parse this
+    ExactTime(DateTime<Local>),
+    Duration(std::time::Duration),
+    Day(DateTime<Local>),
     Boolean(bool),
     Text(String),
     Range(f32, f32),
