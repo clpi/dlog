@@ -2,6 +2,7 @@ use crate::{
     models::{
         fact::{Fact, AbstractFact},
         units::Units,
+        note::Notes,
         item::Item,
         attrib::Attrib,
     },
@@ -131,6 +132,7 @@ impl FromArgMatches for FactCmd {
             Some((&_, &_)) => {},
             None => {}
         }
+
         let fact = Fact::from_arg_matches(&matches);
         let fact_type = AbstractFact::from_arg_matches(&matches);
         println!("Got fact: {:?}", fact);

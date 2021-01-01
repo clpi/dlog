@@ -39,15 +39,28 @@ impl Cmd for RecordCmd {
                 .short_alias('a')
                 .short('A')
                 .overrides_with("attribs") //TODO test this
+                .requires("NAME")
                 .multiple(true)
                 .required(false),
             clap::Arg::new("link-item")
+                .about("Link (add) an item to this record")
+                .long_about("Add an item linkage between a provided record name and an item (whose name is fulfilled by this val)")
+                .long("link-item")
+                .aliases(&["save-item",  "item-link"])
+                .short('I')
+                .short_alias('i')
+                .overrides_with("item") //TODO test this
+                .requires("NAME")
+                .multiple(true)
+                .required(false),
+            clap::Arg::new("link-fact")
                 .about("Whether to persist the item-fact link specified")
                 .long_about("Link an item to this fact (not just this fact entry)")
                 .long("link-item")
                 .aliases(&["save-item",  "item-link"])
                 .short('I')
                 .short_alias('i')
+                .requires("NAME")
                 .overrides_with("item") //TODO test this
                 .multiple(true)
                 .required(false),

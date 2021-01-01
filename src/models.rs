@@ -10,7 +10,8 @@ pub mod value;
 pub mod relation;
 pub mod note;
 
-pub use note::Note;
+pub use note::Notes;
+pub use relation::Relation;
 pub use units::Units;
 pub use fact::Fact;
 pub use record::Record;
@@ -24,6 +25,7 @@ pub use action::Action;
 pub struct Object {
 
 }
+
 
 use chrono::{prelude::*};
 

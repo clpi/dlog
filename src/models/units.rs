@@ -6,7 +6,7 @@ use chrono_english::{Dialect, DateError, parse_date_string};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum Units {
     #[serde(rename="Date")]
     Datetime(DateTime<Local>),
@@ -18,7 +18,7 @@ pub enum Units {
     None,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum UserUnit {
     DiscreteNum(i32),
     ContinuousNum(f32),
@@ -28,7 +28,6 @@ pub enum UserUnit {
         vals: std::collections::HashMap<String, String>,
     },
 }
-
 
 impl Default for Units {
     fn default() -> Self {

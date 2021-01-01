@@ -4,10 +4,8 @@ use crate::{
 };
 use std::fmt;
 use serde::{Serialize, Deserialize};
-use clap::{Clap, ArgMatches, FromArgMatches};
-use colored::{Colorize, Color};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Attrib {
     #[serde(rename = "Name")]
     pub name: String,
