@@ -1,4 +1,4 @@
-use dlog::cmd;
+use dlog_lib::cmd;
 use std::io;
 
 fn main() -> io::Result<()> {

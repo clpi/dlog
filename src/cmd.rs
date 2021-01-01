@@ -75,8 +75,7 @@ impl App {
                 FactCmd::key_arg(1),
                 FactCmd::val_arg(2),
                 FactCmd::val_unit(3),
-                FactCmd::val_notes(4),
-                Self::help(),
+                FactCmd::notes(),
                 Self::version(),
                 Self::output(),
                 Self::config_file(),
@@ -104,15 +103,6 @@ impl App {
                 );
             }
         }
-    }
-
-    pub fn help() -> Arg<'static> {
-        clap::Arg::new("help")
-            .short('h')
-            .long("help")
-            .about("Print help info")
-            .takes_value(false)
-            .exclusive(true)
     }
 
     pub fn version() -> Arg<'static> {

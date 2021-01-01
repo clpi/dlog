@@ -12,7 +12,7 @@ name = "dlog"
 path = "src/bin/dlog.rs"
 
 [lib]
-name = "dlog"
+name = "dlog_lib"
 path = "src/lib.rs"
 
 [dependencies]

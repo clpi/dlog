@@ -26,7 +26,8 @@ impl Cmd for ActionCmd {
         clap::App::new("action")
             .about("actions")
             .subcommands(vec![
-                clap::App::new("new")
+                clap::App::new("new"),
+                Self::help_cmd(),
             ])
             .args(&vec![
                 clap::Arg::new("name")
@@ -42,6 +43,14 @@ impl Cmd for ActionCmd {
     fn print_help() {
         let help = format!("action").color(Color::BrightRed);
         println!("> {}", help)
+    }
+
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
     }
 
 }
