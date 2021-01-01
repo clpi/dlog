@@ -1,7 +1,7 @@
-use dlog_lib::cmd;
+use dlog_lib::cmd::{App, Cmd};
 use std::io;
 
 fn main() -> io::Result<()> {
-    cmd::App::run();
+    App::default().run();
     Ok(())
 }

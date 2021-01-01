@@ -28,6 +28,12 @@ pub enum App {
     Help,
 }
 
+impl Default for App {
+    fn default() -> Self {
+        Self::Help
+    }
+}
+
 pub struct TermSettings {
     atty: bool,
     color: clap::AppSettings,
@@ -44,49 +50,86 @@ impl TermSettings {
     }
 }
 
-impl App {
+impl Cmd for App {
 
-    pub fn run() {
+    fn name() -> &'static str { "dlog" }
+    fn about() -> &'static str { "" }
+    fn long_about() -> &'static str { "The action cmd" }
+
+    fn args() -> Vec<clap::Arg<'static>> {
+        let mut args = FactCmd::args();
+        // let mut args: Vec<Arg> = Vec::new();
+        args.extend(vec![
+            Self::version(),
+            Self::output(),
+            Self::config_file(),
+            clap::Arg::new("pretty-print")
+                .about("Print output into a visually pleasing style")
+                .takes_value(false)
+                .short('p')
+                .long("pretty"),
+        ]);
+        args
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            ItemCmd::cmd(),
+            RecordCmd::cmd(),
+            FactCmd::cmd(),
+            AttribCmd::cmd(),
+            LinkCmd::cmd(),
+            StatsCmd::cmd(),
+            UserCmd::cmd(),
+            ActionCmd::cmd(),
+            Self::help_cmd(),
+            clap::App::new("init")
+                .about("Initialize a fact database in the current folder"),
+            clap::App::new("export")
+                .about("Export all of your data to a .zip file or HTML, or save your data to a file to be imported later"),
+            clap::App::new("import")
+                .about("Import dlog data or other data sources into a local Dlog database"),
+            clap::App::new("inbox")
+                .about("Show operations related to unorganized facts and items"),
+        ]
+    }
+
+    fn print_help() {
+        let help = format!("action").color(Color::BrightRed);
+        println!("> {}", help)
+    }
+
+    fn help_cmd() -> clap::App<'static> {
+        clap::App::new("fact_help")
+            .about("Prints help command for fact")
+            .long_flag("help")
+            .short_flag('h')
+            .long_about("Prints the help information")
+    }
+
+    fn cmd() -> clap::App<'static> {
         let term = TermSettings::new();
         let _conf = DConfig::load();
-        let matches = clap::app_from_crate!()
+        clap::app_from_crate!()
             .setting(term.color)
             .setting(clap::AppSettings::DeriveDisplayOrder)
-            .subcommands(vec![
-                ItemCmd::cmd(),
-                RecordCmd::cmd(),
-                FactCmd::cmd(),
-                AttribCmd::cmd(),
-                LinkCmd::cmd(),
-                StatsCmd::cmd(),
-                UserCmd::cmd(),
-                ActionCmd::cmd(),
-                Self::help_cmd(),
-                clap::App::new("init")
-                    .about("Initialize a fact database in the current folder"),
-                clap::App::new("export")
-                    .about("Export all of your data to a .zip file or HTML, or save your data to a file to be imported later"),
-                clap::App::new("import")
-                    .about("Import dlog data or other data sources into a local Dlog database"),
-                clap::App::new("inbox")
-                    .about("Show operations related to unorganized facts and items"),
-            ])
-            .args(&vec![
-                FactCmd::key_arg(1),
-                FactCmd::val_arg(2),
-                FactCmd::val_unit(3),
-                FactCmd::notes(),
-                Self::version(),
-                Self::output(),
-                Self::config_file(),
-                clap::Arg::new("pretty-print")
-                    .about("Print output into a visually pleasing style")
-                    .takes_value(false)
-                    .short('p')
-                    .long("pretty"),
-            ])
+            .subcommands(Self::subcmds())
+            .args(Self::args())
+            .subcommands(Self::subcmds())
+            .setting(term.color)
+            .setting(clap::AppSettings::DeriveDisplayOrder)
+    }
+
+    fn run(&self) {
+        let matches = Self::cmd()
             .get_matches();
-        // TODO handle this match through self-matching not here
+        let _app = Self::from_arg_matches(&matches);
+    }
+
+}
+
+impl FromArgMatches for App {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
         match matches.subcommand() {
             Some(("record", sub)) => RecordCmd::from_arg_matches(sub).run(),
             Some(("item", sub)) => ItemCmd::from_arg_matches(sub).run(),
@@ -103,11 +146,15 @@ impl App {
                 );
             }
         }
+        Self::default()
     }
+}
+
+impl App {
+
 
     pub fn version() -> Arg<'static> {
         clap::Arg::new("version")
-            .short('v')
             .long("version")
             .about("Print version info")
             .takes_value(false)
