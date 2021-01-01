@@ -21,16 +21,19 @@ impl Default for AttribCmd {
 
 impl Cmd for AttribCmd {
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("attrib")
-            .about("attribs")
-            .subcommands(vec![
-                clap::App::new("new"),
-                Self::help_cmd(),
-            ])
-            .args(&vec![
-                clap::Arg::new("name")
-            ])
+    fn name() -> &'static str { "attrib" }
+    fn about() -> &'static str { "The attribs cmd" }
+    fn long_about() -> &'static str { "The attribs cmd" }
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("help")
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            clap::App::new("new"),
+        ]
     }
 
     fn run(&self) {

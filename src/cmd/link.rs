@@ -17,60 +17,61 @@ impl Default for LinkCmd {
 
 impl Cmd for LinkCmd {
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("link")
-            .about("Link a fact, item, or record with another fact, item, or record")
-            .long_about("Specify a record, an item, or a fact (in a record or item) to link to another of the same or different kind.")
-            .short_flag('L')
-            .long_flag("link")
-            .subcommands(vec![
-                clap::App::new("new")
-                    .visible_aliases(&["create", "add"])
-                    .short_flag('n')
-                    .long_flag("new"),
-                clap::App::new("list")
-                    .about("List all linkages given a set of criteria"),
-                clap::App::new("search")
-                    .about("Search for linked facts, items, or records given a set or input arguments"),
-                clap::App::new("get")
-                    .about("Get all links from a provided fact, item, or record")
-            ])
-            .args(&[
-                clap::Arg::new("NAME")
-                    .about("Give an optional name to the linkage")
-                    .index(1)
-                    .required(false),
-                clap::Arg::new("VALUE")
-                    .about("Give an optional value to the linkage")
-                    .required(false)
-                    .index(2),
-                clap::Arg::new("item")
-                    .short('i')
-                    .long("item")
-                    .multiple(true)
-                    .max_values(2),
-                clap::Arg::new("record")
-                    .short('r')
-                    .long("record")
-                    .alias("rec")
-                    .multiple(true)
-                    .max_values(2),
-                clap::Arg::new("fact")
-                    .short('f')
-                    .long("fact")
-                    .multiple(true)
-                    .max_values(2),
-                clap::Arg::new("attribs")
-                    .about("Specify any attributes to add to the linkage specified")
-                    .long_about("Add any number of attributes, separated by spaces or commas, to the specified linkage. Can only be used when using the link cmd to create a new link")
-                    .short('a')
-                    .visible_short_alias('A')
-                    .long("attrib")
-                    .visible_aliases(&["attribute", "attributes", "attribs"])
-                    .required(false)
-                    .multiple(true)
-                    .global(true)
-            ])
+    fn name() -> &'static str { "link" }
+    fn about() -> &'static str { "The link cmd" }
+    fn long_about() -> &'static str { "The link cmd" }
+
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("NAME")
+                .about("Give an optional name to the linkage")
+                .index(1)
+                .required(false),
+            clap::Arg::new("VALUE")
+                .about("Give an optional value to the linkage")
+                .required(false)
+                .index(2),
+            clap::Arg::new("item")
+                .short('i')
+                .long("item")
+                .multiple(true)
+                .max_values(2),
+            clap::Arg::new("record")
+                .short('r')
+                .long("record")
+                .alias("rec")
+                .multiple(true)
+                .max_values(2),
+            clap::Arg::new("fact")
+                .short('f')
+                .long("fact")
+                .multiple(true)
+                .max_values(2),
+            clap::Arg::new("attribs")
+                .about("Specify any attributes to add to the linkage specified")
+                .long_about("Add any number of attributes, separated by spaces or commas, to the specified linkage. Can only be used when using the link cmd to create a new link")
+                .short('a')
+                .visible_short_alias('A')
+                .long("attrib")
+                .visible_aliases(&["attribute", "attributes", "attribs"])
+                .required(false)
+                .multiple(true)
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            clap::App::new("new")
+                .visible_aliases(&["create", "add"])
+                .short_flag('n')
+                .long_flag("new"),
+            clap::App::new("list")
+                .about("List all linkages given a set of criteria"),
+            clap::App::new("search")
+                .about("Search for linked facts, items, or records given a set or input arguments"),
+            clap::App::new("get")
+                .about("Get all links from a provided fact, item, or record")
+        ]
     }
 
     fn run(&self) {

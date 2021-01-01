@@ -15,22 +15,27 @@ impl Default for UserCmd {
 
 impl Cmd for UserCmd {
 
+    fn name() -> &'static str { "user" }
+    fn about() -> &'static str { "The user cmd" }
+    fn long_about() -> &'static str { "The user cmd" }
+
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("help")
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            clap::App::new("new"),
+        ]
+    }
+
     fn run(&self) {
         println!("{}", format!("Running User cmd...")
             .color(Color::BrightCyan))
     }
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("user")
-            .about("users")
-            .subcommands(vec![
-                Self::help_cmd(),
-            ])
-            .args(&vec![
-                clap::Arg::new("help")
-                    .about("Prints help for the User command")
-            ])
-    }
 
     fn print_help() {
         let help = format!("User

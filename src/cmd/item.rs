@@ -21,86 +21,92 @@ impl Default for ItemCmd {
 
 impl Cmd for ItemCmd {
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("item")
-            .about("items")
-            .subcommands(vec![
-                Self::new_cmd(),
-                Self::search_cmd(),
-                clap::App::new("list")
-                    .about("List all of the items globaally or in a record")
-                    .long_flag("ls")
-                    .short_flag('l'),
-                clap::App::new("get")
-                    .about("Get info about a specific item")
-                    .long_flag("get")
-                    .short_flag('g'),
-                clap::App::new("link")
-                    .about("Link two items together, or with a record/fact")
-                    .long_flag("link")
-                    .short_flag('k')
-            ])
-            .args(&vec![
-                clap::Arg::new("help")
-                    .about("Display help pertaining to items")
-                    .short('h')
-                    .long("help")
-                    .takes_value(false)
-                    .exclusive(true),
-                Arg::new("NAME")
-                    .about("Name of the item to log")
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .index(1),
-                Arg::new("FACT") //TODO if no index 3, prompt from stdin
-                    .about("Optional fact to associate with new item")
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .index(2),
-                Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
-                    .about("Optional value of the fact to associate with new fact")
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .index(3),
-                Arg::new("uncategorized")
-                    .aliases(&["misc", "uncat", "etc"])
-                    .short('u')
-                    .long("uncategorized")
-                    .about("Whether to show items part of the inbox record")
-                    .takes_value(false),
-                Arg::new("attribs")
-                    .about("Add any attribs desired to the new item")
-                    .long("attrib")
-                    .short('a')
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .multiple(true),
-                Arg::new("record")
-                    .about("Specify the record to add this fact to")
-                    .long("record")
-                    .short('r')
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .multiple(true),
-                Arg::new("link-attribute")
-                    .long("Whether to persist the attribute-item link")
-                    .long_about("Link an attribute to this item (not just this fact entry)")
-                    .long("link-attrib")
-                    .aliases(&["save-attrib",  "attrib-link"])
-                    .short('A')
-                    .overrides_with("attribs") //TODO test this
-                    .multiple(true)
-                    .required(false),
-                Arg::new("link-record")
-                    .about("Whether to persist the record-item link specified")
-                    .long_about("Link a record to this item (not just this item entry)")
-                    .long("link-record")
-                    .aliases(&["save-record", "save-rec", "record-link"])
-                    .short('R')
-                    .overrides_with("record") //TODO test this
-                    .multiple(true)
-                    .required(false),
-            ]) //TODO add item-item possibility
+    fn name() -> &'static str { "item" }
+    fn about() -> &'static str { "The item cmd" }
+    fn long_about() -> &'static str { "The item cmd" }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            Self::new_cmd(),
+            Self::search_cmd(),
+            Self::help_cmd(),
+            clap::App::new("list")
+                .about("List all of the items globaally or in a record")
+                .long_flag("ls")
+                .short_flag('l'),
+            clap::App::new("get")
+                .about("Get info about a specific item")
+                .long_flag("get")
+                .short_flag('g'),
+            clap::App::new("link")
+                .about("Link two items together, or with a record/fact")
+                .long_flag("link")
+                .short_flag('k')
+        ]
+    }
+
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("help")
+                .about("Display help pertaining to items")
+                .short('h')
+                .long("help")
+                .takes_value(false)
+                .exclusive(true),
+            Arg::new("NAME")
+                .about("Name of the item to log")
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .index(1),
+            Arg::new("FACT") //TODO if no index 3, prompt from stdin
+                .about("Optional fact to associate with new item")
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .index(2),
+            Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
+                .about("Optional value of the fact to associate with new fact")
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .index(3),
+            Arg::new("uncategorized")
+                .aliases(&["misc", "uncat", "etc"])
+                .short('u')
+                .long("uncategorized")
+                .about("Whether to show items part of the inbox record")
+                .takes_value(false),
+            Arg::new("attribs")
+                .about("Add any attribs desired to the new item")
+                .long("attrib")
+                .short('a')
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .multiple(true),
+            Arg::new("record")
+                .about("Specify the record to add this fact to")
+                .long("record")
+                .short('r')
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .multiple(true),
+            Arg::new("link-attribute")
+                .long("Whether to persist the attribute-item link")
+                .long_about("Link an attribute to this item (not just this fact entry)")
+                .long("link-attrib")
+                .aliases(&["save-attrib",  "attrib-link"])
+                .short('A')
+                .overrides_with("attribs") //TODO test this
+                .multiple(true)
+                .required(false),
+            Arg::new("link-record")
+                .about("Whether to persist the record-item link specified")
+                .long_about("Link a record to this item (not just this item entry)")
+                .long("link-record")
+                .aliases(&["save-record", "save-rec", "record-link"])
+                .short('R')
+                .overrides_with("record") //TODO test this
+                .multiple(true)
+                .required(false),
+            ]
     }
 
     fn run(&self) {

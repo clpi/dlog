@@ -33,42 +33,43 @@ impl Cmd for FactCmd {
             .color(Color::BrightCyan))
     }
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("fact")
-            .about("The fact subcommand")
-            .long_about("A fact is a ...")
-            .subcommands(vec![
-                Self::new_cmd(),
-                Self::search_cmd(),
-                Self::list_cmd(),
-                Self::help_cmd(),
-                Self::delete_cmd(),
-                clap::App::new("get")
-                    .about("Get info about a specific fact")
-                    .long_flag("get")
-                    .short_flag('g'),
-                clap::App::new("link")
-                    .about("Link two facts together, or with a record/fact")
-                    .long_flag("link")
-                    .short_flag('k')
-            ])
-            .args(&vec![
-                Self::key_arg(1),
-                Self::val_arg(2),
-                Self::val_unit(3),
-                Self::value(),
-                Self::units(),
-                Self::persist_units(),
-                Self::notes(),
-                Self::persist_notes(),
-                Self::attributes(),
-                Self::persist_attributes(),
-                Self::record(),
-                Self::persist_record(),
-                Self::item(),
-                Self::persist_item(),
-            ])
-             // TODO add fact-fact link possibility
+    fn name() -> &'static str { "fact" }
+    fn about() -> &'static str { "The fact cmd" }
+    fn long_about() -> &'static str { "The fact cmd" }
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            Self::key_arg(1),
+            Self::val_arg(2),
+            Self::val_unit(3),
+            Self::value(),
+            Self::units(),
+            Self::persist_units(),
+            Self::notes(),
+            Self::persist_notes(),
+            Self::attributes(),
+            Self::persist_attributes(),
+            Self::record(),
+            Self::persist_record(),
+            Self::item(),
+            Self::persist_item(),
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            Self::search_cmd(),
+            Self::list_cmd(),
+            Self::help_cmd(),
+            Self::delete_cmd(),
+            clap::App::new("get")
+                .about("Get info about a specific fact")
+                .long_flag("get")
+                .short_flag('g'),
+            clap::App::new("link")
+                .about("Link two facts together, or with a record/fact")
+                .long_flag("link")
+                .short_flag('k')
+        ]
     }
 
     fn print_help() {
@@ -154,42 +155,23 @@ impl clap::Subcommand for FactCmd {
 
 impl FactCmd {
 
-    pub fn new_cmd() -> clap::App<'static> {
-        clap::App::new("new")
-            .about("Create a new fact as a key-value pair")
-            .long_flag("new")
-            .short_flag('N')
-            .aliases(&["add, create"])
-            .args(&[
-                clap::Arg::new("NAME")
-                    .about("Name of the fact to get or make")
-                    .required(false)
-                    .index(1),
-                clap::Arg::new("record")
-                    .about("Specifies the record to add this new item to; inbox if none")
-                    .aliases(&["r", "rec"])
-                    .long("record")
-                    .short('r')
-                    .required(false)
-                    .multiple(true)
-                    .takes_value(true),
-                clap::Arg::new("item")
-                    .about("Specifies the item to add this new fact to")
-                    .aliases(&["i", "itm"])
-                    .long("item")
-                    .short('i')
-                    .required(false)
-                    .multiple(true)
-                    .requires("VALUE")
-                    .takes_value(true),
-                clap::Arg::new("newattribs")
-                    .about("Add any tags desired to the new item")
-                    .long("attrib")
-                    .short('a')
-                    .required(false)
-                    .multiple(true),
-            ])
-
+    pub fn fact_args() -> Vec<clap::Arg<'static>> {
+        vec![
+            Self::key_arg(1),
+            Self::val_arg(2),
+            Self::val_unit(3),
+            Self::value(),
+            Self::units(),
+            Self::persist_units(),
+            Self::notes(),
+            Self::persist_notes(),
+            Self::attributes(),
+            Self::persist_attributes(),
+            Self::record(),
+            Self::persist_record(),
+            Self::item(),
+            Self::persist_item(),
+        ]
     }
 
     fn search_cmd() -> clap::App<'static> {
@@ -273,8 +255,8 @@ impl FactCmd {
         clap::App::new("delete")
             .about("Delete a fact or fact entry")
             .long_about("Specify arguments to list different facts")
-            .long_flag("ls")
-            .short_flag('l')
+            .long_flag("delete")
+            .short_flag('d')
             .args(&[
                 clap::Arg::new("record")
                     .about("Fact in record")

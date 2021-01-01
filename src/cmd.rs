@@ -164,7 +164,18 @@ impl App {
 
 pub trait Cmd: FromArgMatches + Default {
     fn run(&self);
-    fn cmd() -> clap::App<'static>;
+    fn cmd() -> clap::App<'static> {
+        clap::App::new(Self::name())
+            .about(Self::about())
+            .long_about(Self::long_about())
+            .subcommands(Self::subcmds())
+            .args(Self::args())
+    }
+    fn name() -> &'static str;
+    fn about() -> &'static str;
+    fn long_about() -> &'static str;
+    fn args() -> Vec<clap::Arg<'static>>;
+    fn subcmds() -> Vec<clap::App<'static>>;
     fn print_help();
     fn help_cmd() -> clap::App<'static>;
 }

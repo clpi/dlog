@@ -15,22 +15,23 @@ impl Default for StatsCmd {
 
 impl Cmd for StatsCmd {
 
+    fn name() -> &'static str { "stats" }
+    fn about() -> &'static str { "The stats cmd" }
+    fn long_about() -> &'static str { "The stats cmd" }
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("help")
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            clap::App::new("new"),
+        ]
+    }
     fn run(&self) {
         println!("{}", format!("Running Stats cmd...")
             .color(Color::BrightCyan))
-    }
-
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("stats")
-            .about("stats")
-            .subcommands(vec![
-                clap::App::new("new"),
-                Self::help_cmd(),
-            ])
-            .args(&vec![
-                clap::Arg::new("help")
-                    .about("Prints help for the stats command")
-            ])
     }
 
     fn print_help() {

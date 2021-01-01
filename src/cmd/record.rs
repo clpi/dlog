@@ -20,60 +20,60 @@ impl Default for RecordCmd {
 
 impl Cmd for RecordCmd {
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("record")
-            .about("items")
-            .subcommands(vec![
-                Self::new_cmd(),
-                Self::search_cmd(),
-                Self::help_cmd(),
-                clap::App::new("list")
-                    .about("List all records")
-                    .long_flag("ls")
-                    .short_flag('l'),
-                clap::App::new("get")
-                    .about("Get info about a specific record")
-                    .long_flag("get")
-                    .short_flag('g'),
-                clap::App::new("link")
-                    .about("Link two records together, or with a item/fact")
-                    .long_flag("link")
-                    .short_flag('k')
-            ])
-            .args(&vec![
-                clap::Arg::new("help")
-                    .about("Display help pertaining to records")
-                    .short('h')
-                    .long("help")
-                    .takes_value(false),
-                clap::Arg::new("NAME")
-                    .about("Name of the item to log")
-                    .required(false)
-                    .validator(|a| crate::prompt::validate_input(a.into()))
-                    .index(1),
-                clap::Arg::new("link-attribute")
-                    .long("Link an attribute to this record")
-                    .long_about("Link an attribute to this fact (not just this fact entry)")
-                    .long("link-attrib")
-                    .aliases(&["save-attrib",  "attrib-link"])
-                    .short_alias('a')
-                    .short('A')
-                    .overrides_with("attribs") //TODO test this
-                    .multiple(true)
-                    .required(false),
-                clap::Arg::new("link-item")
-                    .about("Whether to persist the item-fact link specified")
-                    .long_about("Link an item to this fact (not just this fact entry)")
-                    .long("link-item")
-                    .aliases(&["save-item",  "item-link"])
-                    .short('I')
-                    .short_alias('i')
-                    .overrides_with("item") //TODO test this
-                    .multiple(true)
-                    .required(false),
-            ])
+    fn name() -> &'static str { "user" }
+    fn about() -> &'static str { "The user cmd" }
+    fn long_about() -> &'static str { "The user cmd" }
 
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("NAME")
+                .about("Name of the item to log")
+                .required(false)
+                .validator(|a| crate::prompt::validate_input(a.into()))
+                .index(1),
+            clap::Arg::new("link-attribute")
+                .long("Link an attribute to this record")
+                .long_about("Link an attribute to this fact (not just this fact entry)")
+                .long("link-attrib")
+                .aliases(&["save-attrib",  "attrib-link"])
+                .short_alias('a')
+                .short('A')
+                .overrides_with("attribs") //TODO test this
+                .multiple(true)
+                .required(false),
+            clap::Arg::new("link-item")
+                .about("Whether to persist the item-fact link specified")
+                .long_about("Link an item to this fact (not just this fact entry)")
+                .long("link-item")
+                .aliases(&["save-item",  "item-link"])
+                .short('I')
+                .short_alias('i')
+                .overrides_with("item") //TODO test this
+                .multiple(true)
+                .required(false),
+        ]
     }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            Self::new_cmd(),
+            Self::search_cmd(),
+            Self::help_cmd(),
+            clap::App::new("list")
+                .about("List all records")
+                .long_flag("ls")
+                .short_flag('l'),
+            clap::App::new("get")
+                .about("Get info about a specific record")
+                .long_flag("get")
+                .short_flag('g'),
+            clap::App::new("link")
+                .about("Link two records together, or with a item/fact")
+                .long_flag("link")
+                .short_flag('k')
+        ]
+    }
+
 
     fn run(&self) {
         println!("{}", format!("Running record cmd...")

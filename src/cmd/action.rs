@@ -22,16 +22,21 @@ impl Default for ActionCmd {
 
 impl Cmd for ActionCmd {
 
-    fn cmd() -> clap::App<'static> {
-        clap::App::new("action")
-            .about("actions")
-            .subcommands(vec![
-                clap::App::new("new"),
-                Self::help_cmd(),
-            ])
-            .args(&vec![
-                clap::Arg::new("name")
-            ])
+    fn name() -> &'static str { "action" }
+    fn about() -> &'static str { "The action cmd" }
+    fn long_about() -> &'static str { "The action cmd" }
+
+    fn args() -> Vec<clap::Arg<'static>> {
+        vec![
+            clap::Arg::new("name")
+        ]
+    }
+
+    fn subcmds() -> Vec<clap::App<'static>> {
+        vec![
+            clap::App::new("new"),
+            Self::help_cmd(),
+        ]
     }
 
     fn run(&self) {
