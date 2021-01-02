@@ -3,4 +3,4 @@ authors = ["Chris P"]
 language = "en"
 multilingual = false
 src = "src"
-title = "dlog docs"
+title = "The dlog book"
