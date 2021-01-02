@@ -319,15 +319,8 @@ impl FromArgMatches for Fact {
             crate::prompt::prompt("Fact name?: ").unwrap().to_string()
         };
         if let Some(value) = matches.value_of("VALUE") {
-            let units: Units = if let Some(units)
-                = matches.values_of("UNIT")
-            {
-                if matches.occurrences_of("UNIT") == 1 {
-                    Units::Other(units.take(0).collect())
-                } else {
-                    let units = units.into_iter().collect();
-                    Units::Other(units)
-                }
+            let units: Units = if let Some(units) = matches.value_of("UNIT") {
+                Units::from(units)
             } else { Units::None };
             println!("Got new fact: {} = {} ({})", &name, &value, &units);
             let attr = matches.values_of("attribs")

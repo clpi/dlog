@@ -1,7 +1,4 @@
-use crate::{
-    prompt::prompt,
-    cmd::Cmd,
-};
+use crate::prompt::prompt;
 use std::fmt;
 use serde::{Serialize, Deserialize};
 
@@ -14,7 +11,7 @@ pub struct Attrib {
 
 impl Attrib {
     pub fn new(name: &str, val: Option<String>) -> Self {
-        Self { name: name.to_string(), value: None}
+        Self { name: name.to_string(), value: val}
     }
 
     pub fn from_prompt(prompt: String) -> Vec<Attrib> {
