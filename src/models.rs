@@ -45,4 +45,5 @@ pub trait Entry {
     fn weekday(&self) -> chrono::Weekday {
         self.datetime().weekday()
     }
+
 }

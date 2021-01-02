@@ -5,7 +5,7 @@ use colored::{Color, Colorize};
 use crate::{
     prompt::prompt,
     error::DResult,
-    models::{Entry, Fact, Record},
+    models::{Entry, Fact, Record, Attrib},
 };
 use uuid::Uuid;
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
@@ -17,6 +17,7 @@ pub struct Item {
     pub name: String,
     #[serde(skip)]
     pub record: Rc<Record>,
+    pub attribs: Vec<Attrib>,
     pub created: DateTime<Local>,
 }
 
@@ -31,6 +32,7 @@ impl Default for Item {
             id: Uuid::new_v4(),
             name, record: Rc::new(Record::default()),
             created: Local::now(),
+            attribs: Vec::new()
         }
     }
 }
@@ -40,9 +42,18 @@ impl Item {
     pub fn new(name: String, record: Option<String>) -> Self {
         let id: Uuid = Uuid::new_v4();
         if let Some(record) = record {
-            Self { id, name, record: Rc::new(Record::from(record)), created: Local::now()}
+            Self { id, name,
+                record: Rc::new(Record::from(record)),
+                created: Local::now(),
+                attribs: Vec::new(),
+            }
         } else {
-            Self { id, name, record: Rc::new(Record::default()), created: Local::now() }
+            Self {
+                id, name,
+                record: Rc::new(Record::default()),
+                created: Local::now(),
+                attribs: Vec::new(),
+            }
         }
     }
 
@@ -93,6 +104,18 @@ impl FromArgMatches for Item {
             },
             (_, _) => Self::default(),
         }
+    }
+}
+
+// TODO add fact links as rows in table and add notes
+impl comfy_table::ToRow for Item {
+    fn to_row(self) -> comfy_table::Row {
+        comfy_table::Row::from(vec![
+            &self.id.to_string(),
+            &self.name.to_string(),
+            &Attrib::join(&self.attribs),
+            &self.created.to_string(),
+        ])
     }
 }
 

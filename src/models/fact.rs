@@ -1,3 +1,7 @@
+use comfy_table::{
+    Table, ContentArrangement, presets::UTF8_BORDERS_ONLY,
+    Cell, Attribute, Color as TColor,
+};
 use crate::{
     csv as Csv, prompt,
     models::{
@@ -23,6 +27,8 @@ pub struct AbstractFact {
     pub id: uuid::Uuid,
     #[serde(rename="Fact")]
     pub name: String,
+    #[serde(rename="Units", default="Units::default")]
+    pub unit: Units,
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes", default="Vec::new")]
@@ -187,6 +193,31 @@ impl Fact {
         Ok(String::new())
     }
 
+    pub fn table(&self) -> Table {
+        let mut table = Table::new();
+        table.load_preset(UTF8_BORDERS_ONLY)
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            .set_table_width(160)
+            .set_header(vec![
+                Cell::new("Fact").add_attribute(Attribute::Bold)
+                    .fg(TColor::Blue),
+                Cell::new("Value").add_attribute(Attribute::Bold),
+                Cell::new("Units").add_attribute(Attribute::Bold),
+                Cell::new("Attributes").add_attribute(Attribute::Bold),
+                Cell::new("Notes").add_attribute(Attribute::Bold),
+                Cell::new("Created").add_attribute(Attribute::Bold),
+            ])
+            .add_row(vec![
+                &self.name,
+                &self.val.to_string(),
+                &self.unit.to_string(),
+                &Attrib::join(&self.attribs),
+                &Notes::join(&self.notes),
+                &self.created_at.to_string(),
+            ]);
+        table
+        }
+
 }
 
 impl Default for Fact {
@@ -203,12 +234,40 @@ impl Default for Fact {
     }
 }
 
+impl comfy_table::ToRow for Fact {
+    fn to_row(self) -> comfy_table::Row {
+        comfy_table::Row::from(vec![
+            &self.id.to_string(),
+            &self.name.to_string(),
+            &self.val.to_string(),
+            &self.unit.to_string(),
+            &Attrib::join(&self.attribs),
+            &Notes::join(&self.notes),
+            &self.created_at.to_string(),
+        ])
+    }
+}
+
+impl comfy_table::ToRow for AbstractFact {
+    fn to_row(self) -> comfy_table::Row {
+        comfy_table::Row::from(vec![
+            &self.id.to_string(),
+            &self.name.to_string(),
+            &self.unit.to_string(),
+            &Attrib::join(&self.attribs),
+            &Notes::join(&self.notes),
+            &self.created_at.to_string(),
+        ])
+    }
+}
+
 impl fmt::Display for Fact {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let attribs = &self.clone().attribs;
-        let attribs: String = Attrib::join(attribs);
-        f.write_fmt(format_args!("Fact: {}: {} {} {}",
-            &self.name, &self.val, &self.unit, &attribs))
+        let attribs = Attrib::join(&self.clone().attribs);
+        let notes = Notes::join(&self.clone().notes);
+        // f.write_fmt(format_args!("Fact: {}: {} {} {}",
+            // &self.name, &self.val, &self.unit, &attribs))
+        f.write_fmt(format_args!("{}", self.table()))
     }
 }
 
@@ -245,9 +304,11 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
 
 
 impl Entry for Fact {
+
     fn datetime(&self) -> chrono::DateTime<chrono::Local> {
         self.created_at
     }
+
 }
 
 impl FromArgMatches for Fact {
@@ -313,6 +374,16 @@ impl FromArgMatches for AbstractFact {
                 note
             })
             .collect::<Vec<Notes>>();
-        Self { id, name, attribs: linked_attribs, notes: linked_notes, created_at: Local::now() }
+        //TODO handle defaulting units to inferred units for new fact entries which
+        //create a new fact type
+        let unit = if let Some(units) = matches.value_of("link-unit") {
+            Units::from(units)
+        } else {
+            Units::default()
+        };
+        Self { id, name,
+            attribs: linked_attribs,
+            notes: linked_notes,
+            created_at: Local::now(), unit}
     }
 }

@@ -340,7 +340,7 @@ impl FactCmd {
     /// unit does not conform to a known unit type, then adds the provided unit as a known unit for
     /// this fact,
     pub fn persist_units() -> clap::Arg<'static> {
-        clap::Arg::new("link-units") //TODO if no index 3, prompt from stdin
+        clap::Arg::new("link-unit") //TODO if no index 3, prompt from stdin
             .about("Set units for all entries of this fact")
             .long_about("Set the units for all entries of this fact, past or future. If this fact already has a unit type linked to it, set to new linked unit value. Unit type (time, length, volume, etc.) will be inferred from the specific units provided, and any units of that unit kind will be valid (i.e. 'minutes' will set unit type to 'time', meaning 'minutes', 'min', 'hours', etc. are valid)")
             .long_about("Save the defined units as the permanent units for this fact")

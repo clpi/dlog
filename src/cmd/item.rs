@@ -30,10 +30,7 @@ impl Cmd for ItemCmd {
             Self::new_cmd(),
             Self::search_cmd(),
             Self::help_cmd(),
-            clap::App::new("list")
-                .about("List all of the items globaally or in a record")
-                .long_flag("ls")
-                .short_flag('l'),
+            Self::list_cmd(),
             clap::App::new("get")
                 .about("Get info about a specific item")
                 .long_flag("get")
@@ -161,6 +158,16 @@ impl ItemCmd {
                     .required(false)
                     .index(1),
             ])
+    }
+
+    // TODO -- implement this in a trait body and implement the trait
+    // for items, records, facts, maybe attribs and relations?
+    // Since so many of the args and potential options are shared between all
+    fn list_cmd() -> clap::App<'static> {
+        clap::App::new("list")
+            .about("List all of the items globaally or in a record")
+            .long_flag("ls")
+            .short_flag('l')
     }
 
     fn search_cmd() -> clap::App<'static> {

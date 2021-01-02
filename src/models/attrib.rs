@@ -34,10 +34,8 @@ impl Attrib {
     }
 
     pub fn join(attribs: &Vec<Self>) -> String {
-        let attribs = attribs.clone();
         attribs.iter()
-            .map(|a| &a.name)
-            .map(|a| a.to_string())
+            .map(|a| a.clone().name)
             .collect::<Vec<String>>()
             .join(", ")
     }

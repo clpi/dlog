@@ -16,6 +16,7 @@ name = "dlog_lib"
 path = "src/lib.rs"
 
 [dependencies]
+# TODO switch colored for termcolor
 colored = "2.0.0"
 dirs-next = "2.0.0"
 byteorder = "*"
@@ -31,19 +32,23 @@ uuid = { version = "*", features = ["v4", "serde"] }
 atty = "0.2.14"
 dialoguer = "0.7.1"
 ring = "0.16.19"
-clipboard = "0.5.0"
+# clipboard = "0.5.0"
 serde_json = {version = "1.0.60", features = ["preserve_order"]}
-dashmap = { version = "*", features = ["serde"] }
-grep-cli = "*"
-edit = "*"
+# dashmap = { version = "*", features = ["serde"] }
+# grep-cli = "*"
+# edit = "*"
 chrono-humanize = "0.1.1"
 chrono-english = "0.1.4"
-ignore = "*"
 chrono-tz = "0.5.3"
-regex = "1.4.2"
-glob = "*"
+# glob = "*"
 sled = "*"
-lazy_static = "*"
+lazy_static = "1.4.0"
+strsim = "0.10.0"
+
+[dev_dependencies]
+assert_cmd = "1.0.2"
+tempfile = "3.1.0"
+predicates = "1.0.6"
 
 [dependencies.config]
 version = "*"

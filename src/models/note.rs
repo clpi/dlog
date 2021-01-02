@@ -7,8 +7,16 @@ pub struct Notes {
 }
 
 impl Notes {
+
     pub fn new(note: &str) -> Self {
         Self { notes: note.to_string() }
+    }
+
+    pub fn join(notes: &Vec<Self>) -> String {
+        notes.iter()
+            .map(|a| a.notes.to_string())
+            .collect::<Vec<String>>()
+            .join(", ")
     }
 }
 

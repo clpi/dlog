@@ -33,6 +33,8 @@ impl Cmd for AttribCmd {
     fn subcmds() -> Vec<clap::App<'static>> {
         vec![
             clap::App::new("new"),
+            Self::list_cmd(),
+            Self::help_cmd(),
         ]
     }
 
@@ -59,6 +61,38 @@ impl Cmd for AttribCmd {
             .long_about("Prints the help information")
     }
 
+}
+
+impl AttribCmd {
+    pub fn list_cmd() -> clap::App<'static> {
+        clap::App::new("list")
+            .about("List attributes in your log.")
+            .long_about("Subcommand to list all attributes in your log, or a subset based on some criteria")
+            .subcommands(vec![
+                clap::App::new("fact")
+                    .long_about("List all attributes given to facts"),
+                clap::App::new("record")
+                    .long_about("List all attributes given to records"),
+                clap::App::new("item")
+                    .long_about("List all attributes given to items")
+            ])
+            .args(&vec![
+                clap::Arg::new("fact-name")
+                    .short('f')
+                    .long("fact")
+                    .about("List attributes related to a specified fact in your log"),
+                clap::Arg::new("item-name")
+                    .short('i')
+                    .long("item")
+                    .about("List attributes related to a specified item in your log"),
+                clap::Arg::new("record-name")
+                    .short('r')
+                    .long("record")
+                    .aliases(&["rec", "log"])
+                    .about("List attributes related to a specified item in your log"),
+            ])
+
+    }
 }
 
 impl FromArgMatches for AttribCmd {

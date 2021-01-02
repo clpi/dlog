@@ -97,11 +97,10 @@ impl From<Option<String>> for Units {
     }
 }
 
-impl std::str::FromStr for Units {
-    type Err = crate::error::DError;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl From<&str> for Units {
+    fn from(s: &str) -> Units {
         if let Ok(date) = chrono_english::parse_date_string::<Local>(s, Local::now(), Dialect::Us){
-            return Ok(Units::Datetime(date));
+            return Units::Datetime(date);
         }
         if let Some(dur) = s.strip_prefix("for") { //TODO split this into match fn
             if dur.split_whitespace().any(|w| {
@@ -110,12 +109,12 @@ impl std::str::FromStr for Units {
                     || w.contains("hr") || w.contains("hour")
             })
             {
-                return Ok(Units::Duration(Duration::seconds(100)));
+                return Units::Duration(Duration::seconds(100));
             } else {
-                return Ok(Units::Other(s.to_string()));
+                return Units::Other(s.to_string());
             }
         }
-        return Ok(Units::Other(s.to_string()))
+        return Units::Other(s.to_string())
     }
 }
 
