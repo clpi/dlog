@@ -1,3 +1,4 @@
+use chrono::{DateTime, Local};
 use crate::{
     models::{
         fact::{Fact, AbstractFact},
@@ -5,8 +6,9 @@ use crate::{
         note::Notes,
         item::Item,
         attrib::Attrib,
+        record::Record,
     },
-    cmd::Cmd,
+    cmd::{Cmd, Filters},
     prompt::prompt,
 };
 use clap::{ArgMatches, FromArgMatches};
@@ -18,11 +20,15 @@ pub enum FactCmd {
     Delete(Fact),
     LinkFact(Fact),
     LinkItem(Item),
-    Search,
+    Search {
+        query_str: String,
+        filters: Filters,
+    },
     Help,
     List,
     Invalid,
 }
+
 
 impl Default for FactCmd {
     fn default() -> Self {
@@ -125,7 +131,8 @@ impl FromArgMatches for FactCmd {
                         })
                         .collect::<Vec<&str>>();
                 }
-                return FactCmd::Search
+                let filters = Filters::from_arg_matches(matches);
+                return FactCmd::Search { query_str: "".into(), filters }
             },
             Some(("list", sub)) => {
                 println!("List facts comand, {}", "list");

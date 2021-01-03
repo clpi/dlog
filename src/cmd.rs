@@ -8,6 +8,7 @@ pub mod user;
 pub mod stats;
 pub mod args;
 
+use chrono::{DateTime, Local};
 use super::config::DConfig;
 use self::{
     item::ItemCmd,
@@ -19,7 +20,10 @@ use self::{
     stats::StatsCmd,
     action::ActionCmd,
 };
-use crate::models::Entry;
+use crate::models::{
+    Entry, Fact, Record, Item, Attrib,
+    note::Note, Action, Relation, value::FactValue, Units
+};
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
@@ -173,6 +177,12 @@ impl FromArgMatches for App {
                 let stats = StatsCmd::from_arg_matches(sub);
                 Self::Stats(stats)
             },
+            Some(("list", _sub)) => {
+                Self::List
+            },
+            Some(("search", _sub)) => {
+                Self::Search
+            },
             Some((c, sub)) => {
                 println!("Cmd: {}, sub {:?}", c, &sub);
                 Self::Help
@@ -310,3 +320,24 @@ impl std::str::FromStr for Command {
 }
 
 
+
+#[derive(Debug)]
+pub enum Filters {
+    InItems(Vec<Item>),
+    InRecord(Vec<Record>),
+    WithAttribute(Vec<Attrib>),
+    WithUnit(Vec<Units>),
+    NotesContaining(Vec<String>),
+    NameContaining(Vec<String>),
+    HasValue(Vec<FactValue>),
+    CreatedBefore(DateTime<Local>),
+    CreatedAfter(DateTime<Local>),
+    WithRelation(Vec<String>),
+
+}
+
+impl FromArgMatches for Filters {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        Self::HasValue(Vec::new())
+    }
+}
