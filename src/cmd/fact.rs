@@ -18,8 +18,10 @@ pub enum FactCmd {
     Delete(Fact),
     LinkFact(Fact),
     LinkItem(Item),
+    Search,
     Help,
     List,
+    Invalid,
 }
 
 impl Default for FactCmd {
@@ -101,7 +103,8 @@ impl FromArgMatches for FactCmd {
         ).color(Color::BrightCyan));
         match matches.subcommand() {
             Some(("new", sub)) => {
-                let _fact = Fact::from_arg_matches(sub);
+                let fact = Fact::from_arg_matches(sub);
+                return FactCmd::New(fact)
             },
             Some(("search", sub)) => {
                 if let Some(r_filts) = sub.values_of("filterrecord") {
@@ -122,22 +125,28 @@ impl FromArgMatches for FactCmd {
                         })
                         .collect::<Vec<&str>>();
                 }
+                return FactCmd::Search
             },
             Some(("list", sub)) => {
-                println!("List facts comand");
-            }
+                println!("List facts comand, {}", "list");
+                return FactCmd::List
+            },
             Some(("info", sub)) => {
                 println!("Info facts comand");
+                return FactCmd::Help
+            },
+            Some((&_, &_)) => {
+                println!("Some other fact cmd");
+                return FactCmd::Help
+            },
+            None => {
+                let fact = Fact::from_arg_matches(&matches);
+                let fact_type = AbstractFact::from_arg_matches(&matches);
+                println!("Got fact: {:?}", fact);
+                println!("Got abstract fact: {:#?}", fact_type);
+                FactCmd::New(fact)
             }
-            Some((&_, &_)) => {},
-            None => {}
         }
-
-        let fact = Fact::from_arg_matches(&matches);
-        let fact_type = AbstractFact::from_arg_matches(&matches);
-        println!("Got fact: {:?}", fact);
-        println!("Got abstract fact: {:#?}", fact_type);
-        Self::default()
     }
 }
 

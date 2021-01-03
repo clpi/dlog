@@ -23,13 +23,28 @@ use crate::models::Entry;
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
-pub struct App {
+pub enum App {
     //config
+    Fact(FactCmd),
+    Record(RecordCmd),
+    Item(ItemCmd),
+    Action(ActionCmd),
+    Attrib(AttribCmd),
+    Link(LinkCmd),
+    User(UserCmd),
+    Stats(StatsCmd),
+    List,
+    Search,
+    Config,
+    Relation,
+    Export,
+    Import,
+    Help,
 }
 
 impl Default for App {
     fn default() -> Self {
-        Self {  }
+        Self::Help
     }
 }
 
@@ -130,22 +145,47 @@ impl Cmd for App {
 impl FromArgMatches for App {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         match matches.subcommand() {
-            Some(("record", sub)) => RecordCmd::from_arg_matches(sub).run(),
-            Some(("item", sub)) => ItemCmd::from_arg_matches(sub).run(),
-            Some(("fact", sub)) => FactCmd::from_arg_matches(sub).run(),
-            Some(("link", sub)) => LinkCmd::from_arg_matches(sub).run(),
-            Some(("attrib", sub)) => AttribCmd::from_arg_matches(sub).run(),
-            Some(("user", sub)) => UserCmd::from_arg_matches(sub).run(),
-            Some(("stats", sub)) => StatsCmd::from_arg_matches(sub).run(),
-            Some((&_, &_)) => {},
+            Some(("record", sub)) => {
+                let rec = RecordCmd::from_arg_matches(sub);
+                Self::Record(rec)
+            },
+            Some(("item", sub)) => {
+                let item = ItemCmd::from_arg_matches(sub);
+                Self::Item(item)
+            },
+            Some(("fact", sub)) => {
+                let fact = FactCmd::from_arg_matches(sub);
+                Self::Fact(fact)
+            },
+            Some(("link", sub)) => {
+                let link = LinkCmd::from_arg_matches(sub);
+                Self::Link(link)
+            },
+            Some(("attrib", sub)) => {
+                let attrib = AttribCmd::from_arg_matches(sub);
+                Self::Attrib(attrib)
+            },
+            Some(("user", sub)) => {
+                let user = UserCmd::from_arg_matches(sub);
+                Self::User(user)
+            },
+            Some(("stats", sub)) => {
+                let stats = StatsCmd::from_arg_matches(sub);
+                Self::Stats(stats)
+            },
+            Some((c, sub)) => {
+                println!("Cmd: {}, sub {:?}", c, &sub);
+                Self::Help
+            },
             None => {
+                let fact = FactCmd::from_arg_matches(matches);
                 println!("subc: {:#?}\n matches: {:#?}",
                     matches.subcommand(),
                     matches
                 );
+                Self::Fact(fact)
             }
         }
-        Self::default()
     }
 }
 
