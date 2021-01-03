@@ -9,3 +9,6 @@ edition = "2018"
 [dependencies]
 crossterm = "*"
 tui = { version = "*", features = ["crossterm"] }
+chrono = { version = "*", features = ["serde"] }
+serde = { version = "*", features = ["derive"] }
+dirs-next = "*"

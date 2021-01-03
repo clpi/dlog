@@ -7,14 +7,14 @@ use std::{
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub enum FormatConfig {
+pub(crate) enum FormatConfig {
     Csv,
     Json,
     Yaml,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct DConfig {
+pub(crate) struct DConfig {
     name: Option<String>,
     dialect: Option<String>,
     start_of_week: Option<chrono::Weekday>,
@@ -75,6 +75,31 @@ impl DConfig {
     pub fn conf_dir() -> PathBuf {
         util::get_or_create_conf_dir()
             .expect("Could not get or create conf dir")
+    }
+
+    pub fn path() -> PathBuf {
+
+        fn create_conf(conf_dir: PathBuf) -> PathBuf {
+            if conf_dir.exists() {
+                let conf = conf_dir.join("config.toml");
+                return conf
+            } else {
+                fs::create_dir(&conf_dir).unwrap_or_default();
+                let conf = conf_dir.join("config.toml");
+                return conf
+            }
+        }
+
+        if let Some(conf_dir) = dirs_next::config_dir() {
+            let conf_dir = conf_dir.join("dlog");
+            create_conf(conf_dir)
+        } else if let Some(home_dir) = dirs_next::home_dir() {
+            let conf_dir = home_dir.join(".dlog");
+            create_conf(conf_dir)
+        } else {
+            let conf_dir = dirs_next::data_dir().expect("No valid dir");
+            create_conf(conf_dir)
+        }
     }
 
     pub fn data_dir() -> PathBuf {
