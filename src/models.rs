@@ -30,7 +30,7 @@ pub struct Object {
 use chrono::{prelude::*};
 
 // TODO consider using NaiveLocal time instead of DateTime<Local>?
-pub trait Entry {
+pub trait Entry : clap::FromArgMatches {
 
     fn datetime(&self) -> chrono::DateTime<chrono::Local>;
 

@@ -159,3 +159,17 @@ pub enum DateStr {
 }
 
 
+pub enum RelativeTime {
+    EarlierToday(DateTime<Local>),
+    LaterToday(DateTime<Local>),
+    Yesterday(DateTime<Local>),
+    Tomorrow(DateTime<Local>),
+    LastWeek(DateTime<Local>),
+    NextWeek(DateTime<Local>),
+    LastMonth(DateTime<Local>),
+    NextMonth(DateTime<Local>),
+    LastYear(DateTime<Local>),
+    NextYear(DateTime<Local>),
+    Other(DateTime<Local>),
+}
+

@@ -19,18 +19,17 @@ use self::{
     stats::StatsCmd,
     action::ActionCmd,
 };
+use crate::models::Entry;
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches};
 
-pub enum App {
-    Record(RecordCmd),
-    Item(ItemCmd),
-    Help,
+pub struct App {
+    //config
 }
 
 impl Default for App {
     fn default() -> Self {
-        Self::Help
+        Self {  }
     }
 }
 
@@ -217,6 +216,8 @@ pub trait Cmd: FromArgMatches + Default {
             .long_about(Self::long_about())
             .subcommands(Self::subcmds())
             .args(Self::args())
+            .setting(clap::AppSettings::ColoredHelp)
+            .setting(clap::AppSettings::UnifiedHelpMessage)
     }
     fn name() -> &'static str;
     fn about() -> &'static str;
@@ -225,6 +226,21 @@ pub trait Cmd: FromArgMatches + Default {
     fn subcmds() -> Vec<clap::App<'static>>;
     fn print_help();
     fn help_cmd() -> clap::App<'static>;
+    fn settings() -> Vec<clap::AppSettings> { Vec::new() }
+}
+
+
+pub trait EntryCmd: FromArgMatches + clap::Subcommand + Default {
+
+    fn model() -> String;
+
+    fn entry<T: Entry>(matches: &ArgMatches) -> T {
+        T::from_arg_matches(matches)
+    }
+
+    fn list_cmd() -> clap::App<'static>;
+
+    fn search_cmd() -> clap::App<'static>;
 }
 
 
