@@ -3,6 +3,15 @@ name = "dl-tui"
 version = "0.1.0"
 authors = ["Chris P <chrisp1877@gmail.com>"]
 edition = "2018"
+default-run = "dlog_tui"
+
+[[bin]]
+name = "dlog_tui"
+path = "src/bin/dlog-tui.rs"
+
+[lib]
+name = "dlog_tui"
+path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -12,3 +21,4 @@ tui = { version = "*", features = ["crossterm"] }
 chrono = { version = "*", features = ["serde"] }
 serde = { version = "*", features = ["derive"] }
 dirs-next = "*"
+rustyline = "*"

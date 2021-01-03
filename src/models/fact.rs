@@ -9,8 +9,8 @@ use crate::{
         units::Units,
         record::Record,
         item::Item,
-        note::Notes,
-        attrib::Attrib,
+        note::{Note, Notes},
+        attrib::{Attrib, Attribs},
     },
 };
 use uuid::Uuid;
@@ -32,7 +32,7 @@ pub struct AbstractFact {
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes", default="Vec::new")]
-    pub notes: Vec<Notes>,
+    pub notes: Vec<Note>,
     #[serde(rename="Datetime", default="Local::now")]
     pub created_at: DateTime<Local>
 }
@@ -53,7 +53,7 @@ pub struct Fact {
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes", default="Vec::new")]
-    pub notes: Vec<Notes>,
+    pub notes: Vec<Note>,
     #[serde(rename="Datetime", default="Local::now")]
     pub created_at: DateTime<chrono::Local>,
 }
@@ -131,7 +131,7 @@ impl Fact {
         val: String,
         unit: Units,
         attribs: Vec<Attrib>,
-        notes: Vec<Notes>) -> Self
+        notes: Vec<Note>) -> Self
     {
         let unit = Units::from(unit);
         let val = FactValue::from(val);
@@ -212,7 +212,7 @@ impl Fact {
                 &self.val.to_string(),
                 &self.unit.to_string(),
                 &Attrib::join(&self.attribs),
-                &Notes::join(&self.notes),
+                &Note::join(&self.notes),
                 &self.created_at.to_string(),
             ]);
         table
@@ -242,7 +242,7 @@ impl comfy_table::ToRow for Fact {
             &self.val.to_string(),
             &self.unit.to_string(),
             &Attrib::join(&self.attribs),
-            &Notes::join(&self.notes),
+            &Note::join(&self.notes),
             &self.created_at.to_string(),
         ])
     }
@@ -255,7 +255,7 @@ impl comfy_table::ToRow for AbstractFact {
             &self.name.to_string(),
             &self.unit.to_string(),
             &Attrib::join(&self.attribs),
-            &Notes::join(&self.notes),
+            &Note::join(&self.notes),
             &self.created_at.to_string(),
         ])
     }
@@ -264,7 +264,7 @@ impl comfy_table::ToRow for AbstractFact {
 impl fmt::Display for Fact {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let attribs = Attrib::join(&self.clone().attribs);
-        let notes = Notes::join(&self.clone().notes);
+        let notes = Note::join(&self.clone().notes);
         // f.write_fmt(format_args!("Fact: {}: {} {} {}",
             // &self.name, &self.val, &self.unit, &attribs))
         f.write_fmt(format_args!("{}", self.table()))
@@ -295,7 +295,7 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
                 .map(|a| Attrib::new(a, None))
                 .collect(),
             notes: rec.iter().skip(6)
-                .map(|n| Notes::new(n))
+                .map(|n| Note::new(n))
                 .collect(),
         };
         Ok(fact)
@@ -329,8 +329,8 @@ impl FromArgMatches for Fact {
                 .collect::<Vec<Attrib>>();
             let notes = matches.values_of("notes")
                 .unwrap_or_default()
-                .map(|n| { println!(" note: {:?}", n); Notes::new(n) })
-                .collect::<Vec<Notes>>();
+                .map(|n| { println!(" note: {:?}", n); Note::new(n) })
+                .collect::<Vec<Note>>();
             Self::new(name.into(), value.into(), units, attr, notes)
         } else {
             Self { name: name.into(),
@@ -362,11 +362,11 @@ impl FromArgMatches for AbstractFact {
         let linked_notes = matches.values_of("link-notes")
             .unwrap_or_default()
             .map(|note| {
-                let note = Notes::new(note);
+                let note = Note::new(note);
                 println!(" linked note {:?}", note);
                 note
             })
-            .collect::<Vec<Notes>>();
+            .collect::<Vec<Note>>();
         //TODO handle defaulting units to inferred units for new fact entries which
         //create a new fact type
         let unit = if let Some(units) = matches.value_of("link-unit") {

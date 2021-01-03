@@ -32,6 +32,8 @@ pub(crate) struct DConfig {
     item: Option<ItemConfig>,
     fact: Option<FactConfig>,
     user: Option<UserConfig>,
+    prompt_for_value: bool,
+    prompt_for_record: bool,
 }
 
 impl DConfig {

@@ -2,6 +2,8 @@ use crate::prompt::prompt;
 use std::fmt;
 use serde::{Serialize, Deserialize};
 
+pub type Attribs = Vec<Attrib>;
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Attrib {
     #[serde(rename = "Name")]
