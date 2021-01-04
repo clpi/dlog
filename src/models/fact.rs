@@ -351,31 +351,17 @@ impl FromArgMatches for AbstractFact {
             crate::prompt::prompt("Fact name?: ").unwrap().to_string()
         };
         let id = uuid::Uuid::new_v4();
-        let linked_attribs = matches.values_of("link-attrib")
-            .unwrap()
-            .map(|att| {
-                let att = Attrib::from(att.to_string());
-                println!("linked att: {:?}", att);
-                att})
-            .collect::<Vec<Attrib>>();
-        let linked_notes = matches.values_of("link-notes")
-            .unwrap()
-            .map(|note| {
-                let note = Note::new(note);
-                println!(" linked note {:?}", note);
-                note
-            })
-            .collect::<Vec<Note>>();
-        //TODO handle defaulting units to inferred units for new fact entries which
-        //create a new fact type
-        let unit = if let Some(units) = matches.value_of("link-unit") {
-            Units::from(units)
-        } else {
-            Units::default()
-        };
-        Self { id, name,
-            attribs: linked_attribs,
-            notes: linked_notes,
-            created_at: Local::now(), unit}
+        let units = Units::from_match(matches.values_of("UNIT"));
+        let link_units = Units::from_match(matches.values_of("link-unit"));
+        let units = if link_units == Units::None { units } else { link_units };
+        let attr = Attrib::from_match(matches.values_of("link-attrib"));
+        let notes = Note::from_match(matches.values_of("link-notes"));
+        Self { id,
+            name,
+            attribs: attr,
+            notes,
+            unit: units,
+            created_at: Local::now()
+        }
     }
 }
