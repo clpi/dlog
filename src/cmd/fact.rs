@@ -1,5 +1,6 @@
 use chrono::{DateTime, Local};
 use crate::{
+    args::search::{Search, Filters},
     models::{
         fact::{Fact, AbstractFact},
         units::Units,
@@ -8,7 +9,7 @@ use crate::{
         attrib::Attrib,
         record::Record,
     },
-    cmd::{Cmd, Filters},
+    cmd::Cmd,
     prompt::prompt,
 };
 use clap::{ArgMatches, FromArgMatches};
@@ -20,10 +21,7 @@ pub enum FactCmd {
     Delete(Fact),
     LinkFact(Fact),
     LinkItem(Item),
-    Search {
-        query_str: String,
-        filters: Filters,
-    },
+    Search(Search),
     Help,
     List,
     Invalid,
@@ -132,7 +130,7 @@ impl FromArgMatches for FactCmd {
                         .collect::<Vec<&str>>();
                 }
                 let filters = Filters::from_arg_matches(matches);
-                return FactCmd::Search { query_str: "".into(), filters }
+                return FactCmd::Search(Search::default())
             },
             Some(("list", sub)) => {
                 println!("List facts comand, {}", "list");
@@ -154,24 +152,6 @@ impl FromArgMatches for FactCmd {
                 FactCmd::New(fact)
             }
         }
-    }
-}
-
-impl clap::Subcommand for FactCmd {
-    fn from_subcommand(sub: Option<(&str, &ArgMatches)>)
-        -> Option<Self>
-    {
-        let (sub, args) = sub.unwrap();
-        if sub == "fact" {
-            Some(Self::from_arg_matches(args))
-        } else {
-            None
-        }
-    }
-
-    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>
-    {
-        app
     }
 }
 
@@ -526,5 +506,25 @@ impl FactCmd {
 }
 
 
+impl clap::Subcommand for FactCmd {
+    fn from_subcommand(subcommand: Option<(&str, &ArgMatches)>) -> Option<Self> {
+        if let Some((subc, m)) = subcommand {
+            let cmd = match subc {
+                "new" => Some(Self::New(Fact::from_arg_matches(m))),
+                "list" => Some(Self::List),
+                "search" => Some(Self::Search(Search::from_arg_matches(m))),
+                "help" => Some(Self::Help),
+                _ => None,
+            };
+            cmd
+        } else {
+            None
+        }
+    }
+
+    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_> {
+        app
+    }
+}
 
 

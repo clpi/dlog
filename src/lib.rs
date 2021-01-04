@@ -7,6 +7,7 @@ pub mod util;
 pub mod error;
 pub mod search;
 pub mod prompt;
+pub mod args;
 
 pub use error::DResult;
 use std::{io, sync::RwLock};

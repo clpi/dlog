@@ -35,3 +35,10 @@ impl fmt::Display for Action {
     }
 }
 
+// impl clap::FromArgMatches for Action {
+
+//     fn from_arg_matches(matches: &ArgMatches) -> Self {
+//         // if let Some()
+//     }
+
+// }
