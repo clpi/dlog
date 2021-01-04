@@ -1,5 +1,5 @@
 use comfy_table::{
-    Table, ContentArrangement, presets::UTF8_BORDERS_ONLY,
+    Table, ContentArrangement, presets::{self, UTF8_BORDERS_ONLY},
     Cell, Attribute, Color as TColor,
 };
 use crate::{
@@ -195,9 +195,8 @@ impl Fact {
 
     pub fn table(&self) -> Table {
         let mut table = Table::new();
-        table.load_preset(UTF8_BORDERS_ONLY)
+        table.load_preset(presets::UTF8_BORDERS_ONLY)
             .set_content_arrangement(ContentArrangement::Dynamic)
-            .set_table_width(160)
             .set_header(vec![
                 Cell::new("Fact").add_attribute(Attribute::Bold)
                     .fg(TColor::Blue),
@@ -267,6 +266,26 @@ impl comfy_table::ToRow for AbstractFact {
             &self.created_at.to_string(),
         ])
     }
+}
+
+impl AbstractFact {
+    pub fn table(&self) -> Table {
+        let mut table = Table::new();
+        table.load_preset(presets::UTF8_BORDERS_ONLY)
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            .set_header(vec![
+                Cell::new("Fact").add_attribute(Attribute::Bold)
+                    .fg(TColor::Blue),
+                Cell::new("Value").add_attribute(Attribute::Bold),
+                Cell::new("Units").add_attribute(Attribute::Bold),
+                Cell::new("Attributes").add_attribute(Attribute::Bold),
+                Cell::new("Notes").add_attribute(Attribute::Bold),
+                Cell::new("Created").add_attribute(Attribute::Bold),
+            ])
+            .add_row(vec![self]);
+        table
+    }
+
 }
 
 impl fmt::Display for Fact {

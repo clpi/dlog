@@ -173,12 +173,9 @@ impl DApp {
         Self { subcmd, ..Default::default()  }
     }
 
-    pub fn new_from<I, T>(args: I) -> Result<Self, clap::Error>
-        where
-        I: Iterator<Item = T>,
-        T: Into<std::ffi::OsString> + Clone,
-    {
-        let matches = Self::cmd().try_get_matches_from(args)?;
+    pub fn run_cmd(args: &str) -> Result<Self, clap::Error> {
+        let args = args.split_whitespace().collect::<Vec<&str>>();
+        let matches = Self::cmd().try_get_matches_from(args.iter())?;
         Ok(Self::from_arg_matches(&matches))
     }
 

@@ -15,16 +15,12 @@ pub fn fact_cmd_no_key_prompts_user() {
 
 #[test]
 pub fn fact_cmd_first_pos_gives_fact_name() -> Result<(), String> {
-    // let cmd = assert_cmd::cmd::Command::cargo_bin("dlog")
-    //     .unwrap()
-    //     .arg("sleep")
-    //     .assert()
-    //     .success();
-    let cmd = DApp::new_from(vec![ "dlog", "sleep" ].iter());
+    let cmd = DApp::run_cmd("dlog sleep");
     if let Ok(cmd) = cmd {
         match cmd.subcmd {
-            Subcmd::Fact(FactCmd::New(f)) => {
-                assert_eq!(f.name.as_str(), "sleep");
+            Subcmd::Fact(FactCmd::New(f, af)) => {
+                println!("{}", f.table());
+                debug_assert_eq!(f.name.as_str(), "sleep");
                 Ok(())
             },
             _ => Err("Not".to_string())
@@ -34,4 +30,23 @@ pub fn fact_cmd_first_pos_gives_fact_name() -> Result<(), String> {
         Err("NO".to_string())
     }
 
+}
+
+#[test]
+pub fn fact_cmd_second_pos_gives_fact_val() -> Result<(), String> {
+    let cmd = DApp::run_cmd("dlog sleep 5");
+    if let Ok(cmd) = cmd {
+        match cmd.subcmd {
+            Subcmd::Fact(FactCmd::New(f, af)) => {
+                println!("{}", f.table());
+                debug_assert_eq!(f.name, "sleep".to_string());
+                debug_assert_eq!(f.val, FactValue::RealNumber(5.0));
+                Ok(())
+            },
+            _ => Err("Not".to_string())
+
+            }
+    } else {
+        Err("NO".to_string())
+    }
 }

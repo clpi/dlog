@@ -17,7 +17,7 @@ use colored::{Color, Colorize};
 
 #[derive(Debug)]
 pub enum FactCmd {
-    New(Fact),
+    New(Fact, AbstractFact),
     NewFactType(AbstractFact),
     Delete(Fact),
     DeleteFactType(AbstractFact),
@@ -111,7 +111,8 @@ impl FromArgMatches for FactCmd {
         match matches.subcommand() {
             Some(("new", sub)) => {
                 let fact = Fact::from_arg_matches(sub);
-                return FactCmd::New(fact)
+                let af = AbstractFact::from_arg_matches(sub);
+                return FactCmd::New(fact, af)
             },
             Some(("search", sub)) => {
                 if let Some(r_filts) = sub.values_of("filterrecord") {
@@ -152,7 +153,7 @@ impl FromArgMatches for FactCmd {
                 let fact_type = AbstractFact::from_arg_matches(&matches);
                 println!("Got fact: {:?}", fact);
                 println!("Got abstract fact: {:#?}", fact_type);
-                FactCmd::New(fact)
+                FactCmd::New(fact, fact_type)
             }
         }
     }
@@ -513,7 +514,11 @@ impl clap::Subcommand for FactCmd {
     fn from_subcommand(subcommand: Option<(&str, &ArgMatches)>) -> Option<Self> {
         if let Some((subc, m)) = subcommand {
             let cmd = match subc {
-                "new" => Some(Self::New(Fact::from_arg_matches(m))),
+                "new" => {
+                    let fact = Fact::from_arg_matches(m);
+                    let af = AbstractFact::from_arg_matches(m);
+                    Some(Self::New(fact, af))
+                },
                 "list" => Some(Self::List),
                 "search" => Some(Self::Search(Search::from_arg_matches(m))),
                 "help" => Some(Self::Help),
