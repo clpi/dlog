@@ -1,9 +1,14 @@
 [package]
-name = "dl-parse"
+name = "dl_parse"
 version = "0.1.0"
 authors = ["Chris P <chrisp1877@gmail.com>"]
 edition = "2018"
 
+[lib]
+name = "dl_parse"
+path = "src/lib.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+strsim = "*"

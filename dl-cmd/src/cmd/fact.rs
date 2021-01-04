@@ -1,4 +1,3 @@
-use chrono::{DateTime, Local};
 use crate::{
     models::{
         fact::{Fact, AbstractFact},
@@ -12,7 +11,6 @@ use crate::{
     prompt::prompt,
 };
 use clap::{ArgMatches, FromArgMatches};
-use colored::{Color, Colorize};
 
 #[derive(Debug)]
 pub enum FactCmd {

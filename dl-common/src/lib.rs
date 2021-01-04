@@ -1,3 +1,8 @@
+pub mod search;
+pub mod util;
+pub mod models;
+pub mod prompt;
+
 #[cfg(test)]
 mod tests {
     #[test]
