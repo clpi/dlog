@@ -12,15 +12,17 @@ use crate::{
     cmd::Cmd,
     prompt::prompt,
 };
-use clap::{ArgMatches, FromArgMatches};
+use clap::{ArgMatches, FromArgMatches, Subcommand};
 use colored::{Color, Colorize};
 
 #[derive(Debug)]
 pub enum FactCmd {
     New(Fact),
+    NewFactType(AbstractFact),
     Delete(Fact),
-    LinkFact(Fact),
-    LinkItem(Item),
+    DeleteFactType(AbstractFact),
+    Link(Fact),
+    LinkFactType(AbstractFact),
     Search(Search),
     Help,
     List,
@@ -105,6 +107,7 @@ impl FromArgMatches for FactCmd {
             matches.subcommand(),
             matches
         ).color(Color::BrightCyan));
+        let subc = FactCmd::from_subcommand(matches.subcommand());
         match matches.subcommand() {
             Some(("new", sub)) => {
                 let fact = Fact::from_arg_matches(sub);

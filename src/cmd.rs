@@ -33,6 +33,7 @@ pub struct DApp {
     pub subcmd: Subcmd,
 }
 
+#[derive(Debug)]
 pub enum Subcmd {
     //config
     Fact(FactCmd),
@@ -157,9 +158,12 @@ impl Cmd for DApp {
 
 impl FromArgMatches for DApp {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        let subcmd = Subcmd::from_subcommand(matches.subcommand())
-            .expect("Invalid input");
-        Self { subcmd }
+        if let Some(subcmd) = Subcmd::from_subcommand(matches.subcommand()) {
+            println!("GOT SUBCMD: {:#?}", subcmd);
+            Self { subcmd  }
+        } else {
+            Self { subcmd: Subcmd::Fact(FactCmd::from_arg_matches(matches)) }
+        }
     }
 }
 
@@ -167,6 +171,15 @@ impl DApp {
 
     pub fn new(subcmd: Subcmd) -> Self {
         Self { subcmd, ..Default::default()  }
+    }
+
+    pub fn new_from<I, T>(args: I) -> Result<Self, clap::Error>
+        where
+        I: Iterator<Item = T>,
+        T: Into<std::ffi::OsString> + Clone,
+    {
+        let matches = Self::cmd().try_get_matches_from(args)?;
+        Ok(Self::from_arg_matches(&matches))
     }
 
     pub fn version() -> Arg<'static> {

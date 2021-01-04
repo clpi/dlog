@@ -222,15 +222,23 @@ impl Fact {
 
 impl Default for Fact {
     fn default() -> Self {
-        let name = prompt::prompt("Fact name: ")
-            .expect("Could not prompt fact name");
-        let val = prompt::prompt("Fact value: ")
-            .expect("Could not prompt fact value");
-        let unit = Units::prompt("Units? (Enter if not applicable): ");
-        let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
-        println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
-                &name, &val, &unit, &attribs).color(Color::BrightCyan));
-        Fact::new(name, val, unit, attribs, Vec::new())
+        // let name = prompt::prompt("name?").unwrap();
+        let name = String::new();
+        // if config.propt_units {}
+        // let unit = Units::prompt("Units? (Enter if not applicable): ");
+        // if config.prompt.attribs {}
+        // let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
+        // println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
+                // &name, &val, &unit, &attribs).color(Color::BrightCyan));
+        let ab = AbstractFact {
+            name: name.clone(),
+            attribs: Vec::new(),
+            notes: Vec::new(),
+            unit: Units::None,
+            id: uuid::Uuid::new_v4(),
+            created_at: Local::now(),
+        };
+        Fact::new(name, String::new(),Units::None, Vec::new(), Vec::new())
     }
 }
 
@@ -316,21 +324,12 @@ impl FromArgMatches for Fact {
         let name = if let Some(name) = matches.value_of("NAME") {
             name.to_string()
         } else {
-            crate::prompt::prompt("Fact name?: ").unwrap().to_string()
+            crate::prompt::prompt("NONAMEGIVEN: Fact name?: ").unwrap().to_string()
         };
         if let Some(value) = matches.value_of("VALUE") {
-            let units: Units = if let Some(units) = matches.value_of("UNIT") {
-                Units::from(units)
-            } else { Units::None };
-            println!("Got new fact: {} = {} ({})", &name, &value, &units);
-            let attr = matches.values_of("attribs")
-                .unwrap_or_default()
-                .map(|att| {let att = Attrib::from(att.to_string()); println!("att: {:?}", att); att})
-                .collect::<Vec<Attrib>>();
-            let notes = matches.values_of("notes")
-                .unwrap_or_default()
-                .map(|n| { println!(" note: {:?}", n); Note::new(n) })
-                .collect::<Vec<Note>>();
+            let units = Units::from_match(matches.values_of("UNIT"));
+            let attr = Attrib::from_match(matches.values_of("attribs"));
+            let notes = Note::from_match(matches.values_of("notes"));
             Self::new(name.into(), value.into(), units, attr, notes)
         } else {
             Self { name: name.into(),
@@ -353,14 +352,14 @@ impl FromArgMatches for AbstractFact {
         };
         let id = uuid::Uuid::new_v4();
         let linked_attribs = matches.values_of("link-attrib")
-            .unwrap_or_default()
+            .unwrap()
             .map(|att| {
                 let att = Attrib::from(att.to_string());
                 println!("linked att: {:?}", att);
                 att})
             .collect::<Vec<Attrib>>();
         let linked_notes = matches.values_of("link-notes")
-            .unwrap_or_default()
+            .unwrap()
             .map(|note| {
                 let note = Note::new(note);
                 println!(" linked note {:?}", note);

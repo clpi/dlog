@@ -26,6 +26,14 @@ impl Attrib {
         } else { vec![] }
     }
 
+    pub fn from_match(matches: Option<clap::Values>) -> Vec<Self> {
+        if let Some(attribs) = matches {
+            attribs.map(|a| Attrib::from(a.to_string())).collect()
+        } else {
+            Vec::new()
+        }
+    }
+
     pub fn prompt(prompt_str: &str) -> Vec<Attrib> {
         let attrib = prompt(prompt_str)
             .expect("Could not prompt fact value");

@@ -7,6 +7,7 @@ use crate::{
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
 
+#[derive(Debug)]
 pub enum RelCmd {
     FactFact(String),
     FactItem(String),

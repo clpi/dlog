@@ -15,6 +15,14 @@ impl Note {
         Self { notes: note.to_string() }
     }
 
+    pub fn from_match(matches: Option<clap::Values>) -> Vec<Self> {
+        if let Some(notes) = matches {
+            notes.map(|a| Note::from(a.to_string())).collect()
+        } else {
+            Vec::new()
+        }
+    }
+
     pub fn join(notes: &Vec<Self>) -> String {
         notes.iter()
             .map(|a| a.notes.to_string())

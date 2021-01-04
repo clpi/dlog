@@ -43,6 +43,15 @@ impl Units {
        Self::from_prompt(unit)
     }
 
+    pub fn from_match(units: Option<clap::Values>) -> Self {
+        if let Some(units) = units {
+            let units = units.map(|u| u.to_string()).collect::<Vec<String>>();
+            Units::from(units)
+        } else {
+            Units::None
+        }
+    }
+
     pub fn from_prompt(prompt: String) -> Self {
         if prompt.len() != 0 {
             let split = prompt.split_whitespace();
