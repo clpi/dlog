@@ -18,7 +18,7 @@ pub enum RelCmd {
 
 impl Default for RelCmd {
     fn default() -> Self {
-        Self::Help
+        Self::FactFact(String::new())
     }
 }
 
@@ -63,4 +63,11 @@ impl Cmd for RelCmd {
             .long_about("Prints the help information")
     }
 
+}
+
+impl FromArgMatches for RelCmd {
+    fn from_arg_matches(_matches: &ArgMatches) -> Self {
+        Self::print_help();
+        Self::default()
+    }
 }

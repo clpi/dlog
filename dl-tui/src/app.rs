@@ -17,7 +17,7 @@ use tui::{
     terminal::{Terminal, TerminalOptions, Frame},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clap)]
 pub struct App {
     user: User,
     cmd: LineBuffer,

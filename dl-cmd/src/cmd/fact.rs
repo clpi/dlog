@@ -1,3 +1,8 @@
+use dl_common::models::{
+        fact::{Fact, AbstractFact,},
+        units::Units,
+};
+use comfy_table::{Table, Row};
 use crate::{
     models::{
         fact::{Fact, AbstractFact},
@@ -523,6 +528,99 @@ impl FactCmd {
 
 }
 
+impl FromArgMatches for Fact {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        let name = if let Some(name) = matches.value_of("NAME") {
+            name.to_string()
+        } else {
+            crate::prompt::prompt("Fact name?: ").unwrap().to_string()
+        };
+        if let Some(value) = matches.value_of("VALUE") {
+            let units: Units = if let Some(units) = matches.value_of("UNIT") {
+                Units::from(units)
+            } else { Units::None };
+            println!("Got new fact: {} = {} ({})", &name, &value, &units);
+            let attr = matches.values_of("attribs")
+                .unwrap_or_default()
+                .map(|att| {let att = Attrib::from(att.to_string()); println!("att: {:?}", att); att})
+                .collect::<Vec<Attrib>>();
+            let notes = matches.values_of("notes")
+                .unwrap_or_default()
+                .map(|n| { println!(" note: {:?}", n); Note::new(n) })
+                .collect::<Vec<Note>>();
+            Self::new(name.into(), value.into(), units, attr, notes)
+        } else {
+            Self { name: name.into(),
+                val: FactValue::Boolean(true), // NOTE val "true" if no val specified
+                ..Self::default()
+            }
+        }
+    }
+}
 
+// TODO Add logic that makes it such that a previously created abstract fact
+//      (i.e. a fact entry with the key has already been made) will simply
+//      lookup the corresponding abstract fact
+impl FromArgMatches for AbstractFact {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        let name = if let Some(name) = matches.value_of("NAME") {
+            name.to_string()
+        } else {
+            crate::prompt::prompt("Fact name?: ").unwrap().to_string()
+        };
+        let id = uuid::Uuid::new_v4();
+        let linked_attribs = matches.values_of("link-attrib")
+            .unwrap_or_default()
+            .map(|att| {
+                let att = Attrib::from(att.to_string());
+                println!("linked att: {:?}", att);
+                att})
+            .collect::<Vec<Attrib>>();
+        let linked_notes = matches.values_of("link-notes")
+            .unwrap_or_default()
+            .map(|note| {
+                let note = Note::new(note);
+                println!(" linked note {:?}", note);
+                note
+            })
+            .collect::<Vec<Note>>();
+        //TODO handle defaulting units to inferred units for new fact entries which
+        //create a new fact type
+        let unit = if let Some(units) = matches.value_of("link-unit") {
+            Units::from(units)
+        } else {
+            Units::default()
+        };
+        Self { id, name,
+            attribs: linked_attribs,
+            notes: linked_notes,
+            created_at: Local::now(), unit}
+    }
+}
 
+impl comfy_table::ToRow for Fact {
+    fn to_row(self) -> comfy_table::Row {
+        comfy_table::Row::from(vec![
+            &self.id.to_string(),
+            &self.name.to_string(),
+            &self.val.to_string(),
+            &self.unit.to_string(),
+            &Attrib::join(&self.attribs),
+            &Note::join(&self.notes),
+            &self.created_at.to_string(),
+        ])
+    }
+}
 
+impl comfy_table::ToRow for AbstractFact {
+    fn to_row(self) -> comfy_table::Row {
+        comfy_table::Row::from(vec![
+            &self.id.to_string(),
+            &self.name.to_string(),
+            &self.unit.to_string(),
+            &Attrib::join(&self.attribs),
+            &Note::join(&self.notes),
+            &self.created_at.to_string(),
+        ])
+    }
+}

@@ -7,14 +7,14 @@ use std::{
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(crate) enum FormatConfig {
+pub enum FormatConfig {
     Csv,
     Json,
     Yaml,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub(crate) struct DConfig {
+pub struct DConfig {
     name: Option<String>,
     dialect: Option<String>,
     start_of_week: Option<chrono::Weekday>,
@@ -126,7 +126,7 @@ impl Default for DConfig {
     fn default() -> Self {
         Self {
             name: None,
-            data_loc: Some(Self::data_dir()),
+            data_loc: dirs_next::data_dir(),
             format: Some(FormatConfig::Csv),
             record: None,
             user: None,

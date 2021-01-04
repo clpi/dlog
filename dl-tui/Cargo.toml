@@ -1,5 +1,5 @@
 [package]
-name = "dl-tui"
+name = "dl_tui"
 version = "0.1.0"
 authors = ["Chris P <chrisp1877@gmail.com>"]
 edition = "2018"
@@ -7,7 +7,7 @@ default-run = "dlog_tui"
 
 [[bin]]
 name = "gdlog"
-path = "src/bin/dlog-tui.rs"
+path = "src/bin/gdlog.rs"
 
 [lib]
 name = "dl_tui"
@@ -23,3 +23,6 @@ serde = { version = "*", features = ["derive"] }
 dirs-next = "*"
 rustyline = "*"
 
+[dependencies.clap]
+version = "3.0.0-beta.2"
+features = [ "suggestions", "color" ]

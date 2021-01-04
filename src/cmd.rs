@@ -1,12 +1,12 @@
 pub mod fact;
 pub mod action;
+pub mod relation;
 pub mod item;
 pub mod record;
 pub mod attribute;
 pub mod link;
 pub mod user;
 pub mod stats;
-pub mod args;
 
 use chrono::{DateTime, Local};
 use super::config::DConfig;
@@ -19,15 +19,21 @@ use self::{
     user::UserCmd,
     stats::StatsCmd,
     action::ActionCmd,
+    relation::RelCmd,
 };
 use crate::models::{
     Entry, Fact, Record, Item, Attrib,
     note::Note, Action, Relation, value::FactValue, Units
 };
 use colored::{Color, Colorize};
-use clap::{Arg, ArgMatches, Clap, FromArgMatches};
+use clap::{Arg, ArgMatches, Clap, FromArgMatches, Subcommand};
 
-pub enum App {
+pub struct DApp {
+    // pub config: DConfig,
+    pub subcmd: Subcmd,
+}
+
+pub enum Subcmd {
     //config
     Fact(FactCmd),
     Record(RecordCmd),
@@ -37,18 +43,21 @@ pub enum App {
     Link(LinkCmd),
     User(UserCmd),
     Stats(StatsCmd),
+    Relation(RelCmd),
     List,
     Search,
     Config,
-    Relation,
     Export,
     Import,
     Help,
 }
 
-impl Default for App {
+impl Default for DApp {
     fn default() -> Self {
-        Self::Help
+        Self {
+            subcmd: Subcmd::Help,
+            // config: DConfig::default(),
+        }
     }
 }
 
@@ -68,7 +77,7 @@ impl TermSettings {
     }
 }
 
-impl Cmd for App {
+impl Cmd for DApp {
 
     fn name() -> &'static str { "dlog" }
     fn about() -> &'static str { "" }
@@ -141,66 +150,24 @@ impl Cmd for App {
     fn run(&self) {
         let matches = Self::cmd()
             .get_matches();
-        let _app = Self::from_arg_matches(&matches);
+        let _DApp = Self::from_arg_matches(&matches);
     }
 
 }
 
-impl FromArgMatches for App {
+impl FromArgMatches for DApp {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        match matches.subcommand() {
-            Some(("record", sub)) => {
-                let rec = RecordCmd::from_arg_matches(sub);
-                Self::Record(rec)
-            },
-            Some(("item", sub)) => {
-                let item = ItemCmd::from_arg_matches(sub);
-                Self::Item(item)
-            },
-            Some(("fact", sub)) => {
-                let fact = FactCmd::from_arg_matches(sub);
-                Self::Fact(fact)
-            },
-            Some(("link", sub)) => {
-                let link = LinkCmd::from_arg_matches(sub);
-                Self::Link(link)
-            },
-            Some(("attrib", sub)) => {
-                let attrib = AttribCmd::from_arg_matches(sub);
-                Self::Attrib(attrib)
-            },
-            Some(("user", sub)) => {
-                let user = UserCmd::from_arg_matches(sub);
-                Self::User(user)
-            },
-            Some(("stats", sub)) => {
-                let stats = StatsCmd::from_arg_matches(sub);
-                Self::Stats(stats)
-            },
-            Some(("list", _sub)) => {
-                Self::List
-            },
-            Some(("search", _sub)) => {
-                Self::Search
-            },
-            Some((c, sub)) => {
-                println!("Cmd: {}, sub {:?}", c, &sub);
-                Self::Help
-            },
-            None => {
-                let fact = FactCmd::from_arg_matches(matches);
-                println!("subc: {:#?}\n matches: {:#?}",
-                    matches.subcommand(),
-                    matches
-                );
-                Self::Fact(fact)
-            }
-        }
+        let subcmd = Subcmd::from_subcommand(matches.subcommand())
+            .expect("Invalid input");
+        Self { subcmd }
     }
 }
 
-impl App {
+impl DApp {
 
+    pub fn new(subcmd: Subcmd) -> Self {
+        Self { subcmd, ..Default::default()  }
+    }
 
     pub fn version() -> Arg<'static> {
         clap::Arg::new("version")
@@ -277,6 +244,10 @@ pub trait Cmd: FromArgMatches + Default {
     fn print_help();
     fn help_cmd() -> clap::App<'static>;
     fn settings() -> Vec<clap::AppSettings> { Vec::new() }
+    fn search(_long_about: Option<String>) -> clap::App<'static> {
+        clap::App::new("search")
+            .args(&[clap::Arg::new("filter")])
+    }
 }
 
 
@@ -291,6 +262,14 @@ pub trait EntryCmd: FromArgMatches + clap::Subcommand + Default {
     fn list_cmd() -> clap::App<'static>;
 
     fn search_cmd() -> clap::App<'static>;
+}
+
+pub enum EntryMsg {
+    New,
+    Delete,
+    Update,
+    Get,
+    Search,
 }
 
 
@@ -339,5 +318,33 @@ pub enum Filters {
 impl FromArgMatches for Filters {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         Self::HasValue(Vec::new())
+    }
+}
+
+impl clap::Subcommand for Subcmd {
+    fn from_subcommand(subcommand: Option<(&str, &ArgMatches)>) -> Option<Self> {
+        if let Some((subc, m)) = subcommand {
+            let sub = match subc {
+                "fact" => Self::Fact(FactCmd::from_arg_matches(m)),
+                "record" => Self::Record(RecordCmd::from_arg_matches(m)),
+                "item" => Self::Item(ItemCmd::from_arg_matches(m)),
+                "user" => Self::User(UserCmd::from_arg_matches(m)),
+                 "link" => Self::Link(LinkCmd::from_arg_matches(m)),
+                 "relation" => Self::Relation(RelCmd::from_arg_matches(m)),
+                "stats" => Self::Stats(StatsCmd::from_arg_matches(m)),
+                "action" => Self::Action(ActionCmd::from_arg_matches(m)),
+                "list" => Self::List,
+                "search" => Self::Search,
+                "help" => Self::Help,
+                _ => Self::Fact(FactCmd::from_arg_matches(m)),
+            };
+            return Some(sub)
+        } else {
+            return None
+        }
+    }
+
+    fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_> {
+        app
     }
 }

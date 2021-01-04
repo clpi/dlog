@@ -1,5 +1,6 @@
 pub mod app;
 pub mod user;
+pub mod cmd;
 
 pub fn run() -> std::io::Result<()> {
     Ok(())
