@@ -17,6 +17,8 @@ pub fn entry_linked_attrib_from_lc_a_flag() -> Result<(), String> {
                 let sa = Attrib::from("dreamt".to_string());
                 debug_assert_eq!(fs.attribs, vec![sa.clone()]);
                 debug_assert_eq!(fl.attribs, vec![sa.clone()]);
+                debug_assert_ne!(afs.attribs, vec![sa.clone()]);
+                debug_assert_ne!(afl.attribs, vec![sa.clone()]);
                 Ok(())
             },
             _ => Err("Not".to_string())
@@ -40,6 +42,8 @@ pub fn fact_type_linked_attrib_from_up_a_flag() -> Result<(), String> {
                 let sa = Attrib::from("health".to_string());
                 debug_assert_eq!(afs.attribs, vec![sa.clone()]);
                 debug_assert_eq!(afl.attribs, vec![sa.clone()]);
+                debug_assert_ne!(fs.attribs, vec![sa.clone()]);
+                debug_assert_ne!(fl.attribs, vec![sa.clone()]);
                 Ok(())
             },
             _ => Err("Not".to_string())
