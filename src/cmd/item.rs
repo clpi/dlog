@@ -238,7 +238,7 @@ impl FromArgMatches for ItemCmd {
                 _ => {
                     let item = Item::from_arg_matches(args);
                     println!("{}", item.table());
-                    println!("{:#?}", item);
+                    // println!("{:#?}", item);
                     return Self::New(item);
                 },
             };

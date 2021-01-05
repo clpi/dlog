@@ -154,8 +154,8 @@ impl FromArgMatches for FactCmd {
                 let fact_type = AbstractFact::from_arg_matches(&matches);
                 println!("{}", fact.table());
                 println!("{}", fact_type.table());
-                println!("{:#?}", fact);
-                println!("{:#?}", fact_type);
+                // println!("{:#?}", fact);
+                // println!("{:#?}", fact_type);
                 FactCmd::New(fact, fact_type)
             }
         }

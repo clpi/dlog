@@ -1,4 +1,5 @@
 use crate::prompt::prompt;
+use super::fact::FactValue;
 use std::{fmt, path::PathBuf, convert::TryFrom, time};
 use serde::{Serialize, Deserialize};
 use chrono::{Utc, DateTime, Duration, format, prelude::*};
@@ -164,6 +165,23 @@ impl From<String> for UserUnit {
     fn from(inp: String) -> Self {
         let inp_sp = inp.split_whitespace();
         UserUnit::Text(inp)
+    }
+}
+
+impl From<FactValue> for Units {
+    fn from(fv: FactValue) -> Self {
+        match fv {
+            FactValue::Boolean(b) => Self::Boolean,
+            FactValue::Text(t) => {
+                let _sp = t.split_whitespace()
+                    .map(|w| w.to_string())
+                    .collect::<Vec<String>>();
+                Self::Other(UserUnit::from(t))
+            }
+            _ => {
+                Self::Boolean
+            }
+        }
     }
 }
 

@@ -19,7 +19,6 @@ pub fn fact_cmd_first_pos_gives_fact_name() -> Result<(), String> {
     if let Ok(cmd) = cmd {
         match cmd.subcmd {
             Subcmd::Fact(FactCmd::New(f, af)) => {
-                println!("{}", f.table());
                 debug_assert_eq!(f.name.as_str(), "sleep");
                 Ok(())
             },
@@ -38,7 +37,6 @@ pub fn fact_cmd_second_pos_gives_fact_val() -> Result<(), String> {
     if let Ok(cmd) = cmd {
         match cmd.subcmd {
             Subcmd::Fact(FactCmd::New(f, af)) => {
-                println!("{}", f.table());
                 debug_assert_eq!(f.name, "sleep".to_string());
                 debug_assert_eq!(f.val, FactValue::RealNumber(5.0));
                 Ok(())
