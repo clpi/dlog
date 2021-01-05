@@ -1,11 +1,75 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+
+    <title>dlog!</title>
   </head>
   <body>
+    <ul class="nav" style="align-items: center; align-content: center; text-justify: center; display: flex; margin-left: 35%;">
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="/">home</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/">install</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/">about</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/book">book</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="https://github.com/clpi/dlog">repo</a>
+  </li>
+</ul>
+    <br/><br/>
+    <div class="container col-6">
+      <h1>dlog!</h1>
+      <br/><br/>
+      <h3>as powerful as <small class="text-muted">you want it to be!</small>
+        <br/>
+        <p class="lead">
+        dlog is an in-progress tool to keep track of your life from all angles, meant to be uber-extensible and provide real insights. basically, it's meant to connect the dots for you. eventually.
 
-    <h1>dlog home</h1>
-    <p>welcome to the dlog homepage</p>
-    <a href="/book/">dlog book</a>
+    </p>
+    <a href="/book"><button class="btn btn-primary">the book</button></a>
+    <a href="https://github.com/clpi/dlog"><button class="btn btn-primary">the repo</button></a>
+    <br/><br/>
+    <h3>Be emailed when things are ready?</h3>
+    <form>
+  <div class="form-floating mb-3">
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+    <label for="exampleInputEmail1">Email address</label>
+    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+  </div>
+  <div class="form-floating mb-3">
+    <input type="name" class="form-control" id="name">
+    <label for="name">Name</label>
+  </div>
+  <div class="mb-3 form-check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1">
+    <label class="form-check-label" for="exampleCheck1">Sign up for dev updates?</label>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</h3>
+      <p>Thanks for vising, come back later!</p>
+    </div>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+    -->
   </body>
 </html>

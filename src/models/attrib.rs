@@ -42,7 +42,7 @@ impl Attrib {
 
     pub fn join(attribs: &Vec<Self>) -> String {
         attribs.iter()
-            .map(|a| a.clone().name)
+            .map(|a| a.clone().to_string())
             .collect::<Vec<String>>()
             .join(", ")
     }
@@ -62,10 +62,20 @@ impl From<String> for Attrib {
 impl fmt::Display for Attrib {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if let Some(val) = self.value.clone() {
-            f.write_fmt(format_args!("Attrib: {} with value {} ", self.name, val))
+            f.write_fmt(format_args!("(A: {} V: {}) ", self.name, val))
         } else {
-            f.write_fmt(format_args!("Attrib: {}", self.name))
+            f.write_fmt(format_args!("(A: {})", self.name))
         }
 
+    }
+}
+
+impl Into<String> for Attrib {
+    fn into(self) -> String {
+        if let Some(val) = self.value.clone() {
+            format!("(A: {}, V: {})", self.name, val)
+        } else {
+            format!("A: {}", self.name)
+        }
     }
 }

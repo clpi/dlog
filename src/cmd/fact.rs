@@ -104,10 +104,10 @@ impl Cmd for FactCmd {
 
 impl FromArgMatches for FactCmd {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
-        println!("{}", format!("subc: {:?} \n matches: {:?}",
-            matches.subcommand(),
-            matches
-        ).color(Color::BrightCyan));
+        // println!("{}", format!("subc: {:?} \n matches: {:?}",
+        //     matches.subcommand(),
+        //     matches
+        // ).color(Color::BrightCyan));
         let subc = FactCmd::from_subcommand(matches.subcommand());
         match matches.subcommand() {
             Some(("new", sub)) => {
