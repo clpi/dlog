@@ -5,19 +5,22 @@ use colored::{Color, Colorize};
 use crate::{
     prompt::prompt,
     error::DResult,
-    models::{Entry, Fact, Record, Attrib},
+    models::{Entry, Fact, Record, Attrib, Note},
 };
 use uuid::Uuid;
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Item {
+    #[serde(rename = "Id")]
     pub id: uuid::Uuid,
     #[serde(rename = "Item")]
     pub name: String,
-    #[serde(skip)]
-    pub record: Rc<Record>,
+    #[serde(rename = "Attributes")]
     pub attribs: Vec<Attrib>,
+    #[serde(rename = "Notes")]
+    pub notes: Vec<Note>,
+    #[serde(rename = "Created at")]
     pub created: DateTime<Local>,
 }
 
@@ -30,8 +33,9 @@ impl Default for Item {
             .color(Color::BrightCyan));
         Item {
             id: Uuid::new_v4(),
-            name, record: Rc::new(Record::default()),
+            name,
             created: Local::now(),
+            notes: Vec::new(),
             attribs: Vec::new()
         }
     }
@@ -39,32 +43,19 @@ impl Default for Item {
 
 impl Item {
 
-    pub fn new(name: String, record: Option<String>) -> Self {
+    pub fn new(name: String,) -> Self {
         let id: Uuid = Uuid::new_v4();
-        if let Some(record) = record {
-            Self { id, name,
-                record: Rc::new(Record::from(record)),
+        Self { id, name,
                 created: Local::now(),
+                notes: Vec::new(),
                 attribs: Vec::new(),
-            }
-        } else {
-            Self {
-                id, name,
-                record: Rc::new(Record::default()),
-                created: Local::now(),
-                attribs: Vec::new(),
-            }
         }
     }
 
-    pub fn create(&self) -> std::io::Result<PathBuf> {
-        let item = self.record.add_item(self)?;
+    pub fn insert(&self, record: Record) -> std::io::Result<PathBuf> {
+        let item = record.add_item(self)?;
         Ok(item)
     }
-
-    // pub fn path(&self) -> PathBuf {
-
-    // }
 
     pub fn get_all_facts(&self) -> DResult<Vec<Fact>> {
         let mut facts: Vec<Fact> = vec![];
@@ -97,15 +88,16 @@ impl FromArgMatches for Item {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         match (matches.value_of("NAME"), matches.value_of("record")) {
             (Some(item), Some(record)) => {
-                Self::new(item.into(), Some(record.to_string()))
+                Self::new(item.into())
             },
             (Some(item), None)  => {
-                Self::new(item.into(), None)
+                Self::new(item.into())
             },
             (_, _) => Self::default(),
         }
     }
 }
+
 
 // TODO add fact links as rows in table and add notes
 impl comfy_table::ToRow for Item {
@@ -114,6 +106,7 @@ impl comfy_table::ToRow for Item {
             &self.id.to_string(),
             &self.name.to_string(),
             &Attrib::join(&self.attribs),
+            &Note::join(&self.notes),
             &self.created.to_string(),
         ])
     }

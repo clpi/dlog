@@ -13,7 +13,7 @@ pub enum Units {
     #[serde(skip, rename="Duration")]
     Duration(Duration),
     #[serde(rename="Other")]
-    Other(String),
+    Other(UserUnit),
     #[serde(rename="None")]
     None,
 }
@@ -56,10 +56,10 @@ impl Units {
         if prompt.len() != 0 {
             let split = prompt.split_whitespace();
             if split.clone().count() == 1 {
-                Units::Other(prompt)
+                Units::Other(UserUnit::from(prompt))
             } else { //TODO check if datetime
                 let unit: String = split.into_iter().collect();
-                Units::Other(unit)
+                Units::Other(UserUnit::from(prompt))
             }
         } else { Units::None }
     }
@@ -101,7 +101,7 @@ impl From<Option<String>> for Units {
             if let Ok(date) = chrono_english::parse_date_string::<Local>(&input, Local::now(), Dialect::Us){
                 return Units::Datetime(date);
             }
-            Units::Other(input)
+            Units::Other(UserUnit::from(input))
         } else { Units::None }
     }
 }
@@ -120,10 +120,10 @@ impl From<&str> for Units {
             {
                 return Units::Duration(Duration::seconds(100));
             } else {
-                return Units::Other(s.to_string());
+                return Units::Other(UserUnit::from(s.to_string()));
             }
         }
-        return Units::Other(s.to_string())
+        return Units::Other(UserUnit::from(s.to_string()))
     }
 }
 
@@ -133,16 +133,17 @@ impl From<Vec<String>> for Units {
     }
 }
 
-
-
 impl fmt::Display for Units {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Units::Datetime(date) => {
                 f.write_str(date.to_rfc2822().as_str())?;
             },
-            Units::Other(units) => {
-                f.write_str(units.as_str())?;
+            Units::Other(user_unit) => {
+                match user_unit {
+                    UserUnit::Text(txt) =>  f.write_str(txt.as_str())?,
+                    _ => f.write_str("Other custom user units")?,
+                }
             },
             Units::Duration(duration) => {
                 f.write_str(&duration.num_seconds().to_string())?;
@@ -152,6 +153,13 @@ impl fmt::Display for Units {
             }
         }
         Ok(())
+    }
+}
+
+impl From<String> for UserUnit {
+    fn from(inp: String) -> Self {
+        let inp_sp = inp.split_whitespace();
+        UserUnit::Text(inp)
     }
 }
 
@@ -181,4 +189,6 @@ pub enum RelativeTime {
     NextYear(DateTime<Local>),
     Other(DateTime<Local>),
 }
+
+
 

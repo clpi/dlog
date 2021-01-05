@@ -6,7 +6,7 @@ use crate::{
     csv as Csv, prompt,
     models::{
         Entry,
-        units::Units,
+        units::{Units, UserUnit},
         record::Record,
         item::Item,
         note::{Note, Notes},
@@ -317,7 +317,7 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
             val: FactValue::from(rec[1].to_string()),
             created_at: DateTime::parse_from_rfc2822(&rec[3])
                 .expect("Could not parse datetime").into(),
-            unit: Units::Other(rec[4].to_string()), //TODO handle date parsing
+            unit: Units::Other(UserUnit::from(rec[4].to_string())), //TODO handle date parsing
             attribs: rec.iter().skip(5)
                 .map(|a| Attrib::new(a, None))
                 .collect(),

@@ -21,7 +21,7 @@ colored = "2.0.0"
 dirs-next = "2.0.0"
 byteorder = "*"
 zerocopy = "*"
-serde = { version = "*", features = ["derive"] }
+serde = { version = "*", features = ["derive", "rc"] }
 chrono = {version="*", features=["serde", "std"]}
 crossterm = "*"
 toml = "0.5.7"

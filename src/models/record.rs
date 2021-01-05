@@ -5,6 +5,7 @@ use comfy_table::{
 use std::{
     path::PathBuf, fs,
     convert::TryFrom,
+    rc::Rc,
 };
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -17,12 +18,15 @@ use clap::{ArgMatches, FromArgMatches};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
+    #[serde(rename="Id")]
     pub id: uuid::Uuid,
     #[serde(rename="Record")]
     pub name: String,
-    #[serde(rename="Item")]
-    pub items: Vec<Item>,
+    #[serde(rename="Items")]
+    pub items: Vec<Rc<Item>>,
+    #[serde(rename="Facts")]
     pub fact_types: Vec<AbstractFact>,
+    #[serde(rename="Created at")]
     pub created: DateTime<Local>,
 }
 

@@ -1,21 +1,26 @@
 use colored::{Color, Colorize};
 use crate::{
-    models::Item,
+    models::{Item, Record, fact::{Fact, AbstractFact}},
     cmd::Cmd,
+    args::search::Search,
 };
 use clap::{Arg, ArgMatches, ArgSettings, FromArgMatches};
 
 #[derive(Debug)]
 pub enum ItemCmd {
-    New(Option<Item>),
-    Delete(Option<Item>),
+    New(Item),
+    Delete(Item),
+    AddFact(Item, Fact),
+    AddFactType(AbstractFact),
+    EditMetadata(Item),
     List,
+    Search(Search),
     Help,
 }
 
 impl Default for ItemCmd {
     fn default() -> Self {
-        ItemCmd::New(None)
+        ItemCmd::New(Item::default())
     }
 }
 
@@ -31,6 +36,7 @@ impl Cmd for ItemCmd {
             Self::search_cmd(),
             Self::help_cmd(),
             Self::list_cmd(),
+            Self::delete_cmd(),
             clap::App::new("get")
                 .about("Get info about a specific item")
                 .long_flag("get")
@@ -160,6 +166,13 @@ impl ItemCmd {
             ])
     }
 
+    fn delete_cmd() -> clap::App<'static> {
+        clap::App::new("delete")
+            .about("Delete an item from the database")
+            .long_flag("delete")
+            .short_flag('d')
+    }
+
     // TODO -- implement this in a trait body and implement the trait
     // for items, records, facts, maybe attribs and relations?
     // Since so many of the args and potential options are shared between all
@@ -234,12 +247,18 @@ impl FromArgMatches for ItemCmd {
 impl clap::Subcommand for ItemCmd {
     fn from_subcommand(sub: Option<(&str, &ArgMatches)>) -> Option<Self> {
         if let Some((sub, args)) = sub {
-            if sub == "item" {
-                Some(Self::from_arg_matches(args))
-            } else {
-                None
-            }
-        } else { None }
+            let cmd = match sub {
+                "new" => Self::New(Item::from_arg_matches(args)),
+                "add" => Self::AddFact(Item::default(), Fact::from_arg_matches(args)), //TODO handle diff
+                "delete" => Self::Delete(Item::from_arg_matches(args)),
+                "search" => Self::Search(Search::from_arg_matches(args)),
+                "list" => Self::List,
+                _ => Self::New(Item::from_arg_matches(args)),
+            };
+            Some(cmd)
+        } else {
+            None
+        }
     }
 
     fn augment_subcommands(app: clap::App<'_>) -> clap::App<'_>

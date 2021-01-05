@@ -10,7 +10,7 @@ pub mod value;
 pub mod relation;
 pub mod note;
 
-pub use note::Notes;
+pub use note::{Note, Notes};
 pub use relation::Relation;
 pub use units::Units;
 pub use fact::Fact;
