@@ -53,10 +53,9 @@ pub fn fact_type_linked_attrib_from_up_a_flag() -> Result<(), String> {
     }
 }
 
-#[test]
 pub fn attrib_with_equals_gives_val() -> Result<(), String> {
-    let short = DApp::run_cmd("dlog 'took shower' -a at=home");
-    let long = DApp::run_cmd("dlog 'took nap' 5 hrs -A mood=cranky");
+    let short = DApp::run_cmd("dlog nap -a at=home");
+    let long = DApp::run_cmd("dlog nap 5 hrs -A mood=cranky");
     if let (Ok(s), Ok(l)) = (short, long) {
         match (s.subcmd, l.subcmd) {
             (Subcmd::Fact(FactCmd::New(fs, afs)),

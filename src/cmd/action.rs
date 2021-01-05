@@ -59,10 +59,6 @@ impl Cmd for ActionCmd {
                             .index(1)
                             .required(true)
                     ]),
-                    clap::App::new("cmd")
-                        .aliases(&vec!["command", "op", "function"])
-                        .about("Add a new command to the databas, or do other operations")
-                        .long_about("Set a command to a conditional, or add/delete a command, or check current commands attached to a conditional")
                 ])
                 .args(vec![
                     clap::Arg::new("OBJECT")
@@ -93,7 +89,15 @@ impl Cmd for ActionCmd {
                         .long_about("Compares the preceding argument for equality with this value")
                         .requires("OBJECT")
                         .value_name("OBJECT")
-                        .multiple_occurrences(true)
+                        .multiple_occurrences(true),
+                    clap::Arg::new("cmd")
+                        .short('c')
+                        .long("cmd")
+                        .short_alias('x')
+                        .aliases(&vec!["command", "op", "function"])
+                        .about("Add a new command to the databas, or do other operations")
+                        .long_about("Set a command to a conditional, or add/delete a command, or check current commands attached to a conditional")
+                        .value_hint(clap::ValueHint::CommandString)
 
                 ]),
             Self::help_cmd(),

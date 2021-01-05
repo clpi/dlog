@@ -17,7 +17,7 @@ use colored::{Color, Colorize};
 
 #[derive(Debug)]
 pub enum FactCmd {
-    New(Fact, AbstractFact),
+    New(Fact, AbstractFact), // Option<item> Option<record> ?
     NewFactType(AbstractFact),
     Delete(Fact),
     DeleteFactType(AbstractFact),

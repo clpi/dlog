@@ -96,6 +96,14 @@ impl Cmd for DApp {
                 .takes_value(false)
                 .short('p')
                 .long("pretty"),
+            clap::Arg::new("generator")
+                .short('g')
+                .long("generate")
+                .about("Generate shell completion scripts")
+                .long_about("Generate completions for shell, where the shell is the value")
+                .possible_values(&[
+                    "bash", "elvish", "fish", "powershell", "zsh",
+                ]),
         ]);
         args
     }
@@ -111,6 +119,7 @@ impl Cmd for DApp {
             UserCmd::cmd(),
             ActionCmd::cmd(),
             Self::help_cmd(),
+            Self::cfg_cmd(),
             clap::App::new("init")
                 .about("Initialize a fact database in the current folder"),
             clap::App::new("export")
@@ -145,7 +154,6 @@ impl Cmd for DApp {
             .args(Self::args())
             .subcommands(Self::subcmds())
             .setting(term.color)
-            .setting(clap::AppSettings::DeriveDisplayOrder)
     }
 
     fn run(&self) {
@@ -200,6 +208,25 @@ impl DApp {
             "yaml" => { println!("YAML output") }
             _ => { println!("Invalid output type") }
         }
+    }
+
+    pub fn cfg_cmd() -> clap::App<'static> {
+        clap::App::new("cfg")
+            .about("Set configuration properties from the CLI")
+            .long_about("Provide a key-value pair in the form KEY=VALUE or KEY,VALUE
+                to set a config property")
+            .args(&vec![
+                clap::Arg::new("data-dir")
+                    .value_hint(clap::ValueHint::DirPath),
+                clap::Arg::new("config_dir")
+                    .value_hint(clap::ValueHint::DirPath),
+                clap::Arg::new("data-path")
+                    .value_hint(clap::ValueHint::FilePath),
+                clap::Arg::new("config-path")
+                    .value_hint(clap::ValueHint::FilePath),
+                clap::Arg::new("username")
+                    .value_hint(clap::ValueHint::Username)
+            ])
     }
 
     pub fn config_file() -> Arg<'static> {
