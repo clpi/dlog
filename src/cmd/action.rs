@@ -35,6 +35,67 @@ impl Cmd for ActionCmd {
     fn subcmds() -> Vec<clap::App<'static>> {
         vec![
             clap::App::new("new"),
+            clap::App::new("if")
+                .alias("when")
+                .short_flag('i')
+                .about("Create a conditional for some object")
+                .long_about("Subcommand to create a conditional action")
+                .subcommands(vec![
+                    clap::App::new("equals")
+                        .aliases(&vec!["=", "==", "===", "eq", "true"])
+                        .about("Compares the following arguments fore equality")
+                        .long_about("Comares following two positional arguments, as objects, for some equality")
+                        .args(&vec![
+                            clap::Arg::new("TARGET")
+                                .index(1)
+                                .required(true)
+                        ]),
+                    clap::App::new("not")
+                    .aliases(&vec!["!", "~", "false", "not-equals", "not-true"],)
+                    .about("Negates whatever condition comes after")
+                    .long_about("Negates following condition")
+                    .args(vec![
+                        clap::Arg::new("OBJECT")
+                            .index(1)
+                            .required(true)
+                    ]),
+                    clap::App::new("cmd")
+                        .aliases(&vec!["command", "op", "function"])
+                        .about("Add a new command to the databas, or do other operations")
+                        .long_about("Set a command to a conditional, or add/delete a command, or check current commands attached to a conditional")
+                ])
+                .args(vec![
+                    clap::Arg::new("OBJECT")
+                        .index(1),
+                    clap::Arg::new("CONDITIONAL")
+                        .about("Natural language positional conditional arg")
+                        .long_about("Provide a conditional to compare two different objects")
+                        .possible_values(&vec![
+                            "equals", "=", "==", "===", "!=", "~", "<", ">", "<=", ">=",
+                            "is", "isnt", "was", "has", "will",
+                        ]),
+                    clap::Arg::new("equals")
+                        .short('e')
+                        .short_alias('=')
+                        .about("Compares the preceding argument for equality with this value")
+                        .long_about("Comares preceding positional arguments, as objects, for some equality with the value of this arg. May provide an expression instead of simply just an object name")
+                        .value_name("TARGET")
+                        .long("equals")
+                        .multiple_occurrences(true)
+                        .requires("OBJECT")
+                        .aliases(&vec!["eq", "is", "==", "=", "==="],),
+                    clap::Arg::new("not")
+                        .short('n')
+                        .short_aliases(&vec!['~', '!'])
+                        .aliases(&vec!["is-not", "isnt", "not-equal", "ne"])
+                        .long("not")
+                        .about("Compares the preceding argument")
+                        .long_about("Compares the preceding argument for equality with this value")
+                        .requires("OBJECT")
+                        .value_name("OBJECT")
+                        .multiple_occurrences(true)
+
+                ]),
             Self::help_cmd(),
         ]
     }

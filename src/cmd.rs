@@ -128,11 +128,11 @@ impl Cmd for DApp {
     }
 
     fn help_cmd() -> clap::App<'static> {
-        clap::App::new("fact_help")
-            .about("Prints help command for fact")
-            .long_flag("help")
+        clap::App::new("base_help")
+            .about("Prints the help for dlog")
+            .long_about("Prints help of dlog with no args, otherwise, input 'fact', 'record', 'item', etc. for a summary of how to use these different subcommands")
             .short_flag('h')
-            .long_about("Prints the help information")
+            .long_flag("help")
     }
 
     fn cmd() -> clap::App<'static> {
@@ -207,6 +207,7 @@ impl DApp {
             .short('c')
             .long("config")
             .about("Manually set config file location and load")
+            .value_hint(clap::ValueHint::FilePath)
             .takes_value(true)
     }
 
@@ -219,20 +220,6 @@ impl DApp {
             .takes_value(true)
     }
 
-    pub fn matches() -> () {
-    }
-
-    pub fn print_help() {
-        println!("dlog help")
-    }
-
-    pub fn help_cmd() -> clap::App<'static> {
-        clap::App::new("base_help")
-            .about("Prints the help for dlog")
-            .long_about("Prints help of dlog with no args, otherwise, input 'fact', 'record', 'item', etc. for a summary of how to use these different subcommands")
-            .short_flag('h')
-            .long_flag("help")
-    }
 }
 
 pub trait Cmd: FromArgMatches + Default {

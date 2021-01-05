@@ -53,6 +53,7 @@ impl Cmd for FactCmd {
             Self::val_unit(3),
             Self::value(),
             Self::units(),
+            Self::time(),
             Self::persist_units(),
             Self::notes(),
             Self::persist_notes(),
@@ -161,25 +162,6 @@ impl FromArgMatches for FactCmd {
 
 impl FactCmd {
 
-    pub fn fact_args() -> Vec<clap::Arg<'static>> {
-        vec![
-            Self::key_arg(1),
-            Self::val_arg(2),
-            Self::val_unit(3),
-            Self::value(),
-            Self::units(),
-            Self::persist_units(),
-            Self::notes(),
-            Self::persist_notes(),
-            Self::attributes(),
-            Self::persist_attributes(),
-            Self::record(),
-            Self::persist_record(),
-            Self::item(),
-            Self::persist_item(),
-        ]
-    }
-
     fn search_cmd() -> clap::App<'static> {
         clap::App::new("search")
             .about("Search for a fact")
@@ -236,6 +218,18 @@ impl FactCmd {
                     .about("Search for fact case insensitive")
                     .required(false),
             ])
+    }
+
+    fn time() -> clap::Arg<'static> {
+        clap::Arg::new("time")
+            .about("Set the time this log should be added")
+            .long_about("In natural language, say what time should be recorded with this fact entry")
+            .required(false)
+            .takes_value(true)
+            .short('t')
+            .long("time")
+            .value_name("TIME")
+            .alias("at")
     }
 
     fn list_cmd() -> clap::App<'static> {
