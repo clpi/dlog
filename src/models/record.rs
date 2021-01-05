@@ -135,7 +135,7 @@ impl Record {
         // of types corresponding to record fact types and iter through
         // them, adding their row
         table
-        }
+    }
 
     pub fn fact_types_table(&self) -> Table {
         let mut table = Table::new();
@@ -153,7 +153,27 @@ impl Record {
             ])
             .add_row(&self.fact_types);
         table
-        }
+    }
+
+    pub fn record_table() -> Table {
+        let mut table = Table::new();
+        table.load_preset(UTF8_BORDERS_ONLY)
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            .set_table_width(160)
+            .set_header(vec![
+                Cell::new("Record").add_attribute(Attribute::Bold)
+                    .fg(TColor::Yellow),
+                Cell::new("Name").add_attribute(Attribute::Bold),
+                Cell::new("Number of Items").add_attribute(Attribute::Bold),
+                Cell::new("Attributes").add_attribute(Attribute::Bold),
+                Cell::new("Notes").add_attribute(Attribute::Bold),
+                Cell::new("Links").add_attribute(Attribute::Bold),
+                Cell::new("Last Updated").add_attribute(Attribute::Bold),
+                Cell::new("Created").add_attribute(Attribute::Bold),
+            ]);
+        table
+
+    }
 
 }
 

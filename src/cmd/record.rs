@@ -116,9 +116,17 @@ impl FromArgMatches for RecordCmd {
         match matches.value_of("NAME") {
             Some(name) => {
                 println!("Got new record: {}", &name);
-                Self::default()
+                let r = Record::from_arg_matches(matches);
+                println!("{}", r.fact_entry_table());
+                println!("{}", r.fact_types_table());
+                let s = Self::default();
+                s
             },
             None => {
+                let r = Record::from_arg_matches(matches);
+                println!("{}", r.fact_entry_table());
+                println!("{}", r.fact_types_table());
+                let s = Self::default();
                 println!("Received no fact name, provide: to inbox");
                 Self::default()
             }

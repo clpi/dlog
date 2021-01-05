@@ -50,12 +50,6 @@ impl Cmd for ItemCmd {
 
     fn args() -> Vec<clap::Arg<'static>> {
         vec![
-            clap::Arg::new("help")
-                .about("Display help pertaining to items")
-                .short('h')
-                .long("help")
-                .takes_value(false)
-                .exclusive(true),
             Arg::new("NAME")
                 .about("Name of the item to log")
                 .required(false)
@@ -128,7 +122,7 @@ impl Cmd for ItemCmd {
     }
 
     fn help_cmd() -> clap::App<'static> {
-        clap::App::new("fact_help")
+        clap::App::new("item_help")
             .about("Prints help command for fact")
             .long_flag("help")
             .short_flag('h')
@@ -227,7 +221,7 @@ impl FromArgMatches for ItemCmd {
         println!("{}", format!("ITEM: subc: {:#?} \n matches: {:#?}",
             matches.subcommand(),
             matches
-        ).color(Color::BrightMagenta));
+        ).color(Color::Magenta));
         if let Some((sub, args)) = matches.subcommand() {
             let cmd = match sub {
                 "new" => Self::New(Item::from_arg_matches(args)),

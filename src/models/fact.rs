@@ -183,6 +183,20 @@ impl Fact {
         Ok(())
     }
 
+    pub fn parse_tags(self) -> Option<Vec<String>> {
+        let mut tags: Vec<String> = Vec::new();
+        match self.val {
+            FactValue::Text(txt) => {
+                tags.extend_from_slice(txt.split_whitespace()
+                    .filter(|w| w.starts_with("#"))
+                    .map(|w| w.to_string())
+                    .collect::<Vec<String>>().as_slice());
+                Some(tags)
+            },
+            _ => None,
+        }
+    }
+
     pub fn parse_units_in_val(_val: String) -> Option<(String, String)> {
         None
     }
