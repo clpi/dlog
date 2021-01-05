@@ -1,3 +1,7 @@
+use comfy_table::{
+    Table, ContentArrangement, presets::{self, UTF8_BORDERS_ONLY},
+    Cell, Attribute, Color as TColor,
+};
 use std::{rc::Rc, path::PathBuf};
 use chrono::{prelude::*, Utc, DateTime};
 use serde::{Serialize, Deserialize};
@@ -81,6 +85,28 @@ impl Item {
         Ok(facts)
 
     }
+
+    pub fn table(&self) -> Table {
+        let mut table = Table::new();
+        table.load_preset(presets::UTF8_BORDERS_ONLY)
+            .set_content_arrangement(ContentArrangement::Dynamic)
+            .set_header(vec![
+                Cell::new("Id").add_attribute(Attribute::Bold),
+                Cell::new("Item").add_attribute(Attribute::Bold)
+                    .fg(TColor::Green),
+                Cell::new("Attributes").add_attribute(Attribute::Bold),
+                Cell::new("Notes").add_attribute(Attribute::Bold),
+                Cell::new("Created").add_attribute(Attribute::Bold),
+            ])
+            .add_row(vec![
+                &self.id.to_string(),
+                &self.name,
+                &Attrib::join(&self.attribs),
+                &Note::join(&self.notes),
+                &self.created.to_string(),
+            ]);
+        table
+        }
 
 }
 

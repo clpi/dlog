@@ -31,7 +31,7 @@ impl Note {
     }
 
     pub fn prompt(kind: &str, name: &str) -> Result<Note, Box<dyn std::error::Error>> {
-        let prompt = format!("Enter any notes for the {}, {}: ", kind, name);
+        let prompt = format!("Enter any notes for the {}, {} (Enter if not applicable): ", kind, name);
         let notes = crate::prompt::prompt(&prompt)?;
         Ok(Self::from(notes))
     }

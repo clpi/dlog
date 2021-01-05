@@ -12,6 +12,8 @@ pub enum Units {
     Datetime(DateTime<Local>),
     #[serde(skip, rename="Duration")]
     Duration(Duration),
+    #[serde(rename="Boolean")]
+    Boolean,
     #[serde(rename="Other")]
     Other(UserUnit),
     #[serde(rename="None")]
@@ -31,7 +33,7 @@ pub enum UserUnit {
 
 impl Default for Units {
     fn default() -> Self {
-        Units::None
+        Self::Boolean
     }
 }
 
@@ -129,7 +131,8 @@ impl From<&str> for Units {
 
 impl From<Vec<String>> for Units {
     fn from(units: Vec<String>) -> Self {
-        Self::default() //TODO implement
+        let joined = units.join(" ");
+        Self::Other(UserUnit::Text(joined)) //TODO implement
     }
 }
 
@@ -139,6 +142,7 @@ impl fmt::Display for Units {
             Units::Datetime(date) => {
                 f.write_str(date.to_rfc2822().as_str())?;
             },
+            Units::Boolean => {f.write_str("Boolean")?;},
             Units::Other(user_unit) => {
                 match user_unit {
                     UserUnit::Text(txt) =>  f.write_str(txt.as_str())?,

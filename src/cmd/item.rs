@@ -228,19 +228,24 @@ impl FromArgMatches for ItemCmd {
             matches.subcommand(),
             matches
         ).color(Color::BrightMagenta));
-        match matches.subcommand() {
-            Some(("new", sub)) => {
-            },
-            Some(("search", sub)) => {
-            },
-            Some(("list", sub)) => {
-            }
-            Some(("info", sub)) => {
-            }
-            Some((&_, &_)) => {},
-            None => {}
+        if let Some((sub, args)) = matches.subcommand() {
+            let cmd = match sub {
+                "new" => Self::New(Item::from_arg_matches(args)),
+                "add" => Self::AddFact(Item::default(), Fact::from_arg_matches(args)), //TODO handle diff
+                "delete" => Self::Delete(Item::from_arg_matches(args)),
+                "search" => Self::Search(Search::from_arg_matches(args)),
+                "list" => Self::List,
+                _ => {
+                    let item = Item::from_arg_matches(args);
+                    println!("{}", item.table());
+                    println!("{:#?}", item);
+                    return Self::New(item);
+                },
+            };
+            return cmd;
+        } else {
+            Self::New(Item::from_arg_matches(matches))
         }
-        Self::default()
     }
 }
 

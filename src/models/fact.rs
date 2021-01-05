@@ -1,6 +1,6 @@
 use comfy_table::{
     Table, ContentArrangement, presets::{self, UTF8_BORDERS_ONLY},
-    Cell, Attribute, Color as TColor,
+    Cell, Attribute, Color as TColor, ToRow,
 };
 use crate::{
     csv as Csv, prompt,
@@ -207,7 +207,7 @@ impl Fact {
                 Cell::new("Created").add_attribute(Attribute::Bold),
             ])
             .add_row(vec![
-                &self.name,
+                &self.name.to_string(),
                 &self.val.to_string(),
                 &self.unit.to_string(),
                 &Attrib::join(&self.attribs),
@@ -221,30 +221,41 @@ impl Fact {
 
 impl Default for Fact {
     fn default() -> Self {
-        // let name = prompt::prompt("name?").unwrap();
-        let name = String::new();
+        let name = prompt::prompt("Fact name?").unwrap();
+        let val = prompt::prompt("Value name?").unwrap();
         // if config.propt_units {}
-        // let unit = Units::prompt("Units? (Enter if not applicable): ");
+        let unit = Units::prompt("Units? (Enter if not applicable): ");
         // if config.prompt.attribs {}
-        // let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
+        let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
+        let notes = Note::prompt("fact", name.as_str()).unwrap();
         // println!("{}", format!("Got new fact: {} = {} {:?}, attribs {:?}",
                 // &name, &val, &unit, &attribs).color(Color::BrightCyan));
-        let ab = AbstractFact {
-            name: name.clone(),
-            attribs: Vec::new(),
-            notes: Vec::new(),
-            unit: Units::None,
+        let ab = AbstractFact { name: name.clone(), ..Default::default() };
+        ab.insert().expect("Could not insert fact type");
+        Fact::new(name, val, unit, attribs, vec![notes])
+    }
+}
+
+impl Default for AbstractFact {
+    fn default() -> Self {
+        let name = prompt::prompt("Fact type name?").expect("Could not read prompt");
+        let unit = Units::prompt("Units? (Enter if not applicable): ");
+        let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
+        let notes = Note::prompt("fact", name.as_str()).unwrap();
+        Self {
+            name,
             id: uuid::Uuid::new_v4(),
+            unit,
+            attribs,
+            notes: vec![notes],
             created_at: Local::now(),
-        };
-        Fact::new(name, String::new(),Units::None, Vec::new(), Vec::new())
+        }
     }
 }
 
 impl comfy_table::ToRow for Fact {
     fn to_row(self) -> comfy_table::Row {
         comfy_table::Row::from(vec![
-            &self.id.to_string(),
             &self.name.to_string(),
             &self.val.to_string(),
             &self.unit.to_string(),
@@ -258,7 +269,6 @@ impl comfy_table::ToRow for Fact {
 impl comfy_table::ToRow for AbstractFact {
     fn to_row(self) -> comfy_table::Row {
         comfy_table::Row::from(vec![
-            &self.id.to_string(),
             &self.name.to_string(),
             &self.unit.to_string(),
             &Attrib::join(&self.attribs),
@@ -274,16 +284,19 @@ impl AbstractFact {
         table.load_preset(presets::UTF8_BORDERS_ONLY)
             .set_content_arrangement(ContentArrangement::Dynamic)
             .set_header(vec![
-                Cell::new("Fact").add_attribute(Attribute::Bold)
-                    .fg(TColor::Blue),
-                Cell::new("Value").add_attribute(Attribute::Bold),
+                Cell::new("Fact Type").add_attribute(Attribute::Bold)
+                    .fg(TColor::Cyan),
                 Cell::new("Units").add_attribute(Attribute::Bold),
                 Cell::new("Attributes").add_attribute(Attribute::Bold),
                 Cell::new("Notes").add_attribute(Attribute::Bold),
                 Cell::new("Created").add_attribute(Attribute::Bold),
             ])
-            .add_row(vec![self]);
+            .add_row(self.clone().to_row());
         table
+    }
+
+    pub fn insert(&self) -> Result<(), Box<dyn std::error::Error>> {
+        Ok(())
     }
 
 }
@@ -345,16 +358,13 @@ impl FromArgMatches for Fact {
         } else {
             crate::prompt::prompt("NONAMEGIVEN: Fact name?: ").unwrap().to_string()
         };
+        let attr = Attrib::from_match(matches.values_of("attribs"));
+        let notes = Note::from_match(matches.values_of("notes"));
         if let Some(value) = matches.value_of("VALUE") {
             let units = Units::from_match(matches.values_of("UNIT"));
-            let attr = Attrib::from_match(matches.values_of("attribs"));
-            let notes = Note::from_match(matches.values_of("notes"));
             Self::new(name.into(), value.into(), units, attr, notes)
         } else {
-            Self { name: name.into(),
-                val: FactValue::Boolean(true), // NOTE val "true" if no val specified
-                ..Self::default()
-            }
+            Self::new(name.into(), "true".into(), Units::Boolean, attr, notes)
         }
     }
 }
