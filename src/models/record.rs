@@ -6,6 +6,7 @@ use std::{
     path::PathBuf, fs,
     convert::TryFrom,
     rc::Rc,
+    io::{Read, Write},
 };
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
@@ -17,26 +18,39 @@ use crate::{
 use clap::{ArgMatches, FromArgMatches};
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct CentralRecord {
+    pub path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Record {
     #[serde(rename="Id")]
     pub id: uuid::Uuid,
     #[serde(rename="Record")]
     pub name: String,
+    #[serde(rename="Description")]
+    pub description: String,
     #[serde(rename="Items")]
     pub items: Vec<Rc<Item>>,
     #[serde(rename="Facts")]
     pub fact_types: Vec<AbstractFact>,
+    #[serde(rename="Directory")]
+    pub dir: PathBuf,
     #[serde(rename="Created at")]
     pub created: DateTime<Local>,
 }
 
 impl Default for Record {
     fn default() -> Self {
+        let inbox = util::default_data_dir(Some("inbox"))
+            .expect("no valid data dir");
         Self { //FIXME should lookup UUID and created time for Inbox record, not generate
             id: Uuid::new_v4(),
             name: "Inbox".into() ,
+            description: String::new(),
             items: Vec::new(),
             created: Local::now(),
+            dir: inbox,
             fact_types: Vec::new(),
         }
     }
@@ -44,11 +58,16 @@ impl Default for Record {
 
 impl Record {
 
-    pub fn new(name: Option<String>) -> Self {
+    pub fn new(name: Option<String>, dir: Option<String>) -> Self {
         if let Some(name) = name {
+            let dir = dir
+                .map(|a| PathBuf::from(a))
+                .unwrap_or_default();
             Self {
                 id: Uuid::new_v4(),
                 name,
+                description: String::new(),
+                dir,
                 items: Vec::new(),
                 fact_types: Vec::new(),
                 created: Local::now(), }
@@ -75,6 +94,32 @@ impl Record {
             Ok(rec)
         }
     }
+
+    pub fn write(&self) -> crate::DResult<()> {
+        let path = dirs_next::data_dir().expect("");
+        let rec = path.join("dlog").join("dlog");
+        Ok(())
+    }
+
+    pub fn open_path(path: String) -> std::io::Result<Self> {
+        match PathBuf::try_from(path) {
+            Ok(dir) => {
+                fs::create_dir_all(&dir)?;
+                let mut rf = fs::OpenOptions::new()
+                    .read(true)
+                    .write(true)
+                    .create(true)
+                    .open(&dir.join("record.toml"))?;
+                let mut buf = String::new();
+                rf.read_to_string(&mut buf)?;
+                let tf: Record = toml::from_str(buf.as_str())
+                    .expect("Could not read record file");
+                Ok(tf)
+            },
+            Err(e) => Ok(Self::default()),
+        }
+    }
+
 
     pub fn add_item(&self, item: &Item) -> std::io::Result<PathBuf> {
         let rec = self.get_or_create()?;
@@ -180,7 +225,15 @@ impl Record {
 // FIXME implemnt
 impl From<String> for Record {
     fn from(name: String) -> Self {
-        Self { id: uuid::Uuid::new_v4(), name, items: Vec::new(), created: Local::now(), fact_types: Vec::new() }
+        Self {
+            id: uuid::Uuid::new_v4(),
+            name,
+            items: Vec::new(),
+            created: Local::now(),
+            description: String::new(),
+            fact_types: Vec::new(),
+            dir: util::default_data_dir(None).expect("No valid data dir"),
+        }
     }
 }
 

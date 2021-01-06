@@ -4,6 +4,24 @@ pub mod file;
 use colored::{Colorize, Color};
 use std::{fs, io::{Read, prelude::*, self}, path::PathBuf};
 
+pub fn default_data_dir(child: Option<&str>) -> crate::DResult<PathBuf> {
+    let path = dirs_next::data_dir()
+        .or(dirs_next::home_dir())
+        .or(dirs_next::data_local_dir())
+        .or(dirs_next::document_dir())
+        .or(dirs_next::home_dir())
+        .or(dirs_next::desktop_dir())
+        .expect("No valid default data dir")
+        .join("dlog");
+    let mut dir = fs::DirBuilder::new();
+    dir.recursive(true);
+    dir.create(&path)?;
+    if let Some(child) = child {
+        Ok(path.join(child))
+    } else {
+        Ok(path)
+    }
+}
 
 pub fn create_dir(parent: PathBuf, name: &str) -> io::Result<PathBuf> {
     let dir = fs::create_dir(parent.join(name).as_path())?;

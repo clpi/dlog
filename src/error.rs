@@ -7,6 +7,7 @@ pub enum DError {
     Io(io::Error),
     Csv(csv::Error),
     Config(toml::de::Error),
+    ParsePath(std::convert::Infallible),
     NotFound,
 }
 
@@ -22,6 +23,7 @@ impl error::Error for DError {
             DError::Io(ref err) => Some(err),
             DError::Csv(ref err) => Some(err),
             DError::Config(ref err) => Some(err),
+            DError::ParsePath(ref err) => Some(err),
             DError::NotFound => None,
         }
     }
@@ -34,6 +36,7 @@ impl fmt::Display for DError {
             DError::Io(ref err) => write!(f, "IO error: {}", err),
             DError::Config(ref err) => write!(f, "Config TOML parse err {}", err),
             DError::Csv(ref err) => write!(f, "Csv error: {}", err),
+            DError::ParsePath(ref err) => write!(f, "Invalid path: {}", err),
             DError::NotFound => write!(f, "What you were looking for is not there"),
         }
     }
