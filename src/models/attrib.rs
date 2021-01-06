@@ -1,5 +1,5 @@
 use crate::prompt::prompt;
-use std::fmt;
+use std::{fmt, str::FromStr, collections::HashMap};
 use serde::{Serialize, Deserialize};
 
 pub type Attribs = Vec<Attrib>;
@@ -46,7 +46,29 @@ impl Attrib {
             .collect::<Vec<String>>()
             .join(", ")
     }
+
+    pub fn get_matches(matches: &clap::ArgMatches) -> Vec<Self> {
+        match matches.values_of_t::<Attrib>("attribs") {
+            Ok(m) => m,
+            Err(_) => Vec::new(),
+        }
+    }
+
+    pub fn get_links(matches: &clap::ArgMatches) -> Vec<Self> {
+        match matches.values_of_t::<Attrib>("link-attribs") {
+            Ok(m) => m,
+            Err(_) => Vec::new(),
+        }
+    }
+
+    pub fn from_col(rec: &csv::StringRecord, col: usize) -> Vec<Self> {
+            rec.iter().skip(col)
+                .map(|a| Attrib::new(a, None))
+                .collect()
+    }
+
 }
+
 
 impl From<String> for Attrib {
     fn from(attrib: String) -> Self {
@@ -79,3 +101,11 @@ impl Into<String> for Attrib {
         }
     }
 }
+
+impl std::str::FromStr for Attrib {
+    type Err = std::convert::Infallible;
+    fn from_str(a:  &str) -> Result<Self, Self::Err> {
+        Ok(Self { name: a.to_string(), value: None })
+    }
+}
+

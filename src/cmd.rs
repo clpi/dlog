@@ -45,7 +45,9 @@ pub enum Subcmd {
     User(UserCmd),
     Stats(StatsCmd),
     Relation(RelCmd),
+    Alias(String),
     List,
+    Data,
     Search,
     Config,
     Export,
@@ -112,7 +114,9 @@ impl Cmd for DApp {
         vec![
             ItemCmd::cmd(),
             RecordCmd::cmd(),
-            FactCmd::cmd(),
+            FactCmd::cmd()
+                .short_flag('f')
+                .long_flag("fact"),
             AttribCmd::cmd(),
             LinkCmd::cmd(),
             StatsCmd::cmd(),
@@ -120,6 +124,7 @@ impl Cmd for DApp {
             ActionCmd::cmd(),
             Self::help_cmd(),
             Self::cfg_cmd(),
+            Self::data_cmd(),
             clap::App::new("init")
                 .about("Initialize a fact database in the current folder"),
             clap::App::new("export")
@@ -145,10 +150,9 @@ impl Cmd for DApp {
     }
 
     fn cmd() -> clap::App<'static> {
+        // NOTE load conf here to modify cmds?
         let term = TermSettings::new();
-        let _conf = DConfig::load();
         clap::app_from_crate!()
-            .setting(term.color)
             .setting(clap::AppSettings::DeriveDisplayOrder)
             .subcommands(Self::subcmds())
             .args(Self::args())
@@ -160,12 +164,23 @@ impl Cmd for DApp {
     }
 
     fn run(&self) {
+        let term = TermSettings::new();
+        let conf = DConfig::load();
+        let data = crate::models::data::Data::new().expect("could not load data");
         let matches = Self::cmd()
             .get_matches();
         let app = Self::from_arg_matches(&matches);
         match app.subcmd {
             Subcmd::Config => {
-                while let Some(m) = matches.subcommand_matches("config") {
+                if let Some(m) = matches.subcommand_matches("config") {
+                    if m.is_present("show") {
+                        self.config.show();
+                    }
+                }
+                if let Some(m) = matches.subcommand_matches("data") {
+                    if m.is_present("show") {
+                        self.config.show();
+                    }
                     if m.is_present("show") {
                         self.config.show();
                     }
@@ -230,6 +245,8 @@ impl DApp {
             .about("Set configuration properties from the CLI")
             .long_about("Provide a key-value pair in the form KEY=VALUE or KEY,VALUE
                 to set a config property")
+            .short_flag('c')
+            .long_flag("config")
             .args(&vec![
                 clap::Arg::new("show")
                     .about("Show the config file")
@@ -250,10 +267,30 @@ impl DApp {
             ])
     }
 
+    pub fn data_cmd() -> clap::App<'static> {
+        clap::App::new("data")
+            .about("Set or view central data files")
+            .short_flag('d')
+            .long_flag("data")
+            .args(&vec![
+                clap::Arg::new("show")
+                    .about("Show the config file")
+                    .short('s')
+                    .long("show")
+                    .display_order(1)
+                    .takes_value(false),
+                clap::Arg::new("record")
+                    .value_hint(clap::ValueHint::DirPath),
+                clap::Arg::new("item")
+                    .value_hint(clap::ValueHint::DirPath),
+                clap::Arg::new("fact")
+                    .value_hint(clap::ValueHint::FilePath),
+            ])
+    }
+
     pub fn config_file() -> Arg<'static> {
         clap::Arg::new("config-file")
-            .short('c')
-            .long("config")
+            .long("cf")
             .about("Manually set config file location and load")
             .value_hint(clap::ValueHint::FilePath)
             .takes_value(true)

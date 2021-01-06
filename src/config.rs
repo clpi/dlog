@@ -1,13 +1,3 @@
-
-#[derive(Default)]
-pub struct DConfig;
-
-impl DConfig {
-    pub fn show(&self) -> () {}
-    pub fn load() -> Self { Self::default() }
-}
-
-/*
 use crate::util;
 use std::{
     fs, io::{self, prelude::*}, path::PathBuf,
@@ -16,13 +6,70 @@ use std::{
 
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub enum FormatConfig {
-    Csv,
-    Json,
-    Yaml,
+#[derive(Debug, Serialize, Deserialize, )]
+pub struct DConfig {
+    name: Option<String>,
+    aliases: Option<Vec<String>>,
+    // fact_aliases: Option<Vec<String>>,
+    // record_aliases: Option<Vec<String>>,
+    data_dir: PathBuf,
+    auth: Option<AuthConfig>,
+    start_of_week: chrono::Weekday,
+    format: FormatConfig,
+    // record: Option<RecordConfig>,
+    // item: Option<ItemConfig>,
+    // fact: Option<FactConfig>,
+    prompt_for_value: bool,
+    prompt_for_record: bool,
+    prompt_for_units: bool,
 }
 
+
+impl Default for DConfig {
+    fn default() -> Self {
+        Self {
+            name: None,
+            aliases: None,
+            data_dir: util::default_data_dir(None).expect("no valid data dir"),
+            auth: None,
+            format: FormatConfig::default(),
+            start_of_week: chrono::Weekday::Sun,
+            prompt_for_units: false,
+            prompt_for_record: false,
+            prompt_for_value: false,
+        }
+    }
+}
+
+impl DConfig {
+
+    pub fn show(&self) -> () {
+        let p = toml::to_string_pretty(&self).unwrap();
+        println!("{}", p);
+    }
+
+    pub fn load() -> Self { Self::default() }
+}
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FormatConfig {
+    time_format: String,
+    hour_format: HourFormat,
+    date_format: String,
+}
+
+impl Default for FormatConfig {
+    fn default() -> Self {
+        Self {
+            time_format: "HH:MM:SS".into(),
+            date_format: "YYYY-MM-DD".into(),
+            hour_format: HourFormat::default()
+        }
+    }
+}
+
+/*
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DConfig {
     name: Option<String>,
@@ -39,9 +86,6 @@ pub struct DConfig {
     // synchronization: bool,
     // password: Option<String>,
     // data_loc: Option<PathBuf>,
-    // record: Option<RecordConfig>,
-    // item: Option<ItemConfig>,
-    // fact: Option<FactConfig>,
     // user: Option<UserConfig>,
     // prompt_for_value: bool,
     // prompt_for_record: bool,
@@ -137,21 +181,32 @@ impl DConfig {
     }
 }
 
-impl Default for DConfig {
+
+*/
+
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthConfig {
+    username: Option<String>,
+    password: Option<String>,
+    email: Option<String>,
+    password_cmd: Option<String>,
+}
+
+impl Default for AuthConfig {
     fn default() -> Self {
         Self {
-            name: None,
-            data_loc: util::default_data_dir(None).expect("no valid data dir"),
-            format: Some(FormatConfig::Csv),
-            ..Default::default()
+            username: None,
+            email: None,
+            password_cmd: None,
+            password: None,
         }
     }
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RecordConfig {
-
+    init_behavior: InitBehavior
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -168,4 +223,45 @@ pub struct UserConfig {
 pub struct FactConfig {
 
 }
-*/
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum InitBehavior {
+    CurrentDir,
+    DataDir,
+    Documents,
+    Home,
+    Desktop,
+    DataLocalDir,
+    CustomDir(PathBuf),
+}
+
+impl Default for InitBehavior {
+    fn default() -> Self {
+        Self::DataDir
+    }
+}
+
+impl std::str::FromStr for InitBehavior {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ini = match s.to_lowercase().as_str() {
+            "cd" | "current_dir" | "cwd" | "pwd" => Self::CurrentDir,
+            "data" | "data_dir" => Self::DataDir,
+            "docs" | "documents" => Self::Documents,
+            _ => Self::CustomDir(PathBuf::new().join(s)),
+        };
+        Ok(ini)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum HourFormat {
+    TwelveHr,
+    TwentyFourHr,
+}
+
+impl Default for HourFormat {
+    fn default() -> Self {
+        HourFormat::TwelveHr
+    }
+}

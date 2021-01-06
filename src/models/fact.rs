@@ -317,10 +317,6 @@ impl AbstractFact {
 
 impl fmt::Display for Fact {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let attribs = Attrib::join(&self.clone().attribs);
-        let notes = Note::join(&self.clone().notes);
-        // f.write_fmt(format_args!("Fact: {}: {} {} {}",
-            // &self.name, &self.val, &self.unit, &attribs))
         f.write_fmt(format_args!("{}", self.table()))
     }
 }
@@ -345,12 +341,8 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
             created_at: DateTime::parse_from_rfc2822(&rec[3])
                 .expect("Could not parse datetime").into(),
             unit: Units::Other(UserUnit::from(rec[4].to_string())), //TODO handle date parsing
-            attribs: rec.iter().skip(5)
-                .map(|a| Attrib::new(a, None))
-                .collect(),
-            notes: rec.iter().skip(6)
-                .map(|n| Note::new(n))
-                .collect(),
+            attribs: Attrib::from_col(&rec, 5),
+            notes: Note::from_col(&rec, 6),
         };
         Ok(fact)
     }
@@ -372,8 +364,8 @@ impl FromArgMatches for Fact {
         } else {
             crate::prompt::prompt("NONAMEGIVEN: Fact name?: ").unwrap().to_string()
         };
-        let attr = Attrib::from_match(matches.values_of("attribs"));
-        let notes = Note::from_match(matches.values_of("notes"));
+        let attr = Attrib::get_matches(&matches);
+        let notes = Note::get_matches(&matches);
         if let Some(value) = matches.value_of("VALUE") {
             let units = Units::from_match(matches.values_of("UNIT"));
             Self::new(name.into(), value.into(), units, attr, notes)
@@ -396,9 +388,9 @@ impl FromArgMatches for AbstractFact {
         let id = uuid::Uuid::new_v4();
         let units = Units::from_match(matches.values_of("UNIT"));
         let link_units = Units::from_match(matches.values_of("link-unit"));
+        let attr = Attrib::get_links(&matches);
+        let notes = Note::get_links(&matches);
         let units = if link_units == Units::None { units } else { link_units };
-        let attr = Attrib::from_match(matches.values_of("link-attrib"));
-        let notes = Note::from_match(matches.values_of("link-notes"));
         Self { id,
             name,
             attribs: attr,

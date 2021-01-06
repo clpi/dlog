@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, str::FromStr};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -17,7 +17,7 @@ impl Note {
 
     pub fn from_match(matches: Option<clap::Values>) -> Vec<Self> {
         if let Some(notes) = matches {
-            notes.map(|a| Note::from(a.to_string())).collect()
+            notes.map(|a| Note::from_str(a).unwrap()).collect()
         } else {
             Vec::new()
         }
@@ -33,7 +33,27 @@ impl Note {
     pub fn prompt(kind: &str, name: &str) -> Result<Note, Box<dyn std::error::Error>> {
         let prompt = format!("Enter any notes for the {}, {} (Enter if not applicable): ", kind, name);
         let notes = crate::prompt::prompt(&prompt)?;
-        Ok(Self::from(notes))
+        Ok(Self::from_str(notes.as_str()).expect(""))
+    }
+
+    pub fn get_matches(matches: &clap::ArgMatches) -> Vec<Self> {
+        match matches.values_of_t::<Note>("notes") {
+            Ok(m) => m,
+            Err(_) => Vec::new(),
+        }
+    }
+
+    pub fn get_links(matches: &clap::ArgMatches) -> Vec<Self> {
+        match matches.values_of_t::<Note>("link-notes") {
+            Ok(m) => m,
+            Err(_) => Vec::new(),
+        }
+    }
+
+    pub fn from_col(rec: &csv::StringRecord, col: usize) -> Vec<Self> {
+            rec.iter().skip(col)
+                .map(|a| Note::new(a))
+                .collect()
     }
 }
 
@@ -52,9 +72,10 @@ impl fmt::Display for Note {
     }
 }
 
-impl From<String> for Note {
-    fn from(notes: String) -> Self {
-        Self { notes }
+impl std::str::FromStr for Note {
+    type Err = std::convert::Infallible;
+    fn from_str(notes:  &str) -> Result<Self, Self::Err> {
+        Ok(Self { notes: notes.to_string() })
     }
 
 }

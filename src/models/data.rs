@@ -18,9 +18,9 @@ use std::{
 };
 use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Data {
-    pub dir: PathBuf,
+    pub path: PathBuf,
     pub records: RecordData,
     pub facts: FactData,
     pub items: ItemData,
@@ -66,23 +66,15 @@ pub struct ItemData {
 }
 
 
-impl Default for Data {
-    fn default() -> Self {
-        let dir = util::default_data_dir(None).expect("No valid data dir");
-        Self {
-            dir, ..Default::default()
-        }
-    }
-}
-
 impl Data {
 
     pub fn new() -> crate::DResult<Self> {
-        Ok(Self::default())
+        let dir = util::default_data_dir(None).expect("No valid data dir");
+        Ok(Self { path: dir, ..Default::default() })
     }
 
     pub fn records(&self) -> RecordData {
-        let rec = self.dir.join("records.toml");
+        let rec = self.path.join("records.toml");
         RecordData::default()
     }
 
