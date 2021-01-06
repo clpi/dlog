@@ -1,4 +1,5 @@
 use crate::util;
+use crate::models::Record;
 use std::{
     fs, io::{self, prelude::*}, path::PathBuf,
         convert::TryInto, collections::HashMap,
@@ -16,12 +17,13 @@ pub struct DConfig {
     auth: Option<AuthConfig>,
     start_of_week: chrono::Weekday,
     format: FormatConfig,
-    // record: Option<RecordConfig>,
-    // item: Option<ItemConfig>,
-    // fact: Option<FactConfig>,
-    prompt_for_value: bool,
-    prompt_for_record: bool,
-    prompt_for_units: bool,
+    record: Option<RecordConfig>,
+    item: Option<ItemConfig>,
+    fact: Option<FactConfig>,
+    default_editor: Option<String>,
+    // prompt_for_value: bool,
+    // prompt_for_record: bool,
+    // prompt_for_units: bool,
 }
 
 
@@ -34,9 +36,13 @@ impl Default for DConfig {
             auth: None,
             format: FormatConfig::default(),
             start_of_week: chrono::Weekday::Sun,
-            prompt_for_units: false,
-            prompt_for_record: false,
-            prompt_for_value: false,
+            record: Some(RecordConfig::default()),
+            item: None,
+            fact: None,
+            default_editor: None,
+            // prompt_for_units: false,
+            // prompt_for_record: false,
+            // prompt_for_value: false,
         }
     }
 }
@@ -81,7 +87,6 @@ pub struct DConfig {
     // custom_db: Option<String>,
     // data_dir: Option<String>,
     // date_format: Option<String>,
-    // default_editor: Option<String>,
     // encryption: bool,
     // synchronization: bool,
     // password: Option<String>,
@@ -204,23 +209,48 @@ impl Default for AuthConfig {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, )]
 pub struct RecordConfig {
-    init_behavior: InitBehavior
+    init_behavior: InitBehavior,
+    inbox: InboxConfig,
+    records: Vec<Record>,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct InboxConfig {
+    name: String,
+    path: PathBuf
+}
+
+impl Default for InboxConfig {
+    fn default() -> Self {
+        Self {
+            name: "Inbox".into(),
+            path: util::default_data_dir(Some("inbox")).unwrap(),
+        }
+    }
+}
+impl Default for RecordConfig {
+    fn default() -> Self {
+        Self {
+            init_behavior: InitBehavior::DataDir,
+            inbox: InboxConfig::default(),
+            records: vec![Record::default()]
+        }
+    }
+}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ItemConfig {
 
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct UserConfig {
+pub struct FactConfig {
 
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FactConfig {
+pub struct GitConfig {
 
 }
 
