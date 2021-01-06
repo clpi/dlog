@@ -20,7 +20,7 @@ impl Store {
 
     pub fn new() -> sled::Result<Self> {
         let db = sled::open("dlog_db")?;
-        let data = crate::config::DConfig::data_dir();
+        let data = crate::util::default_data_dir(None).unwrap();
         let loc = data.join("ddb");
         Ok(Self { db, loc })
     }
@@ -85,7 +85,7 @@ impl Store {
 
 impl Default for Store {
     fn default() -> Self {
-        let loc = DConfig::conf_dir().join("db");
+        let loc = crate::util::default_data_dir(None).unwrap().join("db");
         let db = SConfig::default()
             .path(&loc)
             .cache_capacity(10_000_000)

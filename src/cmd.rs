@@ -29,7 +29,7 @@ use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches, Subcommand};
 
 pub struct DApp {
-    // pub config: DConfig,
+    pub config: DConfig,
     pub subcmd: Subcmd,
 }
 
@@ -57,7 +57,7 @@ impl Default for DApp {
     fn default() -> Self {
         Self {
             subcmd: Subcmd::Help,
-            // config: DConfig::default(),
+            config: DConfig::default(),
         }
     }
 }
@@ -152,14 +152,27 @@ impl Cmd for DApp {
             .setting(clap::AppSettings::DeriveDisplayOrder)
             .subcommands(Self::subcmds())
             .args(Self::args())
-            .subcommands(Self::subcmds())
+            .setting(clap::AppSettings::ColoredHelp)
+            .setting(clap::AppSettings::ColorAlways)
+            .setting(clap::AppSettings::UnifiedHelpMessage)
+            .setting(clap::AppSettings::NextLineHelp)
             .setting(term.color)
     }
 
     fn run(&self) {
         let matches = Self::cmd()
             .get_matches();
-        let _DApp = Self::from_arg_matches(&matches);
+        let app = Self::from_arg_matches(&matches);
+        match app.subcmd {
+            Subcmd::Config => {
+                while let Some(m) = matches.subcommand_matches("config") {
+                    if m.is_present("show") {
+                        self.config.show();
+                    }
+                }
+            },
+            _ => {}
+        }
     }
 
 }
@@ -167,10 +180,12 @@ impl Cmd for DApp {
 impl FromArgMatches for DApp {
     fn from_arg_matches(matches: &ArgMatches) -> Self {
         if let Some(subcmd) = Subcmd::from_subcommand(matches.subcommand()) {
-            println!("GOT SUBCMD: {:#?}", subcmd);
-            Self { subcmd  }
+            Self { subcmd, config: DConfig::default()  }
         } else {
-            Self { subcmd: Subcmd::Fact(FactCmd::from_arg_matches(matches)) }
+            Self {
+                subcmd: Subcmd::Fact(FactCmd::from_arg_matches(matches)) ,
+                config: DConfig::default(),
+            }
         }
     }
 }
@@ -211,11 +226,17 @@ impl DApp {
     }
 
     pub fn cfg_cmd() -> clap::App<'static> {
-        clap::App::new("cfg")
+        clap::App::new("config")
             .about("Set configuration properties from the CLI")
             .long_about("Provide a key-value pair in the form KEY=VALUE or KEY,VALUE
                 to set a config property")
             .args(&vec![
+                clap::Arg::new("show")
+                    .about("Show the config file")
+                    .short('s')
+                    .long("show")
+                    .display_order(1)
+                    .takes_value(false),
                 clap::Arg::new("data-dir")
                     .value_hint(clap::ValueHint::DirPath),
                 clap::Arg::new("config_dir")
@@ -230,7 +251,7 @@ impl DApp {
     }
 
     pub fn config_file() -> Arg<'static> {
-        clap::Arg::new("config")
+        clap::Arg::new("config-file")
             .short('c')
             .long("config")
             .about("Manually set config file location and load")
@@ -357,6 +378,7 @@ impl clap::Subcommand for Subcmd {
                  "relation" => Self::Relation(RelCmd::from_arg_matches(m)),
                 "stats" => Self::Stats(StatsCmd::from_arg_matches(m)),
                 "action" => Self::Action(ActionCmd::from_arg_matches(m)),
+                "config" => Self::Config,
                 "list" => Self::List,
                 "search" => Self::Search,
                 "help" => Self::Help,

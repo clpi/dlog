@@ -1,3 +1,13 @@
+
+#[derive(Default)]
+pub struct DConfig;
+
+impl DConfig {
+    pub fn show(&self) -> () {}
+    pub fn load() -> Self { Self::default() }
+}
+
+/*
 use crate::util;
 use std::{
     fs, io::{self, prelude::*}, path::PathBuf,
@@ -17,23 +27,24 @@ pub enum FormatConfig {
 pub struct DConfig {
     name: Option<String>,
     dialect: Option<String>,
-    start_of_week: Option<chrono::Weekday>,
-    color: Option<bool>,
-    custom_db: Option<String>,
-    data_dir: Option<String>,
-    date_format: Option<String>,
-    default_editor: Option<String>,
-    encryption: bool,
-    synchronization: bool,
-    password: Option<String>,
     format: Option<FormatConfig>,
-    data_loc: Option<PathBuf>,
-    record: Option<RecordConfig>,
-    item: Option<ItemConfig>,
-    fact: Option<FactConfig>,
-    user: Option<UserConfig>,
-    prompt_for_value: bool,
-    prompt_for_record: bool,
+    data_loc: PathBuf,
+    // start_of_week: Option<chrono::Weekday>,
+    // color: Option<bool>,
+    // custom_db: Option<String>,
+    // data_dir: Option<String>,
+    // date_format: Option<String>,
+    // default_editor: Option<String>,
+    // encryption: bool,
+    // synchronization: bool,
+    // password: Option<String>,
+    // data_loc: Option<PathBuf>,
+    // record: Option<RecordConfig>,
+    // item: Option<ItemConfig>,
+    // fact: Option<FactConfig>,
+    // user: Option<UserConfig>,
+    // prompt_for_value: bool,
+    // prompt_for_record: bool,
 }
 
 impl DConfig {
@@ -62,6 +73,10 @@ impl DConfig {
             config
         };
         Ok(conf)
+    }
+
+    pub fn show(&self) {
+        println!("{}", toml::to_string_pretty(self).unwrap())
     }
 
     pub fn dialect(self) -> Option<chrono_english::Dialect> {
@@ -126,12 +141,8 @@ impl Default for DConfig {
     fn default() -> Self {
         Self {
             name: None,
-            data_loc: dirs_next::data_dir(),
+            data_loc: util::default_data_dir(None).expect("no valid data dir"),
             format: Some(FormatConfig::Csv),
-            record: None,
-            user: None,
-            item: None,
-            fact: None,
             ..Default::default()
         }
     }
@@ -157,3 +168,4 @@ pub struct UserConfig {
 pub struct FactConfig {
 
 }
+*/

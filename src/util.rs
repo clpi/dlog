@@ -23,16 +23,6 @@ pub fn default_data_dir(child: Option<&str>) -> crate::DResult<PathBuf> {
     }
 }
 
-pub fn create_dir(parent: PathBuf, name: &str) -> io::Result<PathBuf> {
-    let dir = fs::create_dir(parent.join(name).as_path())?;
-    Ok(parent.join(name))
-}
-
-pub fn create_default_conf() -> io::Result<()> {
-    fs::copy("../assets/Config.default.toml", crate::config::DConfig::conf_dir())?;
-    Ok(())
-}
-
 pub fn tokenize(input: String) -> Vec<String> {
     let tokens: Vec<String> = input.split_whitespace()
         .map(|s| s.to_string())
@@ -41,7 +31,6 @@ pub fn tokenize(input: String) -> Vec<String> {
 }
 
 pub fn write_file(input: String, path: PathBuf) -> io::Result<fs::File> {
-    use io::Write;
     let mut file = fs::File::create(path.as_path())?;
     write!(file, "{}", input)?;
     Ok(file)

@@ -47,6 +47,7 @@ impl Notes {
 
 impl fmt::Display for Note {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.notes.len() == 0 { f.write_str("(no notes)")?; };
         f.write_str(self.notes.as_str())
     }
 }
