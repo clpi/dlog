@@ -20,6 +20,7 @@ crossterm = "*"
 tui = { version = "*", features = ["crossterm"] }
 chrono = { version = "*", features = ["serde"] }
 serde = { version = "*", features = ["derive"] }
+# crosstermion = { version = "0.5.0", optional = true, default-features = false }
 dirs-next = "*"
 rustyline = "*"
 

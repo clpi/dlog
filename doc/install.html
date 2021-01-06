@@ -8,6 +8,13 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 
+<style>
+
+.active {
+
+  font-weight: 600;
+}
+</style>
     <title>dlog!</title>
   </head>
   <body>
@@ -16,10 +23,13 @@
     <a class="nav-link"  href="/">home</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="/">install</a>
+    <a class="nav-link active" aria-current="install" href="/install.html">install</a>
   </li>
   <li class="nav-item">
-    <a class="nav-link active" aria-current="about" href="/">about</a>
+    <a class="nav-link" href="/about.html">about</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="/documentation.html">documentation</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" href="/book">book</a>
@@ -30,7 +40,7 @@
 </ul>
     <br/><br/>
     <div class="container col-6">
-      <h1>dlog!</h1> <small class="text-muted">install</small>
+      <h1>dlog!<small class="text-muted">&nbsp;&nbsp;<span style="font-weight: 300;">install</span></small></h1>
       <br/><br/>
         <p class="lead">
         installation instructions forthcoming

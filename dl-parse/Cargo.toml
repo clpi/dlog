@@ -12,3 +12,6 @@ path = "src/lib.rs"
 
 [dependencies]
 strsim = "*"
+serde = { version = "*", features = ["derive"] }
+chrono = { version = "*", features = ["serde"] }
+chrono-english = "*"
