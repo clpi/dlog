@@ -1,10 +1,11 @@
 use crate::util;
 use crate::models::Record;
 use std::{
-    fs, io::{self, prelude::*}, path::PathBuf,
-        convert::TryInto, collections::HashMap,
+    io::{self, prelude::*, Read, Write},
+    path::PathBuf,
+    convert::TryInto,
+    collections::HashMap,
 };
-
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Serialize, Deserialize, )]
@@ -17,6 +18,7 @@ pub struct DConfig {
     auth: Option<AuthConfig>,
     start_of_week: chrono::Weekday,
     format: FormatConfig,
+    records: Vec<Record>,
     record: Option<RecordConfig>,
     item: Option<ItemConfig>,
     fact: Option<FactConfig>,
@@ -40,6 +42,7 @@ impl Default for DConfig {
             item: None,
             fact: None,
             default_editor: None,
+            records: vec![Record::default()]
             // prompt_for_units: false,
             // prompt_for_record: false,
             // prompt_for_value: false,
@@ -54,7 +57,35 @@ impl DConfig {
         println!("{}", p);
     }
 
-    pub fn load() -> Self { Self::default() }
+    pub fn load() -> crate::DResult<Self> {
+        let mut buf = String::new();
+        let mut cf = Self::file()?;
+        cf.read_to_string(&mut buf)?;
+        if buf.len() == 0 {
+            let conf = Self::default();
+            cf.write_all(toml::to_string_pretty(&conf).expect("Could not create TOML").as_bytes())?;
+            Ok(conf)
+        } else {
+            let conf: Self = toml::from_str(buf.as_str()).expect("Invalid TOML");
+            Ok(conf)
+        }
+    }
+
+    pub fn file() -> crate::DResult<std::fs::File> {
+        let path = util::default_conf_dir(None)?
+            .join("dlog.toml");
+        Ok(std::fs::OpenOptions::new()
+            .create(true)
+            .read(true)
+            .write(true)
+            .open(&path)?)
+    }
+
+    pub fn set_data_dir(mut self, dir: String) -> Self {
+        let dir = PathBuf::new().join(dir);
+        self.data_dir = dir;
+        self
+    }
 }
 
 
@@ -74,121 +105,6 @@ impl Default for FormatConfig {
         }
     }
 }
-
-/*
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DConfig {
-    name: Option<String>,
-    dialect: Option<String>,
-    format: Option<FormatConfig>,
-    data_loc: PathBuf,
-    // start_of_week: Option<chrono::Weekday>,
-    // color: Option<bool>,
-    // custom_db: Option<String>,
-    // data_dir: Option<String>,
-    // date_format: Option<String>,
-    // encryption: bool,
-    // synchronization: bool,
-    // password: Option<String>,
-    // data_loc: Option<PathBuf>,
-    // user: Option<UserConfig>,
-    // prompt_for_value: bool,
-    // prompt_for_record: bool,
-}
-
-impl DConfig {
-
-    pub fn new() -> Self {
-        let path = Self::conf_dir().join("config");
-        let mut cf = config::Config::default();
-        cf.merge(config::File::with_name(path.to_str().unwrap()))
-            .unwrap()
-            .merge(config::Environment::with_prefix("APP")).unwrap();
-        println!("{:?}", cf.try_into::<HashMap<String, String>>().unwrap());
-        Self::default()
-    }
-
-    pub fn load() -> io::Result<Self> {
-        let path = Self::conf_dir().join("dlog.toml");
-        let conf = if path.exists() {
-            let toml = toml::de::from_str(&fs::read_to_string(path)?)?;
-            toml
-        } else {
-            let mut conf_file = fs::File::create(path)?;
-            let config = Self::default();
-            let toml = toml::ser::to_string_pretty(&config)
-                .expect("Could not serialize config to TOML");
-            conf_file.write_all(toml.as_bytes())?;
-            config
-        };
-        Ok(conf)
-    }
-
-    pub fn show(&self) {
-        println!("{}", toml::to_string_pretty(self).unwrap())
-    }
-
-    pub fn dialect(self) -> Option<chrono_english::Dialect> {
-        if let Some(dialect) = self.dialect {
-            match dialect.to_lowercase().as_str() {
-                "en_us" => Some(chrono_english::Dialect::Us),
-                "en_uk" => Some(chrono_english::Dialect::Uk),
-                _ => None,
-            }
-        } else { None }
-    }
-
-    pub fn conf_dir() -> PathBuf {
-        util::get_or_create_conf_dir()
-            .expect("Could not get or create conf dir")
-    }
-
-    pub fn path() -> PathBuf {
-
-        fn create_conf(conf_dir: PathBuf) -> PathBuf {
-            if conf_dir.exists() {
-                let conf = conf_dir.join("config.toml");
-                return conf
-            } else {
-                fs::create_dir(&conf_dir).unwrap_or_default();
-                let conf = conf_dir.join("config.toml");
-                return conf
-            }
-        }
-
-        if let Some(conf_dir) = dirs_next::config_dir() {
-            let conf_dir = conf_dir.join("dlog");
-            create_conf(conf_dir)
-        } else if let Some(home_dir) = dirs_next::home_dir() {
-            let conf_dir = home_dir.join(".dlog");
-            create_conf(conf_dir)
-        } else {
-            let conf_dir = dirs_next::data_dir().expect("No valid dir");
-            create_conf(conf_dir)
-        }
-    }
-
-    pub fn data_dir() -> PathBuf {
-        util::get_or_create_data_dir()
-            .expect("Could not get or create conf dir")
-    }
-
-    pub fn default_config() -> DConfig {
-    let toml_str = r#"
-        [format]
-        [user]
-        [record]
-        [item]
-        [fact]
-    "#;
-    let conf: DConfig = toml::from_str(toml_str).unwrap();
-    conf
-    }
-}
-
-
-*/
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AuthConfig {
@@ -213,7 +129,6 @@ impl Default for AuthConfig {
 pub struct RecordConfig {
     init_behavior: InitBehavior,
     inbox: InboxConfig,
-    records: Vec<Record>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -235,7 +150,6 @@ impl Default for RecordConfig {
         Self {
             init_behavior: InitBehavior::DataDir,
             inbox: InboxConfig::default(),
-            records: vec![Record::default()]
         }
     }
 }
@@ -246,7 +160,24 @@ pub struct ItemConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FactConfig {
+    default_empty_behavior: DefaultFactBehavior,
+}
 
+/// Default behavior to occur when 'dlog fact' is run without a fact name
+#[derive(Debug, Serialize, Deserialize)]
+pub enum DefaultFactBehavior {
+    ListMostRecentFacts,
+    PromptForFact,
+    PrintHelp,
+    LisFactsWithAttribute(String),
+    ListFactsInRecord(String),
+    ListFactsInItem(String)
+}
+
+impl Default for DefaultFactBehavior {
+    fn default() -> Self {
+        Self::ListMostRecentFacts
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -259,7 +190,7 @@ pub enum InitBehavior {
     CurrentDir,
     DataDir,
     Documents,
-    Home,
+    HomeDir,
     Desktop,
     DataLocalDir,
     CustomDir(PathBuf),
@@ -278,6 +209,9 @@ impl std::str::FromStr for InitBehavior {
             "cd" | "current_dir" | "cwd" | "pwd" => Self::CurrentDir,
             "data" | "data_dir" => Self::DataDir,
             "docs" | "documents" => Self::Documents,
+            "desktop"  => Self::Desktop,
+            "data_local" | "data_local_dir" => Self::DataLocalDir,
+            "home" | "~" => Self::HomeDir,
             _ => Self::CustomDir(PathBuf::new().join(s)),
         };
         Ok(ini)

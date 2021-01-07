@@ -10,7 +10,7 @@ pub mod prompt;
 pub mod args;
 
 pub use error::DResult;
-use std::{io, sync::RwLock};
+use std::sync::RwLock;
 
 lazy_static::lazy_static! {
     static ref CONF: RwLock<Vec<u8>> = RwLock::new(Vec::new());

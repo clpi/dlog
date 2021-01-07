@@ -9,10 +9,29 @@ pub fn default_data_dir(child: Option<&str>) -> crate::DResult<PathBuf> {
         .or(dirs_next::home_dir())
         .or(dirs_next::data_local_dir())
         .or(dirs_next::document_dir())
-        .or(dirs_next::home_dir())
         .or(dirs_next::desktop_dir())
         .expect("No valid default data dir")
         .join("dlog");
+    let mut dir = fs::DirBuilder::new();
+    dir.recursive(true);
+    dir.create(&path)?;
+    if let Some(child) = child {
+        Ok(path.join(child))
+    } else {
+        Ok(path)
+    }
+}
+
+pub fn default_conf_dir(child: Option<&str>) -> crate::DResult<PathBuf> {
+    let path = dirs_next::config_dir()
+        .map(|cd| cd.join("dlog"))
+        .or(dirs_next::home_dir())
+        .map(|hd| hd.join(".dlog"))
+        .or(dirs_next::document_dir())
+        .map(|dd| dd.join("dlog"))
+        .or(dirs_next::data_dir())
+        .map(|dd| dd.join("dlog"))
+        .expect("No valid config dir");
     let mut dir = fs::DirBuilder::new();
     dir.recursive(true);
     dir.create(&path)?;

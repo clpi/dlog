@@ -9,7 +9,7 @@ pub fn create<P: Into<PathBuf>>(path: P) -> io::Result<()> {
 }
 
 pub fn read<P: Into<PathBuf>>(path: P) -> io::Result<()> {
-    let mut rdr =
+    let mut _rdr =
         csv::ReaderBuilder::new()
             .has_headers(false)
             .from_path(path.into())?;

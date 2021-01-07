@@ -7,7 +7,8 @@ pub enum DError {
     Io(io::Error),
     Csv(csv::Error),
     Config(toml::de::Error),
-    ParsePath(std::convert::Infallible),
+    KeyRejected(ring::error::KeyRejected),
+    ParsePath,
     NotFound,
 }
 
@@ -23,7 +24,8 @@ impl error::Error for DError {
             DError::Io(ref err) => Some(err),
             DError::Csv(ref err) => Some(err),
             DError::Config(ref err) => Some(err),
-            DError::ParsePath(ref err) => Some(err),
+            DError::KeyRejected(ref err) => None,
+            DError::ParsePath => None,
             DError::NotFound => None,
         }
     }
@@ -36,8 +38,9 @@ impl fmt::Display for DError {
             DError::Io(ref err) => write!(f, "IO error: {}", err),
             DError::Config(ref err) => write!(f, "Config TOML parse err {}", err),
             DError::Csv(ref err) => write!(f, "Csv error: {}", err),
-            DError::ParsePath(ref err) => write!(f, "Invalid path: {}", err),
+            DError::ParsePath => write!(f, "Invalid path"),
             DError::NotFound => write!(f, "What you were looking for is not there"),
+            DError::KeyRejected(ref err) => write!(f, "Invalid key {}", err)
         }
     }
 }
@@ -54,3 +57,15 @@ impl From<csv::Error> for DError {
     }
 }
 
+
+impl From<std::convert::Infallible> for DError {
+    fn from(_: std::convert::Infallible) -> Self {
+        DError::ParsePath
+    }
+}
+
+impl From<ring::error::KeyRejected> for DError {
+    fn from(key_error: ring::error::KeyRejected) -> Self {
+        DError::KeyRejected(key_error)
+    }
+}
