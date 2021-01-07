@@ -165,7 +165,7 @@ impl Cmd for DApp {
 
     fn run(&self) {
         let term = TermSettings::new();
-        let conf = DConfig::load();
+        let conf = DConfig::load().expect("Could not load config");
         let data = crate::models::data::Data::new().expect("could not load data");
         let matches = Self::cmd()
             .get_matches();

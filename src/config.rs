@@ -18,7 +18,7 @@ pub struct DConfig {
     auth: Option<AuthConfig>,
     start_of_week: chrono::Weekday,
     format: FormatConfig,
-    records: Vec<Record>,
+    records: Option<Vec<Record>>,
     record: Option<RecordConfig>,
     item: Option<ItemConfig>,
     fact: Option<FactConfig>,
@@ -42,7 +42,7 @@ impl Default for DConfig {
             item: None,
             fact: None,
             default_editor: None,
-            records: vec![Record::default()]
+            records: None,
             // prompt_for_units: false,
             // prompt_for_record: false,
             // prompt_for_value: false,
@@ -72,13 +72,32 @@ impl DConfig {
     }
 
     pub fn file() -> crate::DResult<std::fs::File> {
-        let path = util::default_conf_dir(None)?
+        let path = Self::default_dir()?
             .join("dlog.toml");
-        Ok(std::fs::OpenOptions::new()
+        let cf = std::fs::OpenOptions::new()
             .create(true)
             .read(true)
             .write(true)
-            .open(&path)?)
+            .open(&path)?;
+        Ok(cf)
+    }
+
+    pub fn default_dir() -> crate::DResult<PathBuf> {
+        let path = if let Some(dir) = dirs_next::config_dir() {
+            dir.join("dlog")
+        } else if let Some(dir) = dirs_next::home_dir() {
+            dir.join(".dlog")
+        } else if let Some(dir) = dirs_next::document_dir() {
+            dir.join("dlog")
+        } else if let Some(dir) = dirs_next::desktop_dir() {
+            dir.join("dlog")
+        } else {
+            PathBuf::new().join("~/").join(".dlog")
+        };
+        let mut dir = std::fs::DirBuilder::new();
+        dir.recursive(true);
+        dir.create(&path)?;
+        Ok(path)
     }
 
     pub fn set_data_dir(mut self, dir: String) -> Self {
