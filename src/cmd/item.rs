@@ -37,6 +37,9 @@ impl Cmd for ItemCmd {
             Self::help_cmd(),
             Self::list_cmd(),
             Self::delete_cmd(),
+            clap::App::new("add")
+                .about("Add a fact entry to an item you choose")
+                .long_about("Add a fact to an item. For example, 'dlog item add health sleep 4 hr' will create the item 'health' if not already created, and addd the fact 'sleep' = '5 hrs' to it"),
             clap::App::new("get")
                 .about("Get info about a specific item")
                 .long_flag("get")
@@ -50,21 +53,14 @@ impl Cmd for ItemCmd {
 
     fn args() -> Vec<clap::Arg<'static>> {
         vec![
-            Arg::new("NAME")
+            Arg::new("ITEM")
                 .about("Name of the item to log")
                 .required(false)
                 .validator(|a| crate::prompt::validate_input(a.into()))
                 .index(1),
-            Arg::new("FACT") //TODO if no index 3, prompt from stdin
-                .about("Optional fact to associate with new item")
-                .required(false)
-                .validator(|a| crate::prompt::validate_input(a.into()))
-                .index(2),
-            Arg::new("FACTVAL") //TODO if no index 3, prompt from stdin
-                .about("Optional value of the fact to associate with new fact")
-                .required(false)
-                .validator(|a| crate::prompt::validate_input(a.into()))
-                .index(3),
+            super::FactCmd::key_arg(2),
+            super::FactCmd::val_arg(3),
+            super::FactCmd::val_unit(4),
             Arg::new("uncategorized")
                 .aliases(&["misc", "uncat", "etc"])
                 .short('u')
@@ -153,7 +149,7 @@ impl ItemCmd {
                     .short('a')
                     .required(false)
                     .multiple(true),
-                clap::Arg::new("NAME")
+                clap::Arg::new("ITEM")
                     .about("The name of the item to be added")
                     .required(false)
                     .index(1),
@@ -238,6 +234,11 @@ impl FromArgMatches for ItemCmd {
             };
             return cmd;
         } else {
+            let item = Item::from_arg_matches(matches);
+            if matches.is_present("NAME") {
+                let fact = Fact::from_arg_matches(matches);
+                return Self::AddFact(item, fact);
+            }
             Self::New(Item::from_arg_matches(matches))
         }
     }
