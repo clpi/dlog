@@ -1,0 +1,99 @@
+body {
+    font-family: Cantarell;
+    background-color: #efefef;
+    color: #1f1f1f;
+}
+h1 a {
+    font-weight: 300;
+    font-family: Cantarell;
+    color: #222;
+}
+h2 a {
+    font-weight: 200;
+    color: #222;
+}
+h3 a {
+    font-weight: 300;
+    color: #222;
+}
+p {
+    font-weight: 500;
+    color: #222;
+}
+html {
+    color: #222;
+    background-color: #fbfcff;
+}
+div {
+}
+#sidebar {
+    background-color: #dddfed;
+    color: #222;
+
+}
+.nav-chapters i {
+    color: #4466ff;
+}
+.navy {
+    --links: #4466ff;
+    --theme-hover: rgba(0,0,0,0.1);
+    --bg: #fbfcff;
+    --fg: #1f1f1f;
+    --sidebar-bg: #eaecff;
+    --sidebar-fg: #abafaf;
+    --sidebar-active: #4466ff;
+    --icons: #4466ff;
+}
+.nav-chapters:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+#sidebar a {
+    color: #444854;
+}
+#sidebar a.active {
+    font-weight: 600;
+    color: #4466ff;
+}
+#content {
+    font-family: Cantarell;
+    background-color: #fbfcff;
+    color: #1f1f1f;
+
+}
+#menu-bar-hover-placeholder {
+    font-family: Cantarell;
+    background-color: #efefef;
+    color: #1f1f1f;
+
+}
+#page {
+    font-family: Cantarell;
+    background-color: #efefef;
+    color: #1f1f1f;
+
+}
+#menu-bar {
+    background-color: rgba(0,0,0.2,0.04);
+    color: #1f1f1f;
+    border: none;
+    font-weight: 500;
+
+}
+#page-wrapper {
+    font-family: Cantarell;
+    background-color: #efefef;
+    color: #1f1f1f;
+
+}
+button {
+    background-color: #4466ff;
+    color: #1f1f1f;
+
+}
+a {
+    color: #4466ff;
+}
+a:visited {
+    color: #4466cc;
+}
+
