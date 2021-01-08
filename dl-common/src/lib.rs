@@ -2,6 +2,7 @@ pub mod search;
 pub mod util;
 pub mod models;
 pub mod prompt;
+pub mod error;
 
 #[cfg(test)]
 mod tests {

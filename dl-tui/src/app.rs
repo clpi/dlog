@@ -1,6 +1,7 @@
 pub mod views;
 pub mod mode;
 
+use std::io;
 use crate::user::User;
 use self::{
     views::Views,
@@ -18,7 +19,7 @@ use tui::{
 };
 
 #[derive(Debug, Clap)]
-pub struct App {
+pub struct Dlog {
     user: User,
     cmd: LineBuffer,
     state: AppState,
@@ -43,8 +44,9 @@ impl Default for AppState {
     }
 }
 
-impl App {
-    pub fn new() -> Self {
+impl Dlog {
+    pub fn new() -> io::Result<()> {
+        let stdout = io::stdout().into_raw_mode()?;
         Self {
             user: User::default(),
             cmd: LineBuffer::with_capacity(4096),

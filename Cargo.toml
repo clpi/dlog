@@ -45,6 +45,7 @@ chrono-tz = "0.5.3"
 sled = "*"
 lazy_static = "1.4.0"
 strsim = "0.10.0"
+humantime = "2.0.1"
 
 [dev_dependencies]
 assert_cmd = "1.0.2"

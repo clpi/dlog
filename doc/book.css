@@ -1,6 +1,6 @@
 body {
     font-family: Cantarell;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
     color: #1d1e1f;
 }
 h1 a {
@@ -22,7 +22,7 @@ p {
 }
 html {
     color: #1d1e1f;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
 }
 div {
 }
@@ -32,7 +32,7 @@ div {
 .navy {
     --links: #4466ff;
     --theme-hover: rgba(0,0,0,0.08);
-    --bg: #fbfcff;
+    --bg: #fdfeff;
     --fg: #1d1e1f;
     --sidebar-bg: #f9fbfd;
     --sidebar-fg: #2d2e2f;
@@ -84,19 +84,19 @@ code {
 }
 #content {
     font-family: Cantarell;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
     color: #1d1e1f;
 
 }
 #menu-bar-hover-placeholder {
     font-family: Cantarell;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
     color: #1d1e1f;
 
 }
 #page {
     font-family: Cantarell;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
     color: #1d1e1f;
 
 }
@@ -109,7 +109,7 @@ code {
 }
 #page-wrapper {
     font-family: Cantarell;
-    background-color: #fbfcff;
+    background-color: #fdfeff;
     color: #1d1e1f;
 
 }
