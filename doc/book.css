@@ -1,48 +1,61 @@
 body {
     font-family: Cantarell;
-    background-color: #efefef;
-    color: #1f1f1f;
+    background-color: #fbfcff;
+    color: #1d1e1f;
 }
 h1 a {
     font-weight: 300;
     font-family: Cantarell;
-    color: #222;
+    color: #1d1e1f;
 }
 h2 a {
     font-weight: 200;
-    color: #222;
+    color: #1d1e1f;
 }
 h3 a {
     font-weight: 300;
-    color: #222;
+    color: #1d1e1f;
 }
 p {
     font-weight: 500;
-    color: #222;
+    color: #1d1e1f;
 }
 html {
-    color: #222;
+    color: #1d1e1f;
     background-color: #fbfcff;
 }
 div {
-}
-#sidebar {
-    background-color: #dddfed;
-    color: #222;
-
 }
 .nav-chapters i {
     color: #4466ff;
 }
 .navy {
     --links: #4466ff;
-    --theme-hover: rgba(0,0,0,0.1);
+    --theme-hover: rgba(0,0,0,0.08);
     --bg: #fbfcff;
-    --fg: #1f1f1f;
-    --sidebar-bg: #eaecff;
-    --sidebar-fg: #abafaf;
+    --fg: #1d1e1f;
+    --sidebar-bg: #f9fbfd;
+    --sidebar-fg: #2d2e2f;
     --sidebar-active: #4466ff;
     --icons: #4466ff;
+    --scrollbar: rgba(0,0,0,0.05);
+}
+blockquote {
+    background-color: transparent;
+    color: #2d2e2f;
+    border-radius: 20px;
+    border: 2px solid #4466ff;
+    color: rgba(0,0,0.8);
+}
+h1.menu-title::after {
+    content: "!  ";
+    color: #4466ff;
+}
+h2::before, h3::before, h4::before, h5::before {
+    content: "> ";
+    color: #4466ff;
+    font-size: 2.5rem;
+    font-weight: 300;
 }
 .nav-chapters:hover {
     background-color: rgba(0,0,0,0.1);
@@ -54,40 +67,55 @@ div {
     font-weight: 600;
     color: #4466ff;
 }
+.sidebar-scrollbar:active {
+    color: #4466ff;
+}
+/* pre pre.playground { */
+/*     background-color: #1d1e1f; */
+/*     color: #fdfeff; */
+/*     padding: 4%; */
+/*     border: 1px solid #4466ff; */
+/*     border-radius: 10px; */
+/* } */
+code {
+    font-family: "Ubuntu Mono", "Source Code Pro", "Monospace";
+    font-weight: 300;
+    color: #4466ff;
+}
 #content {
     font-family: Cantarell;
     background-color: #fbfcff;
-    color: #1f1f1f;
+    color: #1d1e1f;
 
 }
 #menu-bar-hover-placeholder {
     font-family: Cantarell;
-    background-color: #efefef;
-    color: #1f1f1f;
+    background-color: #fbfcff;
+    color: #1d1e1f;
 
 }
 #page {
     font-family: Cantarell;
-    background-color: #efefef;
-    color: #1f1f1f;
+    background-color: #fbfcff;
+    color: #1d1e1f;
 
 }
 #menu-bar {
-    background-color: rgba(0,0,0.2,0.04);
-    color: #1f1f1f;
+    /* background-color: rgba(0,0,0.2,0.04); */
+    color: #1d1e1f;
     border: none;
     font-weight: 500;
 
 }
 #page-wrapper {
     font-family: Cantarell;
-    background-color: #efefef;
-    color: #1f1f1f;
+    background-color: #fbfcff;
+    color: #1d1e1f;
 
 }
 button {
     background-color: #4466ff;
-    color: #1f1f1f;
+    color: #1e1e1f;
 
 }
 a {

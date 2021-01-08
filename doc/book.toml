@@ -27,10 +27,19 @@ default-theme = "light"
 preferred-dark-theme = "navy"
 curly-quotes = true
 copy-fonts = true
-additional-css = ["book.css"]
+additional-css = [
+"book.css",
+# "assets/css/bootstrap.min.css",
+# "assets/css/bootstrap-utilities.min.css"
+]
+additional-js = [
+"book.js",
+# "assets/js/bootstrap.min.js",
+# "assets/js/bootstrap.esm.min.js",
+# "assets/js/bootstrap.bundle.min.js"
+]
 mathjax-support = true
 google-analytics = "G-5FW053QJP8"
-additional-js = ["book.js"]
 git-repository-url = "https://github.com/clpi/dlog"
 git-repository-icon = "fa-github"
 input-404 = "404.md"
@@ -44,11 +53,11 @@ enable = true
 enable = false
 level = 0
 
-[output.html.playground]
-editable = false
-copyable = true
-copy-js = true
-line-numbers = false
+# [output.html.playground]
+# editable = true
+# copyable = true
+# copy-js = true
+# line-numbers = true
 
 [output.html.search]
 enable = true
