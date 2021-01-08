@@ -1,0 +1,7 @@
+# Collaboration
+
+## Public Records
+- When using dlog while authenticated into the main service, you are provided the new ability to choose the visibility of records you create, or have created (by default, all records are private). You are also provided the ability to search for public records others have created, or depending on the permissions granted by the record creator, add entries to a user's record. This allows for several different manners in which you may work with records -- as your own personal knowledge base or notebook, to keep information organized for yourself, or as a repository or collaborative entity on which any number of different users (invited or otherwise) may assist with establishing.
+
+## Visibility Levels
+- When logged in, a new flag, `--visibility` (or `-v`/`--vis` for short) becomes available to you (or, more accurately, becomes meaningful -- you can set visibility while offline too, but unless you intend to log in to the main service in the near future, it's rather pointless). This flag has several possible values -- `public-write` (or `pw`) grants all users logged into the main service the ability to contribute to the record or add attributes, relations, descriptions, etc. (TODO These options should all be individually tuneable by the user, maybe even through the command line, and there should be a special system for creating a 'consensus' for certain central/non-multipliable properties of public objects like a description, i.e. upvoting/downvoting) .
