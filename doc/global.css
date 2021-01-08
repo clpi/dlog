@@ -1,0 +1,10 @@
+nav ul {
+    align-items: center;
+    align-content: center;
+    text-justify: center;
+    display: flex;
+    margin-left: 32%;
+}
+a {
+    color: #4466ff;
+}

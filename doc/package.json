@@ -1,5 +1,8 @@
 {
   "scripts": {
     "build": "./.bin/mdbook build"
+  },
+  "dependencies": {
+    "stencil": "^0.0.5"
   }
 }

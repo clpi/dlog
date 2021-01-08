@@ -3,6 +3,7 @@
   <head>
         <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5FW053QJP8"></script>
+    <link rel="stylesheet" href="global.css"/>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -17,7 +18,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 
-    <title>dlog!</title>
+    <title>docs - dlog!</title>
 <style>
 .active {
   font-weight: 600;
@@ -26,7 +27,7 @@
   </head>
   <body>
 <nav class="navbar navbar-expand-md navbar-light mb-4">
-    <ul class="nav" style="align-items: center; align-content: center; text-justify: center; display: flex; margin-left: 35%;">
+      <ul class="nav">
   <li class="nav-item">
     <a class="nav-link"  href="/index.html">home</a>
   </li>
@@ -53,7 +54,28 @@
         <p class="lead">
         full documentation forthcoming!
     </p>
-    <a href="/book/"><button class="btn btn-primary">the book</button></a>
+<div class="col-6">
+<a href="/book/" style="text-decoration: none; color: unset; font-weight: 300;">
+  <br/>
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+    <h5 class="card-title">The dlog book</h5>
+    <p class="card-text">The book going over both basic and advanced usage of dlog</p>
+    <br/>
+    <a href="/book/" class="btn btn-primary">The Book</a>
+  </div>
+</div>
+</a>
+<a href="/book/">
+<div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
+  <div class="card-header">API Documentation</div>
+  <div class="card-body">
+    <h5 class="card-title">Crates.io docs</h5>
+    <p class="card-text">The documentation of the dlog API, on crates.io</p>
+  </div>
+</div>
+</a>
+</div>
     <a href="https://github.com/clpi/dlog"><button class="btn btn-primary">the repo</button></a>
     <br/><br/>
     </div>

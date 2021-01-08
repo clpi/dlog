@@ -2,3 +2,14 @@
 # yarn lockfile v1
 
 
+stencil@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/stencil/-/stencil-0.0.5.tgz#d71fdd933e3b1f724736b5c388f191a7e7fc1d47"
+  integrity sha1-1x/dkz47H3JHNrXDiPGRp+f8HUc=
+  dependencies:
+    xmldom "0.1.15"
+
+xmldom@0.1.15:
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/xmldom/-/xmldom-0.1.15.tgz#b3048062f1bdd52edc421424459f06dceeb2f94d"
+  integrity sha1-swSAYvG91S7cQhQkRZ8G3O6y+U0=
