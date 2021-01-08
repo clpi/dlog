@@ -55,7 +55,7 @@ impl Attrib {
     }
 
     pub fn get_links(matches: &clap::ArgMatches) -> Vec<Self> {
-        match matches.values_of_t::<Attrib>("link-attribs") {
+        match matches.values_of_t::<Attrib>("link-attrib") {
             Ok(m) => m,
             Err(_) => Vec::new(),
         }

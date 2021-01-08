@@ -14,7 +14,7 @@ use crate::{
     },
 };
 use uuid::Uuid;
-use std::{fmt, path::PathBuf, collections::HashMap};
+use std::{fmt, path::PathBuf, collections::HashMap, str::FromStr};
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
@@ -58,7 +58,7 @@ pub struct Fact {
     pub created_at: DateTime<chrono::Local>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum FactValue {
     Integer(i32),
     RealNumber(f32),
@@ -66,12 +66,74 @@ pub enum FactValue {
     ExactDateTime(DateTime<Local>),
     NaiveDateTime(chrono::NaiveDateTime),
     Duration(std::time::Duration),
-    Day(chrono::Weekday),
+    Day(chrono::Weekday, DayRelativeTo),
     Boolean(bool),
     Text(String),
     Range(f32, f32),
     UserValue(String),
     UserEnum(UserEnum),
+    Amount(i32, UserObject),
+    None,
+}
+
+// TODO should really be RelatiTo::Next/Prev(DateEntity::Week/Day/Hour)
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum DayRelativeTo {
+    Now(DateTime<Local>),
+    Next(DateTime<Local>),
+    Last(DateTime<Local>),
+    Tomrrow(DateTime<Local>),
+    Every,
+    EveryOther,
+    FirstOfMonth,
+    SecondOfMonth,
+    ThirdOfMonth,
+    FourthOfMonth,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserObject(String);
+
+impl std::str::FromStr for DayRelativeTo {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // TODO implement
+        Ok(DayRelativeTo::Now(Local::now()))
+    }
+}
+
+impl std::cmp::PartialEq for FactValue {
+    fn eq(&self, other: &FactValue) -> bool {
+        match (self, other) {
+            (Self::Text(t1), Self::Text(t2)) => t1 == t2,
+            (Self::Boolean(b1), Self::Boolean(b2)) => b1 == b2,
+            (Self::Integer(i1), Self::Integer(i2)) => i1 == i2,
+            (Self::Duration(d1), Self::Duration(d2)) => d1.eq(d2),
+            (Self::Day(d1, r1), Self::Day(d2, r2)) => if d1.eq(d2) { r1.eq(r2)  } else { false },
+            (Self::UserEnum(ue1), Self::UserEnum(ue2)) => {
+                return false;
+            }
+            (Self::ExactDateTime(d1), Self::ExactDateTime(d2)) => d1.eq(d2),
+            _ => false,
+        }
+    }
+}
+
+impl std::cmp::Eq for FactValue {
+    fn assert_receiver_is_total_eq(&self) {
+
+    }
+}
+
+impl std::hash::Hash for FactValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+
+    }
+    fn hash_slice<H: std::hash::Hasher>(data: &[Self], state: &mut H)
+    where
+        Self: Sized, {
+
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -97,7 +159,7 @@ impl std::str::FromStr for FactValue {
             } else if let Ok(num) = s.parse::<f32>() {
                 return Ok(Self::RealNumber(num))
             } else if let Ok(day) = s.parse::<chrono::Weekday>() {
-                return Ok(Self::Day(day))
+                return Ok(Self::Day(day, DayRelativeTo::Next(Local::now())))
             } else if let Ok(b) = s.parse::<bool>() {
                 return Ok(Self::Boolean(b))
             } else {
@@ -105,8 +167,42 @@ impl std::str::FromStr for FactValue {
             }
         } else {
             let s_s = s.split_whitespace().collect::<Vec<&str>>();
-            Ok(Self::Text(s.to_string()))
+            match s_s[0] {
+                "last" | "next" | "this" => if let Ok(day) = s_s[1].parse::<chrono::Weekday>() {
+                    return Ok(Self::Day(day, DayRelativeTo::from_str(s_s[0]).unwrap()))
+                } else {
+                    return Ok(Self::Text(s.to_string()))
+                },
+                "a" | "one" | "two" | "three" => {
+                    let amt = match s_s[1] {
+                        "one" => Some(1),
+                        "two" => Some(2),
+                        "three" => Some(3),
+                        "four" => Some(4),
+                        "a" => Some(1),
+                        _ => None, //TODO obviously handle this better, cardinal number to stirng method or something
+                    };
+                    if let Some(amt) = amt {
+                        let obj = UserObject(s_s[1].to_string());
+                        return Ok(Self::Amount(amt, obj));
+                    } else {
+                        return Ok(Self::Text(s.to_string()))
+                    }
+                },
+                _ => {
+                    return Ok(Self::Text(s.to_string()))
+                }
+            }
+        }
 
+    }
+}
+impl FromArgMatches for FactValue {
+    fn from_arg_matches(matches: &ArgMatches) -> Self {
+        if let Ok(value) = matches.value_of_t::<FactValue>("VALUE") {
+            value
+        } else {
+            Self::Boolean(true)
         }
     }
 }
@@ -404,13 +500,14 @@ impl FromArgMatches for Fact {
         } else {
             crate::prompt::prompt("NONAMEGIVEN: Fact name?: ").unwrap().to_string()
         };
-        let attr = Attrib::get_matches(&matches);
+        let attribs = Attrib::get_matches(&matches);
         let notes = Note::get_matches(&matches);
-        if let Ok(value) = matches.value_of_t::<FactValue>("VALUE") {
-            let units = Units::from_match(matches.values_of("UNIT"));
-            Self::new(name.into(), value.into(), units, attr, notes)
-        } else {
-            Self::new(name.into(), "true".into(), Units::Boolean, attr, notes)
+        let val = FactValue::from_arg_matches(&matches);
+        let unit = Units::from_match(matches.values_of("UNIT"));
+        Self {
+            id: uuid::Uuid::new_v4(),
+            created_at: Local::now(),
+            name, notes, val, unit, attribs,
         }
     }
 }
