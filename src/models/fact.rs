@@ -63,12 +63,52 @@ pub enum FactValue {
     Integer(i32),
     RealNumber(f32),
     Option(HashMap<String, bool>), //TODO find a way to parse this
-    ExactTime(DateTime<Local>),
+    ExactDateTime(DateTime<Local>),
+    NaiveDateTime(chrono::NaiveDateTime),
     Duration(std::time::Duration),
-    Day(DateTime<Local>),
+    Day(chrono::Weekday),
     Boolean(bool),
     Text(String),
     Range(f32, f32),
+    UserValue(String),
+    UserEnum(UserEnum),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserEnum {
+    possible_values: HashMap<FactValue, Option<Units>>,
+    choice: Option<usize>,
+}
+
+impl std::str::FromStr for FactValue {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        if !s.contains(" ") {
+            if let Ok(dur) = s.parse::<humantime::Duration>() {
+                return Ok(Self::Duration(dur.into()))
+            } else if let Ok(time) = chrono_english::parse_date_string(
+                s, Local::now(), chrono_english::Dialect::Us
+            ) {
+                return Ok(Self::ExactDateTime(time))
+            // } else if let Ok(time) = s.parse::<humantime::Timestamp>() {
+            //     return Ok(Self::NaiveDateTime(huma)))
+            } else if let Ok(num) = s.parse::<i32>() {
+                return Ok(Self::Integer(num))
+            } else if let Ok(num) = s.parse::<f32>() {
+                return Ok(Self::RealNumber(num))
+            } else if let Ok(day) = s.parse::<chrono::Weekday>() {
+                return Ok(Self::Day(day))
+            } else if let Ok(b) = s.parse::<bool>() {
+                return Ok(Self::Boolean(b))
+            } else {
+                return Ok(Self::Text(s.to_string()))
+            }
+        } else {
+            let s_s = s.split_whitespace().collect::<Vec<&str>>();
+            Ok(Self::Text(s.to_string()))
+
+        }
+    }
 }
 
 impl Default for FactValue {
@@ -366,7 +406,7 @@ impl FromArgMatches for Fact {
         };
         let attr = Attrib::get_matches(&matches);
         let notes = Note::get_matches(&matches);
-        if let Some(value) = matches.value_of("VALUE") {
+        if let Ok(value) = matches.value_of_t::<FactValue>("VALUE") {
             let units = Units::from_match(matches.values_of("UNIT"));
             Self::new(name.into(), value.into(), units, attr, notes)
         } else {

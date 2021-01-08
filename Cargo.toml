@@ -38,7 +38,7 @@ serde_json = {version = "1.0.60", features = ["preserve_order"]}
 # dashmap = { version = "*", features = ["serde"] }
 # grep-cli = "*"
 # edit = "*"
-chrono-humanize = "0.1.1"
+# chrono-humanize = "0.1.1"
 chrono-english = "0.1.4"
 chrono-tz = "0.5.3"
 # glob = "*"
@@ -46,6 +46,9 @@ sled = "*"
 lazy_static = "1.4.0"
 strsim = "0.10.0"
 humantime = "2.0.1"
+humantime-serde = "1.0.1"
+# meval = "0.2.0"
+# humanize-rs = "0.1.5"
 
 [dev_dependencies]
 assert_cmd = "1.0.2"

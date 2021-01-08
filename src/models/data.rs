@@ -1,7 +1,7 @@
 use crate::{
     util,
     models::{
-        Entry, Units, Action, Note, Item, fact::{Fact, AbstractFact},
+        Entry, Units, Action, Note, Item, fact::{FactValue, Fact, AbstractFact},
         Attrib, Relation,
         Record,
     },
@@ -38,6 +38,7 @@ pub struct RecordData {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FactData {
     facts: Vec<Fact>,
+    custom_values: Vec<FactValue>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

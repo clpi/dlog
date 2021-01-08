@@ -131,15 +131,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chrono-humanize"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f0a4c32145b4db85fe1c4f2b125a4f9493769df424f5f84baf6b04ea8eaf33c9"
-dependencies = [
- "chrono",
-]
-
-[[package]]
 name = "chrono-tz"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -383,7 +374,6 @@ dependencies = [
  "byteorder",
  "chrono",
  "chrono-english",
- "chrono-humanize",
  "chrono-tz",
  "clap",
  "colored",
@@ -394,6 +384,7 @@ dependencies = [
  "dialoguer",
  "dirs-next",
  "humantime",
+ "humantime-serde",
  "indicatif",
  "lazy_static",
  "predicates",
@@ -649,6 +640,16 @@ name = "humantime"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c1ad908cc71012b7bea4d0c53ba96a8cba9962f048fa68d143376143d863b7a"
+
+[[package]]
+name = "humantime-serde"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac34a56cfd4acddb469cc7fff187ed5ac36f498ba085caf8bbc725e3ff474058"
+dependencies = [
+ "humantime",
+ "serde",
+]
 
 [[package]]
 name = "hyper"
