@@ -1,3 +1,4 @@
+
 use comfy_table::{
     Table, ContentArrangement, presets::{self, UTF8_BORDERS_ONLY},
     Cell, Attribute, Color as TColor, ToRow,
@@ -11,6 +12,7 @@ use crate::{
         item::Item,
         note::{Note, Notes},
         attrib::{Attrib, Attribs},
+        date::{Datelike, Duration, Recurring, RelativeTo},
     },
 };
 use uuid::Uuid;
@@ -63,44 +65,19 @@ pub enum FactValue {
     Integer(i32),
     RealNumber(f32),
     Option(HashMap<String, bool>), //TODO find a way to parse this
-    ExactDateTime(DateTime<Local>),
-    NaiveDateTime(chrono::NaiveDateTime),
-    Duration(std::time::Duration),
-    Day(chrono::Weekday, DayRelativeTo),
+    Datelike(Datelike),
+    Recurring(Recurring),
     Boolean(bool),
     Text(String),
     Range(f32, f32),
+    Duration(Duration),
     UserValue(String),
     UserEnum(UserEnum),
     Amount(i32, UserObject),
     None,
 }
 
-// TODO should really be RelatiTo::Next/Prev(DateEntity::Week/Day/Hour)
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-pub enum DayRelativeTo {
-    Now(DateTime<Local>),
-    Next(DateTime<Local>),
-    Last(DateTime<Local>),
-    Tomrrow(DateTime<Local>),
-    Every,
-    EveryOther,
-    FirstOfMonth,
-    SecondOfMonth,
-    ThirdOfMonth,
-    FourthOfMonth,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserObject(String);
-
-impl std::str::FromStr for DayRelativeTo {
-    type Err = std::convert::Infallible;
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // TODO implement
-        Ok(DayRelativeTo::Now(Local::now()))
-    }
-}
 
 impl std::cmp::PartialEq for FactValue {
     fn eq(&self, other: &FactValue) -> bool {
@@ -109,11 +86,18 @@ impl std::cmp::PartialEq for FactValue {
             (Self::Boolean(b1), Self::Boolean(b2)) => b1 == b2,
             (Self::Integer(i1), Self::Integer(i2)) => i1 == i2,
             (Self::Duration(d1), Self::Duration(d2)) => d1.eq(d2),
-            (Self::Day(d1, r1), Self::Day(d2, r2)) => if d1.eq(d2) { r1.eq(r2)  } else { false },
             (Self::UserEnum(ue1), Self::UserEnum(ue2)) => {
                 return false;
             }
-            (Self::ExactDateTime(d1), Self::ExactDateTime(d2)) => d1.eq(d2),
+            (Self::Date(d1), Self::Date(d2)) => match (d1, d2) {
+                (Datelike::Day(d1), Datelike::Day(d2)) => d1.eq(d2),
+                (Datelike::Date(d1), Datelike::Date(d2)) => d1.eq(d2),
+                (Datelike::Week(w1), Datelike::Week(w2)) => w1.eq(w2),
+                (Datelike::Weekday(w1), Datelike::Weekday(w2)) => w1.eq(w2),
+                (Datelike::Month(m1), Datelike::Month(m2)) => m1.eq(m2),
+                (Datelike::Year(m1), Datelike::Year(m2)) => m1.eq(m2),
+                _ => false,
+            },
             _ => false,
         }
     }
@@ -121,7 +105,6 @@ impl std::cmp::PartialEq for FactValue {
 
 impl std::cmp::Eq for FactValue {
     fn assert_receiver_is_total_eq(&self) {
-
     }
 }
 
@@ -151,15 +134,17 @@ impl std::str::FromStr for FactValue {
             } else if let Ok(time) = chrono_english::parse_date_string(
                 s, Local::now(), chrono_english::Dialect::Us
             ) {
-                return Ok(Self::ExactDateTime(time))
-            // } else if let Ok(time) = s.parse::<humantime::Timestamp>() {
-            //     return Ok(Self::NaiveDateTime(huma)))
+                return Ok(Self::Date(Datelike::Datetime(time)))
             } else if let Ok(num) = s.parse::<i32>() {
                 return Ok(Self::Integer(num))
             } else if let Ok(num) = s.parse::<f32>() {
                 return Ok(Self::RealNumber(num))
             } else if let Ok(day) = s.parse::<chrono::Weekday>() {
-                return Ok(Self::Day(day, DayRelativeTo::Next(Local::now())))
+                return Ok(Self::Date(Datelike::Weekday(day, Local::now())))
+            } else if let Ok(month) = s.parse::<chrono::Month>() {
+                return Ok(Self::Date(Datelike::Month(month, Local::now())))
+            } else if let Ok(day) = s.parse::<chrono::NaiveDate>() {
+                return Ok(Self::Date(Datelike::Day(day)))
             } else if let Ok(b) = s.parse::<bool>() {
                 return Ok(Self::Boolean(b))
             } else {
@@ -169,7 +154,7 @@ impl std::str::FromStr for FactValue {
             let s_s = s.split_whitespace().collect::<Vec<&str>>();
             match s_s[0] {
                 "last" | "next" | "this" => if let Ok(day) = s_s[1].parse::<chrono::Weekday>() {
-                    return Ok(Self::Day(day, DayRelativeTo::from_str(s_s[0]).unwrap()))
+                    return Ok(Self::Date(Date::Relative(RelativeDate::Next(NaiveDate::Day(day), None))))
                 } else {
                     return Ok(Self::Text(s.to_string()))
                 },
@@ -241,6 +226,21 @@ impl fmt::Display for FactValue {
             FactValue::Boolean(b) => f.write_fmt(format_args!("Bool value: {}", b)),
             FactValue::RealNumber(r) => f.write_fmt(format_args!("Real num: {}", r)),
             FactValue::Integer(i) => f.write_fmt(format_args!("Integer: {}", i)),
+            FactValue::Date(d) => match d {
+                Datelike::Relative(r) => match r {
+                    RelativeDate::Next(n, t) => match n {
+                        NaiveDate::Day(na) => write!(f, "Next {} at {:?}", na.to_string(), t),
+                        _ => write!(f, ""),
+                    },
+                    _ => write!(f, ""),
+                },
+                _ => write!(f, ""),
+                // DayRelativeTo::Next(now) => { write!(f, "Next {} from {}", d.to_string(), now.to_string()) },
+                // DayRelativeTo::Last(now) => { write!(f, "Last {} from {}", d.to_string(), now.to_string()) },
+                // DayRelativeTo::Now(now) => { write!(f, "Now, {}, {}", d, now) },
+                // DayRelativeTo::Every => { write!(f, "Every {}", d) },
+                // DayRelativeTo::Tomrrow(n) => { write!(f, "") }
+            }
             FactValue::Range(n1, n2) => {
                 f.write_fmt(format_args!("Range value from {} to {}",n1, n2))
             },

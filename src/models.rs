@@ -10,6 +10,7 @@ pub mod stats;
 pub mod value;
 pub mod relation;
 pub mod note;
+pub mod date;
 
 pub use note::{Note, Notes};
 pub use relation::Relation;

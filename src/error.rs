@@ -9,6 +9,7 @@ pub enum DError {
     Config(toml::de::Error),
     KeyRejected(ring::error::KeyRejected),
     ParsePath,
+    ParseDate,
     NotFound,
 }
 
@@ -27,6 +28,7 @@ impl error::Error for DError {
             DError::KeyRejected(ref err) => None,
             DError::ParsePath => None,
             DError::NotFound => None,
+            DError::ParseDate => None,
         }
     }
 
@@ -40,7 +42,8 @@ impl fmt::Display for DError {
             DError::Csv(ref err) => write!(f, "Csv error: {}", err),
             DError::ParsePath => write!(f, "Invalid path"),
             DError::NotFound => write!(f, "What you were looking for is not there"),
-            DError::KeyRejected(ref err) => write!(f, "Invalid key {}", err)
+            DError::KeyRejected(ref err) => write!(f, "Invalid key {}", err),
+            DError::ParseDate => write!(f, "Could not parse date"),
         }
     }
 }
