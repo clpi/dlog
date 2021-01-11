@@ -11,6 +11,7 @@ pub mod value;
 pub mod relation;
 pub mod note;
 pub mod date;
+pub mod topic;
 
 pub use note::{Note, Notes};
 pub use relation::Relation;
@@ -22,6 +23,7 @@ pub use attrib::Attrib;
 pub use graph::Graph;
 pub use stats::Stats;
 pub use action::Action;
+pub use topic::Topic;
 
 #[derive(Debug)]
 pub struct Object {
