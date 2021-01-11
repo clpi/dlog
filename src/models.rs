@@ -7,7 +7,6 @@ pub mod item;
 pub mod record;
 pub mod units;
 pub mod stats;
-pub mod value;
 pub mod relation;
 pub mod note;
 pub mod date;
@@ -15,8 +14,7 @@ pub mod topic;
 
 pub use note::{Note, Notes};
 pub use relation::Relation;
-pub use units::Units;
-pub use fact::Fact;
+pub use fact::{Unit, UserUnit, Fact, FactValue, AbstractFact};
 pub use record::Record;
 pub use item::Item;
 pub use attrib::Attrib;

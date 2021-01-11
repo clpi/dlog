@@ -1,9 +1,11 @@
 pub mod entry;
 pub mod value;
+pub mod units;
 
 pub use self::{
     entry::Fact,
     value::FactValue,
+    units::{UserUnit, Unit}
 };
 
 use comfy_table::{
@@ -14,7 +16,6 @@ use crate::{
     csv as csv, prompt,
     models::{
         Entry,
-        units::{Units, UserUnit},
         record::Record,
         item::Item,
         note::{Note, Notes},
@@ -28,15 +29,15 @@ use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
-// TODO add units
+// TODO add Unit
 #[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub struct AbstractFact {
     #[serde(rename="Id", default = "uuid::Uuid::new_v4")]
     pub id: uuid::Uuid,
     #[serde(rename="Fact")]
     pub name: String,
-    #[serde(rename="Units", default="Units::default")]
-    pub unit: Units,
+    #[serde(rename="Unit", default="Unit::default")]
+    pub unit: Unit,
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes", default="Vec::new")]
@@ -49,7 +50,7 @@ pub struct AbstractFact {
 impl Default for AbstractFact {
     fn default() -> Self {
         let name = prompt::prompt("Fact type name?").expect("Could not read prompt");
-        let unit = Units::prompt("Units? (Enter if not applicable): ");
+        let unit = Unit::prompt("Unit? (Enter if not applicable): ");
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         let notes = Note::prompt("fact", name.as_str()).unwrap();
         Self {
@@ -84,7 +85,7 @@ impl AbstractFact {
             .set_header(vec![
                 Cell::new("Fact Type").add_attribute(Attribute::Bold)
                     .fg(TColor::Cyan),
-                Cell::new("Units").add_attribute(Attribute::Bold),
+                Cell::new("Unit").add_attribute(Attribute::Bold),
                 Cell::new("Attributes").add_attribute(Attribute::Bold),
                 Cell::new("Notes").add_attribute(Attribute::Bold),
                 Cell::new("Created").add_attribute(Attribute::Bold),
@@ -119,16 +120,16 @@ impl FromArgMatches for AbstractFact {
             crate::prompt::prompt("Fact name?: ").unwrap().to_string()
         };
         let id = uuid::Uuid::new_v4();
-        let units = Units::from_match(matches.values_of("UNIT"));
-        let link_units = Units::from_match(matches.values_of("link-unit"));
+        let Unit = Unit::from_match(matches.values_of("UNIT"));
+        let link_Unit = Unit::from_match(matches.values_of("link-unit"));
         let attr = Attrib::get_links(&matches);
         let notes = Note::get_links(&matches);
-        let units = if link_units == Units::None { units } else { link_units };
+        let Unit = if link_Unit == Unit::None { Unit } else { link_Unit };
         Self { id,
             name,
             attribs: attr,
             notes,
-            unit: units,
+            unit: Unit,
             created_at: Local::now()
         }
     }

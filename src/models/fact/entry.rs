@@ -6,8 +6,7 @@ use crate::{
     csv as Csv, prompt,
     models::{
         Entry,
-        units::{Units, UserUnit},
-        fact::{FactValue, AbstractFact},
+        fact::{FactValue, AbstractFact, Unit, UserUnit},
         record::Record,
         item::Item,
         note::{Note, Notes},
@@ -32,8 +31,8 @@ pub struct Fact {
     pub name: String,
     #[serde(rename="Value")]
     pub val: FactValue,
-    #[serde(rename="Units", default="Units::default")]
-    pub unit: Units,
+    #[serde(rename="Units", default="Unit::default")]
+    pub unit: Unit,
     #[serde(rename="Attribute", default="Vec::new")]
     pub attribs: Vec<Attrib>,
     #[serde(rename="Notes", default="Vec::new")]
@@ -47,11 +46,11 @@ impl Fact {
     pub fn new(
         name: String,
         val: String,
-        unit: Units,
+        unit: Unit,
         attribs: Vec<Attrib>,
         notes: Vec<Note>) -> Self
     {
-        let unit = Units::from(unit);
+        let unit = Unit::from(unit);
         let val = FactValue::from(val);
         // TODO parse val into appropriate fact value
         Self {
@@ -155,7 +154,7 @@ impl Default for Fact {
         let name = prompt::prompt("Fact name?").unwrap();
         let val = prompt::prompt("Value name?").unwrap();
         // if config.propt_units {}
-        let unit = Units::prompt("Units? (Enter if not applicable): ");
+        let unit = Unit::prompt("Units? (Enter if not applicable): ");
         // if config.prompt.attribs {}
         let attribs = Attrib::prompt("Attributes? (Enter if not applicable): ");
         let notes = Note::prompt("fact", name.as_str()).unwrap();
@@ -196,7 +195,7 @@ impl FromArgMatches for Fact {
         let attribs = Attrib::get_matches(&matches);
         let notes = Note::get_matches(&matches);
         let val = FactValue::from_arg_matches(&matches);
-        let unit = Units::from_match(matches.values_of("UNIT"));
+        let unit = Unit::from_match(matches.values_of("UNIT"));
         Self {
             id: uuid::Uuid::new_v4(),
             created_at: Local::now(),
@@ -222,7 +221,7 @@ impl std::convert::TryFrom<csv::StringRecord> for Fact {
             val: FactValue::from(rec[1].to_string()),
             created_at: DateTime::parse_from_rfc2822(&rec[3])
                 .expect("Could not parse datetime").into(),
-            unit: Units::Other(UserUnit::from(rec[4].to_string())), //TODO handle date parsing
+            unit: Unit::Other(UserUnit::from(rec[4].to_string())), //TODO handle date parsing
             attribs: Attrib::from_col(&rec, 5),
             notes: Note::from_col(&rec, 6),
         };

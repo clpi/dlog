@@ -13,7 +13,7 @@ use uuid::Uuid;
 use chrono::{DateTime, Local};
 use crate::{
     util,
-    models::{Entry, Units, Item, fact::{Fact, AbstractFact}},
+    models::{Entry, Unit, Item, fact::{Fact, AbstractFact}},
 };
 use clap::{ArgMatches, FromArgMatches};
 

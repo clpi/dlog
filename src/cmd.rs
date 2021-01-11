@@ -23,7 +23,7 @@ use self::{
 };
 use crate::models::{
     Entry, Fact, Record, Item, Attrib,
-    note::Note, Action, Relation, value::FactValue, Units
+    note::Note, Action, Relation,  Unit, FactValue,
 };
 use colored::{Color, Colorize};
 use clap::{Arg, ArgMatches, Clap, FromArgMatches, Subcommand};
@@ -387,7 +387,7 @@ pub enum Filters {
     InItems(Vec<Item>),
     InRecord(Vec<Record>),
     WithAttribute(Vec<Attrib>),
-    WithUnit(Vec<Units>),
+    WithUnit(Vec<Unit>),
     NotesContaining(Vec<String>),
     NameContaining(Vec<String>),
     HasValue(Vec<FactValue>),

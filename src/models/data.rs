@@ -1,7 +1,7 @@
 use crate::{
     util,
     models::{
-        Entry, Units, Action, Note, Item, fact::{FactValue, Fact, AbstractFact},
+        Entry, Unit, Action, Note, Item, fact::{FactValue, Fact, AbstractFact},
         Attrib, Relation,
         Record,
     },
@@ -48,7 +48,7 @@ pub struct NoteData {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UnitsData {
-    units: Vec<Units>,
+    units: Vec<Unit>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
