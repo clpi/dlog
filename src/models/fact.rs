@@ -1,4 +1,3 @@
-
 use comfy_table::{
     Table, ContentArrangement, presets::{self, UTF8_BORDERS_ONLY},
     Cell, Attribute, Color as TColor, ToRow,
@@ -12,11 +11,11 @@ use crate::{
         item::Item,
         note::{Note, Notes},
         attrib::{Attrib, Attribs},
-        date::{Datelike, Duration, Recurring, RelativeTo},
+        date::{Datelike, Duration, RelativeTo, Recurring},
     },
 };
 use uuid::Uuid;
-use std::{fmt, path::PathBuf, collections::HashMap, str::FromStr};
+use std::{convert::TryFrom, fmt, path::PathBuf, collections::HashMap, str::FromStr};
 use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
@@ -77,6 +76,7 @@ pub enum FactValue {
     None,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserObject(String);
 
 impl std::cmp::PartialEq for FactValue {
@@ -85,16 +85,15 @@ impl std::cmp::PartialEq for FactValue {
             (Self::Text(t1), Self::Text(t2)) => t1 == t2,
             (Self::Boolean(b1), Self::Boolean(b2)) => b1 == b2,
             (Self::Integer(i1), Self::Integer(i2)) => i1 == i2,
-            (Self::Duration(d1), Self::Duration(d2)) => d1.eq(d2),
+            (Self::Duration(d1), Self::Duration(d2)) => d1.secs.eq(&d2.secs),
             (Self::UserEnum(ue1), Self::UserEnum(ue2)) => {
                 return false;
             }
-            (Self::Date(d1), Self::Date(d2)) => match (d1, d2) {
-                (Datelike::Day(d1), Datelike::Day(d2)) => d1.eq(d2),
-                (Datelike::Date(d1), Datelike::Date(d2)) => d1.eq(d2),
+            (Self::Datelike(d1), Self::Datelike(d2)) => match (d1, d2) {
+                (Datelike::Day(d1), Datelike::Day(d2)) => d1.eq(&d2),
                 (Datelike::Week(w1), Datelike::Week(w2)) => w1.eq(w2),
-                (Datelike::Weekday(w1), Datelike::Weekday(w2)) => w1.eq(w2),
-                (Datelike::Month(m1), Datelike::Month(m2)) => m1.eq(m2),
+                (Datelike::Weekday(w1, RelativeTo::Now(r1)), Datelike::Weekday(w2, RelativeTo::Now(r2))) => w1.eq(&w2) && r1.eq(&r2),
+                (Datelike::Month(m1, RelativeTo::Now(r1)), Datelike::Month(m2, RelativeTo::Now(r2))) => m1.eq(&m2),
                 (Datelike::Year(m1), Datelike::Year(m2)) => m1.eq(m2),
                 _ => false,
             },
@@ -129,22 +128,25 @@ impl std::str::FromStr for FactValue {
     type Err = std::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.contains(" ") {
+            if let Ok(dl) = Datelike::from_str(s) {
+                return Ok(Self::Datelike(dl));
+            }
             if let Ok(dur) = s.parse::<humantime::Duration>() {
-                return Ok(Self::Duration(dur.into()))
+                return Ok(Self::Duration(Duration::today(dur.as_secs() as u32)));
             } else if let Ok(time) = chrono_english::parse_date_string(
                 s, Local::now(), chrono_english::Dialect::Us
             ) {
-                return Ok(Self::Date(Datelike::Datetime(time)))
+                return Ok(Self::Datelike(Datelike::Datetime(time)))
             } else if let Ok(num) = s.parse::<i32>() {
                 return Ok(Self::Integer(num))
             } else if let Ok(num) = s.parse::<f32>() {
                 return Ok(Self::RealNumber(num))
             } else if let Ok(day) = s.parse::<chrono::Weekday>() {
-                return Ok(Self::Date(Datelike::Weekday(day, Local::now())))
+                return Ok(Self::Datelike(Datelike::Weekday(day, RelativeTo::Now(Local::now()))))
             } else if let Ok(month) = s.parse::<chrono::Month>() {
-                return Ok(Self::Date(Datelike::Month(month, Local::now())))
+                return Ok(Self::Datelike(Datelike::Month(month, RelativeTo::Now(Local::now()))))
             } else if let Ok(day) = s.parse::<chrono::NaiveDate>() {
-                return Ok(Self::Date(Datelike::Day(day)))
+                return Ok(Self::Datelike(Datelike::Day(day)))
             } else if let Ok(b) = s.parse::<bool>() {
                 return Ok(Self::Boolean(b))
             } else {
@@ -152,34 +154,8 @@ impl std::str::FromStr for FactValue {
             }
         } else {
             let s_s = s.split_whitespace().collect::<Vec<&str>>();
-            match s_s[0] {
-                "last" | "next" | "this" => if let Ok(day) = s_s[1].parse::<chrono::Weekday>() {
-                    return Ok(Self::Date(Date::Relative(RelativeDate::Next(NaiveDate::Day(day), None))))
-                } else {
-                    return Ok(Self::Text(s.to_string()))
-                },
-                "a" | "one" | "two" | "three" => {
-                    let amt = match s_s[1] {
-                        "one" => Some(1),
-                        "two" => Some(2),
-                        "three" => Some(3),
-                        "four" => Some(4),
-                        "a" => Some(1),
-                        _ => None, //TODO obviously handle this better, cardinal number to stirng method or something
-                    };
-                    if let Some(amt) = amt {
-                        let obj = UserObject(s_s[1].to_string());
-                        return Ok(Self::Amount(amt, obj));
-                    } else {
-                        return Ok(Self::Text(s.to_string()))
-                    }
-                },
-                _ => {
-                    return Ok(Self::Text(s.to_string()))
-                }
-            }
+            return Ok(Self::Text(s.to_string()))
         }
-
     }
 }
 impl FromArgMatches for FactValue {
@@ -226,21 +202,9 @@ impl fmt::Display for FactValue {
             FactValue::Boolean(b) => f.write_fmt(format_args!("Bool value: {}", b)),
             FactValue::RealNumber(r) => f.write_fmt(format_args!("Real num: {}", r)),
             FactValue::Integer(i) => f.write_fmt(format_args!("Integer: {}", i)),
-            FactValue::Date(d) => match d {
-                Datelike::Relative(r) => match r {
-                    RelativeDate::Next(n, t) => match n {
-                        NaiveDate::Day(na) => write!(f, "Next {} at {:?}", na.to_string(), t),
-                        _ => write!(f, ""),
-                    },
-                    _ => write!(f, ""),
-                },
-                _ => write!(f, ""),
-                // DayRelativeTo::Next(now) => { write!(f, "Next {} from {}", d.to_string(), now.to_string()) },
-                // DayRelativeTo::Last(now) => { write!(f, "Last {} from {}", d.to_string(), now.to_string()) },
-                // DayRelativeTo::Now(now) => { write!(f, "Now, {}, {}", d, now) },
-                // DayRelativeTo::Every => { write!(f, "Every {}", d) },
-                // DayRelativeTo::Tomrrow(n) => { write!(f, "") }
-            }
+            FactValue::Duration(d) => write!(f, "{}", d),
+            FactValue::Datelike(d) => write!(f, "Datelike {}", d),
+            FactValue::Recurring(r) => write!(f, "Recurring: {} every {}", r.date, r.event),
             FactValue::Range(n1, n2) => {
                 f.write_fmt(format_args!("Range value from {} to {}",n1, n2))
             },

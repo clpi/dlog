@@ -23,6 +23,10 @@ cargo install dlog
 
 ## Project goals
 - `01/05/21` Allow a record to be stored **independent** of absolute data directory, etc. -- records may be created per-project, or per-topic, for instance, in whatever directory the user calls (or specifies). However, a central record keep tracks of all records and enables all of the link info and interrelationships to persist even though records may be dispersed.
+-
+
+## Todo
+- $22:16$ $01/10/21$ Merge the idea of a "fact value" and "unit" model
 
 ## Author
 
