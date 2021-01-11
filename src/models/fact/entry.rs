@@ -20,6 +20,7 @@ use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
+
 /// A single key-value pair to be logged into a csv corresponding to the fact's
 /// name (key). Fact entries are automatically tagged with their time of entry
 /// and each entry may optionally be associated with a number of different attributes.

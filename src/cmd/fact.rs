@@ -2,8 +2,7 @@ use chrono::{DateTime, Local};
 use crate::{
     args::search::{Search, Filters},
     models::{
-        fact::{Fact, AbstractFact},
-        units::Units,
+        fact::{Fact, AbstractFact, Unit},
         note::Notes,
         item::Item,
         attrib::Attrib,
