@@ -6,7 +6,7 @@ use crate::{
     csv as csv, prompt,
     models::{
         Entry,
-        units::{Units, UserUnit},
+        fact::{Unit, UserUnit},
         record::Record,
         item::Item,
         note::{Note, Notes},
@@ -82,7 +82,7 @@ impl std::hash::Hash for FactValue {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserEnum {
-    possible_values: HashMap<FactValue, Option<Units>>,
+    possible_values: HashMap<FactValue, Option<Unit>>,
     choice: Option<usize>,
 }
 
