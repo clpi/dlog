@@ -26,7 +26,7 @@ cargo install dlog
 -
 
 ## Todo
-- $22:16$ $01/10/21$ Merge the idea of a "fact value" and "unit" model
+- $22:16$ $01/10/21$ Merge the idea of a "fact value" and "unit" model -- decide on how facts / values should be parsed and reuqested from the user, and if "units" are strictly necessary
 
 ## Author
 

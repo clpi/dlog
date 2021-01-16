@@ -5,11 +5,11 @@ pub mod graph;
 pub mod attrib;
 pub mod item;
 pub mod record;
-pub mod stats;
 pub mod relation;
 pub mod note;
 pub mod date;
 pub mod topic;
+pub mod user;
 
 pub use note::{Note, Notes};
 pub use relation::Relation;
@@ -18,9 +18,9 @@ pub use record::Record;
 pub use item::Item;
 pub use attrib::Attrib;
 pub use graph::Graph;
-pub use stats::Stats;
 pub use action::Action;
 pub use topic::Topic;
+pub use user::User;
 
 #[derive(Debug)]
 pub struct Object {

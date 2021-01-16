@@ -25,7 +25,6 @@ pub struct Recurring {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum RelativeTo {
     Now(DateTime<Local>),
-
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -34,6 +33,7 @@ pub struct InputDate {
     day_of_month: Option<usize>,
     month: Option<chrono::Month>,
 }
+
 
 #[derive(Debug, Clone, Serialize,  Deserialize)]
 pub struct Duration {
@@ -169,3 +169,4 @@ impl fmt::Display for Datelike {
         }
     }
 }
+

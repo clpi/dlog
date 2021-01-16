@@ -20,6 +20,7 @@ use serde::{Serialize, Deserialize};
 use chrono::{DateTime, Local};
 use clap::{ArgMatches, FromArgMatches};
 use colored::{Color, Colorize};
+use chrono_english::{parse_date_string, Dialect};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum FactValue {
@@ -90,19 +91,14 @@ impl std::str::FromStr for FactValue {
     type Err = std::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if !s.contains(" ") {
-            if let Ok(dl) = Datelike::from_str(s) {
-                return Ok(Self::Datelike(dl));
-            }
-            if let Ok(dur) = s.parse::<humantime::Duration>() {
-                return Ok(Self::Duration(Duration::today(dur.as_secs() as u32)));
-            } else if let Ok(time) = chrono_english::parse_date_string(
-                s, Local::now(), chrono_english::Dialect::Us
-            ) {
-                return Ok(Self::Datelike(Datelike::Datetime(time)))
-            } else if let Ok(num) = s.parse::<i32>() {
+            if let Ok(num) = s.parse::<i32>() {
                 return Ok(Self::Integer(num))
             } else if let Ok(num) = s.parse::<f32>() {
                 return Ok(Self::RealNumber(num))
+            } else if let Ok(dur) = s.parse::<humantime::Duration>() {
+                return Ok(Self::Duration(Duration::today(dur.as_secs() as u32)));
+            } else if let Ok(time) = parse_date_string(s, Local::now(), Dialect::Us) {
+                return Ok(Self::Datelike(Datelike::Datetime(time)))
             } else if let Ok(day) = s.parse::<chrono::Weekday>() {
                 return Ok(Self::Datelike(Datelike::Weekday(day, RelativeTo::Now(Local::now()))))
             } else if let Ok(month) = s.parse::<chrono::Month>() {

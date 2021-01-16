@@ -19,6 +19,7 @@ path = "src/lib.rs"
 # TODO switch colored for termcolor
 colored = "2.0.0"
 dirs-next = "2.0.0"
+lexical = "*"
 byteorder = "*"
 zerocopy = "*"
 serde = { version = "*", features = ["derive", "rc"] }
